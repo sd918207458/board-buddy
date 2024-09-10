@@ -1,5 +1,6 @@
 import Image from "next/image";
 import localFont from "next/font/local";
+import ProductList from '../components/ProductList'; // 导入 ProductList 组件
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
