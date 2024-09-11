@@ -1,4 +1,5 @@
 import React from 'react'
+import style from "./sidebar.module.css"
 
 const Sidebar = () => {
   return (
@@ -16,6 +17,7 @@ const Sidebar = () => {
     <div className="collapse-title text-xl font-medium">策略遊戲</div>
     <div className="collapse-content">
       <p>阿瓦隆</p>
+      <button className={style.button}>click me</button>
     </div>
   </div>
   <div className="collapse collapse-arrow join-item border-base-300 border">
