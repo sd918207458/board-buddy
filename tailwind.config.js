@@ -11,8 +11,14 @@ module.exports = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        "primary": "#5C6FC7", //board-buddy:primary color
-        "secondary": "#F9C748", //board-buddy:secondary color
+        primaryColor: {
+          DEFAULT: "#5C6FC7", // 默認主色
+          dark: '#4D5DA7',   // 暗色版本
+        } ,    //board-buddy:primary color
+        secondaryColor:{
+          DEFAULT: "#F9C748", // 默認主色
+          light: '#FAD065',   // 亮色版本
+        } ,    //board-buddy:secondary color
       },
     },
   },
