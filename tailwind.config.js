@@ -11,6 +11,8 @@ module.exports = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        "primary": "#5C6FC7", //board-buddy:primary color
+        "secondary": "#F9C748", //board-buddy:secondary color
       },
     },
   },

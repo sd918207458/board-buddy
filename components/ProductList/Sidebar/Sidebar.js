@@ -3,7 +3,7 @@ import React from 'react'
 const Sidebar = () => {
   return (
     <div>
-      <div className="join join-vertical w-full">
+      <div className="join join-vertical w-full bg-primary">
   <div className="collapse collapse-arrow join-item border-base-300 border">
     <input type="radio" name="my-accordion-4" defaultChecked />
     <div className="collapse-title text-xl font-medium">熱門遊戲</div>
