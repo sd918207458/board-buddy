@@ -1,0 +1,42 @@
+[
+    {
+        "orderId": "1001",
+        "customerName": "John Doe",
+        "orderDate": "2024-09-10",
+        "status": "Shipped",
+        "totalAmount": 250.75,
+        "items": [
+            {"productName": "Laptop", "quantity": 1, "price": 200.00},
+            {"productName": "Mouse", "quantity": 2, "price": 25.38}
+        ]
+    },
+    {
+        "orderId": "1002",
+        "customerName": "Jane Smith",
+        "orderDate": "2024-09-11",
+        "status": "Processing",
+        "totalAmount": 80.50,
+        "items": [
+            {"productName": "Keyboard", "quantity": 1, "price": 50.50},
+            {"productName": "USB Cable", "quantity": 3, "price": 10.00}
+        ]
+    },
+    {
+        "orderId": "1003",
+        "customerName": "Alice Johnson",
+        "orderDate": "2024-09-12",
+        "status": "Delivered",
+        "totalAmount": 150.00,
+        "items": [
+            {"productName": "Monitor", "quantity": 1, "price": 150.00}
+        ]
+    },
+    {
+        "orderId": "1004",
+        "customerName": "Bob Brown",
+        "orderDate": "2024-09-13",
+        "status": "Cancelled",
+        "totalAmount": 0.00,
+        "items": []
+    }
+]

@@ -151,7 +151,7 @@ export default function ShippingAddress() {
               {/* Modal Actions */}
               <div className="modal-action">
                 <form method="dialog">
-                  <button className="btn">Close</button>
+                  <button className="btn">新增地址</button>
                 </form>
               </div>
             </div>
