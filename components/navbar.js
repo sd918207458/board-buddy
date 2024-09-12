@@ -2,11 +2,124 @@ import React from "react";
 
 export default function Navbar() {
   return (
-    <div className="navbar bg-base-100">
+    <div className="navbar bg-[#003E52] text-white">
+      {/* 左側 LOGO 與導航按鈕 */}
       <div className="flex-1">
-        <a className="btn btn-ghost text-xl">daisyUI</a>
+        <a className="btn btn-ghost normal-case text-xl text-white">
+          <img
+            src="https://your-logo-url-here.com"
+            alt="Logo"
+            className="w-10 h-10 mr-2"
+          />
+        </a>
+        <nav className="flex space-x-6">
+          <a className="btn btn-ghost text-white flex flex-col items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M3 3h18v18H3V3z"
+              />
+            </svg>
+            <span>首頁</span>
+          </a>
+          <a className="btn btn-ghost text-white flex flex-col items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 12l8-8m0 0v4.8a9.2 9.2 0 01-9.2 9.2H4"
+              />
+            </svg>
+            <span>揪團</span>
+          </a>
+          <a className="btn btn-ghost text-white flex flex-col items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M3 3h18v18H3V3z"
+              />
+            </svg>
+            <span>商城</span>
+          </a>
+          <a className="btn btn-ghost text-white flex flex-col items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M3 3h18v18H3V3z"
+              />
+            </svg>
+            <span>討論區</span>
+          </a>
+          <a className="btn btn-ghost text-white flex flex-col items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M3 3h18v18H3V3z"
+              />
+            </svg>
+            <span>測驗</span>
+          </a>
+        </nav>
       </div>
-      <div className="flex-none">
+
+      {/* 右側登入與購物車按鈕 */}
+      <div className="flex items-center space-x-4">
+        <a className="btn btn-ghost text-white flex items-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            className="w-6 h-6 mr-2"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M5 3v4h4m6 16v-4h-4"
+            />
+          </svg>
+          <span>Login</span>
+        </a>
         <div className="dropdown dropdown-end">
           <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
             <div className="indicator">
@@ -39,37 +152,6 @@ export default function Navbar() {
               </div>
             </div>
           </div>
-        </div>
-        <div className="dropdown dropdown-end">
-          <div
-            tabIndex={0}
-            role="button"
-            className="btn btn-ghost btn-circle avatar"
-          >
-            <div className="w-10 rounded-full">
-              <img
-                alt="Tailwind CSS Navbar component"
-                src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-              />
-            </div>
-          </div>
-          <ul
-            tabIndex={0}
-            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
-          >
-            <li>
-              <a className="justify-between">
-                Profile
-                <span className="badge">New</span>
-              </a>
-            </li>
-            <li>
-              <a>Settings</a>
-            </li>
-            <li>
-              <a>Logout</a>
-            </li>
-          </ul>
         </div>
       </div>
     </div>

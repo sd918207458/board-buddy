@@ -1,9 +1,9 @@
 import React from "react";
 
-// 定義一個單獨的表格行組件
+// 定義表格行組件
 const TableRow = ({ user }) => {
   return (
-    <tr>
+    <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
       <th>
         <label>
           <input type="checkbox" className="checkbox" />
@@ -18,7 +18,9 @@ const TableRow = ({ user }) => {
           </div>
           <div>
             <div className="font-bold">{user.name}</div>
-            <div className="text-sm opacity-50">{user.location}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-300">
+              {user.location}
+            </div>
           </div>
         </div>
       </td>
@@ -29,7 +31,7 @@ const TableRow = ({ user }) => {
       </td>
       <td>{user.favoriteColor}</td>
       <th>
-        <button className="btn btn-ghost btn-xs">訂單詳情</button>
+        <button className="btn btn-primary btn-xs">訂單詳情</button>
       </th>
     </tr>
   );
@@ -38,10 +40,10 @@ const TableRow = ({ user }) => {
 // 主表格組件
 const UserTable = ({ users }) => {
   return (
-    <div className="overflow-x-auto">
-      <table className="table">
+    <div className="overflow-x-auto shadow-md rounded-lg">
+      <table className="table w-full">
         {/* 表頭 */}
-        <thead>
+        <thead className="bg-gray-200 dark:bg-gray-700">
           <tr>
             <th>
               <label>
@@ -60,16 +62,6 @@ const UserTable = ({ users }) => {
             <TableRow key={index} user={user} />
           ))}
         </tbody>
-        {/* 表尾
-        <tfoot>
-          <tr>
-            <th></th>
-            <th>Name</th>
-            <th>Job</th>
-            <th>Favorite Color</th>
-            <th></th>
-          </tr>
-        </tfoot> */}
       </table>
     </div>
   );

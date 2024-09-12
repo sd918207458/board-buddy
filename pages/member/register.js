@@ -6,95 +6,87 @@ export default function Register() {
   return (
     <>
       <Navbar />
-      <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
-        <div className="flex w-full max-w-sm mx-auto overflow-hidden bg-white rounded-lg shadow-lg dark:bg-gray-800 lg:max-w-4xl">
-          <div
-            className="hidden bg-cover lg:block lg:w-1/2"
-            style={{
-              backgroundImage:
-                'url("https://images.unsplash.com/photo-1606660265514-358ebbadc80d?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1575&q=80")',
-            }}
-          />
-          <div className="w-full px-6 py-8 md:px-8 lg:w-1/2">
-            <div className="flex justify-center mx-auto">
+      <div className="flex items-center justify-center min-h-screen bg-base-200">
+        <div className="card  max-w-sm lg:max-w-4xl bg-base-100 shadow-xl">
+
+          <div className="card-body w-full  px-6 py-8">
+            <div className="flex justify-center">
               <img
-                className="w-auto h-7 sm:h-8"
+                className="w-auto h-8"
                 src="https://merakiui.com/images/logo.svg"
-                alt=""
+                alt="Logo"
               />
             </div>
-            <p className="mt-3 text-xl text-center text-gray-600 dark:text-gray-200">
+
+            <h2 className="text-center text-2xl font-bold text-gray-700 dark:text-gray-200 mt-4">
               註冊
-            </p>
-            <div className="mt-4">
-              <label
-                className="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-200"
-                htmlFor="LoggingEmailAddress"
-              >
-                電子信箱
+            </h2>
+
+            {/* 電子信箱輸入欄 */}
+            <div className="form-control mt-4">
+              <label htmlFor="email" className="label">
+                <span className="label-text">電子信箱</span>
               </label>
               <input
-                id="LoggingEmailAddress"
-                className="block w-full px-4 py-2 text-gray-700 bg-white border rounded-lg dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring focus:ring-blue-300"
+                id="email"
                 type="email"
+                placeholder="example@example.com"
+                className="input input-bordered w-full"
               />
             </div>
-            <div className="mt-4">
-              <div className="flex justify-between">
-                <label
-                  className="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-200"
-                  htmlFor="loggingPassword"
-                >
-                  密碼
-                </label>
-              </div>
+
+            {/* 密碼欄位 */}
+            <div className="form-control mt-4">
+              <label htmlFor="password" className="label">
+                <span className="label-text">密碼</span>
+              </label>
               <input
-                id="loggingPassword"
-                className="block w-full px-4 py-2 text-gray-700 bg-white border rounded-lg dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring focus:ring-blue-300"
-                type="text"
+                id="password"
+                type="password"
+                placeholder="********"
+                className="input input-bordered w-full"
               />
             </div>
-            <div className="mt-4">
-              <div className="flex justify-between">
-                <label
-                  className="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-200 "
-                  htmlFor="loggingPassword"
-                >
-                  確認密碼
-                </label>
-              </div>
+
+            {/* 確認密碼欄位 */}
+            <div className="form-control mt-4">
+              <label htmlFor="confirmPassword" className="label">
+                <span className="label-text">確認密碼</span>
+              </label>
               <input
-                id="CheckPassword"
-                className="block w-full px-4 py-2 text-gray-700 bg-white border rounded-lg dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring focus:ring-blue-300"
-                type="text"
+                id="confirmPassword"
+                type="password"
+                placeholder="********"
+                className="input input-bordered w-full"
               />
             </div>
-            <div className="flex justify-center mx-auto">
-              <label className="label cursor-pointer">
-                <input type="checkbox" className=" checkbox-sm" />
+
+            {/* 條款與隱私政策 */}
+            <div className="form-control mt-4">
+              <label className="cursor-pointer label">
+                <input type="checkbox" className="checkbox checkbox-sm" />
                 <span className="label-text ml-2">
                   一旦創建賬戶，即意味著您同意我們的條款和隱私政策。
                 </span>
               </label>
             </div>
-            <div className="mt-0">
-              <button className="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-gray-800 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-50">
+
+            {/* 註冊按鈕 */}
+            <div className="mt-6">
+              <button className="btn btn-primary w-full">
                 註冊
               </button>
             </div>
-            <div className="flex items-center justify-between mt-4">
-              <span className="w-1/5 border-b dark:border-gray-600 md:w-1/4" />
-              <span className="text-xs text-gray-500 uppercase dark:text-gray-400">
-                已經有帳戶了?快
-                <a
-                  href="login"
-                  className="text-xs text-gray-500 uppercase dark:text-gray-400 hover:underline"
-                >
+
+            {/* 已有帳戶提示 */}
+            <div className="flex items-center justify-center mt-4">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                已經有帳戶了?{" "}
+                <a href="login" className="link">
                   登入
                 </a>
                 吧!
               </span>
-              <span className="w-1/5 border-b dark:border-gray-600 md:w-1/4" />
             </div>
           </div>
         </div>
