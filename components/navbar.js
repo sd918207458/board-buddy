@@ -7,48 +7,67 @@ import {
   GiCat,
   GiPerson,
 } from "react-icons/gi";
+import Link from "next/link";
 
 export default function Navbar() {
   return (
     <div className="navbar bg-[#003E52] text-white">
       {/* 左側 LOGO 與導航按鈕 */}
       <div className="flex-1">
-        <a className="btn btn-ghost normal-case text-xl text-white">
+        <Link href="/" className="btn btn-ghost normal-case text-xl text-white">
           <img
             src="https://your-logo-url-here.com"
             className="w-10 h-10 mr-2"
           />
-        </a>
+        </Link>
         <nav className="flex space-x-6">
-          <a className="btn btn-ghost text-white flex flex-col items-center">
+          <Link
+            href="/"
+            className="btn btn-ghost text-white flex flex-col items-center"
+          >
             <GiHouse className="w-6 h-6" />
             <span>首頁</span>
-          </a>
-          <a className="btn btn-ghost text-white flex flex-col items-center">
+          </Link>
+          <Link
+            href="/group"
+            className="btn btn-ghost text-white flex flex-col items-center"
+          >
             <GiThreeFriends className="w-6 h-6" />
             <span>揪團</span>
-          </a>
-          <a className="btn btn-ghost text-white flex flex-col items-center">
+          </Link>
+          <Link
+            href="/shop"
+            className="btn btn-ghost text-white flex flex-col items-center"
+          >
             <GiShoppingBag className="w-6 h-6" />
             <span>商城</span>
-          </a>
-          <a className="btn btn-ghost text-white flex flex-col items-center">
+          </Link>
+          <Link
+            href="/forum"
+            className="btn btn-ghost text-white flex flex-col items-center"
+          >
             <GiTalk className="w-6 h-6" />
             <span>討論區</span>
-          </a>
-          <a className="btn btn-ghost text-white flex flex-col items-center">
+          </Link>
+          <Link
+            href="/quiz"
+            className="btn btn-ghost text-white flex flex-col items-center"
+          >
             <GiCat className="w-6 h-6" />
             <span>測驗</span>
-          </a>
+          </Link>
         </nav>
       </div>
 
       {/* 右側登入與購物車按鈕 */}
       <div className="flex items-center space-x-4">
-        <a className="btn btn-ghost text-white flex items-center">
+        <Link
+          href="/member/login"
+          className="btn btn-ghost text-white flex items-center"
+        >
           <GiPerson className="w-6 h-6" />
           <span>Login</span>
-        </a>
+        </Link>
         <div className="dropdown dropdown-end">
           <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
             <div className="indicator">
