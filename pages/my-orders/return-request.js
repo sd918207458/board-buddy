@@ -13,7 +13,7 @@ export default function ReturnRequest() {
             <Breadcrumbs />
           </div>
           <section className="max-w-4xl p-6 mx-auto bg-white rounded-md shadow-md dark:bg-gray-800 ">
-            <h2 className="text-lg font-semibold text-gray-700 capitalize dark:text-white ">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6 text-center">
               退換貨處理
             </h2>
           </section>
