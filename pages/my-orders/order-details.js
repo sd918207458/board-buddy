@@ -143,7 +143,7 @@ export default function OrderDetails() {
                   <td>$999</td>
                   <td>1</td>
                   <td>
-                    <button className="btn btn-primary btn-xs">再次購買</button>
+                    <button className="btn btn-neutral btn-xs">再次購買</button>
                   </td>
                 </tr>
               </tbody>

@@ -20,7 +20,7 @@ export default function OrderTracking() {
               我的訂單
             </h2>
           </section>
-          <div role="tablist" className="tabs tabs-bordered ">
+          <div role="tablist" className="tabs tabs-boxed justify-center">
             <input
               type="radio"
               name="my_tabs_1"

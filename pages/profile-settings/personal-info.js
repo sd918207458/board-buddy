@@ -9,29 +9,31 @@ export default function PersonalInfo() {
     <>
       <Navbar />
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52]">
-        <div className="card w-full max-w-lg mx-auto overflow-hidden bg-base-100 shadow-lg lg:max-w-4xl">
+        <div className="card w-full max-w-lg mx-auto overflow-hidden bg-white dark:bg-gray-800 shadow-lg lg:max-w-4xl rounded-lg">
           <div className="w-full p-4">
             <Breadcrumbs />
           </div>
 
           <section className="p-6">
-            <h2 className="text-2xl font-semibold text-gray-700 dark:text-white text-center">
+            <h2 className="text-2xl font-semibold text-[#003E52] dark:text-white text-center">
               個人資料設定
             </h2>
 
             <form>
               {/* 上傳頭像 */}
               <div className="form-control my-4 items-center">
-                <label className="label">上傳頭像</label>
+                <label className="label text-gray-700 dark:text-gray-300">
+                  上傳頭像
+                </label>
                 <div className="flex items-center space-x-4">
                   <div className="avatar">
-                    <div className="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                    <div className="w-24 rounded-full ring ring-[#036672] ring-offset-base-100 ring-offset-2">
                       <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
                     </div>
                   </div>
                   <label htmlFor="file" className="flex items-center">
                     <input type="file" id="file" className="hidden" />
-                    <button className="btn btn-outline btn-primary">
+                    <button className="btn btn-outline btn-neutral bg-[#036672] border-none text-white hover:bg-[#024c52]">
                       上傳 & 移除
                     </button>
                   </label>
@@ -41,74 +43,92 @@ export default function PersonalInfo() {
               {/* 使用者資料輸入 */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="form-control">
-                  <label htmlFor="username" className="label">
+                  <label
+                    htmlFor="username"
+                    className="label text-gray-700 dark:text-gray-300"
+                  >
                     <span className="label-text">使用者名稱</span>
                   </label>
                   <input
                     id="username"
                     type="text"
-                    className="input input-bordered"
+                    className="input input-bordered border-[#036672] focus:border-[#024c52]"
                   />
                 </div>
 
                 <div className="form-control">
-                  <label htmlFor="phone" className="label">
+                  <label
+                    htmlFor="phone"
+                    className="label text-gray-700 dark:text-gray-300"
+                  >
                     <span className="label-text">手機號碼</span>
                   </label>
                   <input
                     id="phone"
                     type="text"
-                    className="input input-bordered"
+                    className="input input-bordered border-[#036672] focus:border-[#024c52]"
                   />
                 </div>
 
                 <div className="form-control">
-                  <label htmlFor="emailAddress" className="label">
+                  <label
+                    htmlFor="emailAddress"
+                    className="label text-gray-700 dark:text-gray-300"
+                  >
                     <span className="label-text">電子信箱</span>
                   </label>
                   <input
                     id="emailAddress"
                     type="email"
-                    className="input input-bordered"
+                    className="input input-bordered border-[#036672] focus:border-[#024c52]"
                   />
                 </div>
 
                 <div className="form-control">
-                  <label htmlFor="password" className="label">
+                  <label
+                    htmlFor="password"
+                    className="label text-gray-700 dark:text-gray-300"
+                  >
                     <span className="label-text">密碼</span>
                   </label>
                   <input
                     id="password"
                     type="password"
-                    className="input input-bordered"
+                    className="input input-bordered border-[#036672] focus:border-[#024c52]"
                   />
                 </div>
 
                 <div className="form-control">
-                  <label htmlFor="first_name" className="label">
+                  <label
+                    htmlFor="first_name"
+                    className="label text-gray-700 dark:text-gray-300"
+                  >
                     <span className="label-text">姓氏</span>
                   </label>
                   <input
                     id="first_name"
                     type="text"
-                    className="input input-bordered"
+                    className="input input-bordered border-[#036672] focus:border-[#024c52]"
                   />
                 </div>
 
                 <div className="form-control">
-                  <label htmlFor="last_name" className="label">
+                  <label
+                    htmlFor="last_name"
+                    className="label text-gray-700 dark:text-gray-300"
+                  >
                     <span className="label-text">名字</span>
                   </label>
                   <input
                     id="last_name"
                     type="text"
-                    className="input input-bordered"
+                    className="input input-bordered border-[#036672] focus:border-[#024c52]"
                   />
                 </div>
 
                 {/* 生日選擇器 */}
                 <div className="form-control">
-                  <label className="label">
+                  <label className="label text-gray-700 dark:text-gray-300">
                     <span className="label-text">生日</span>
                   </label>
                   <DatePicker1 />
@@ -116,10 +136,10 @@ export default function PersonalInfo() {
 
                 {/* 性別選擇 */}
                 <div className="form-control">
-                  <label className="label">
+                  <label className="label text-gray-700 dark:text-gray-300">
                     <span className="label-text">性別</span>
                   </label>
-                  <select className="select select-bordered w-full mt-4">
+                  <select className="select select-bordered border-[#036672] focus:border-[#024c52] w-full mt-4">
                     <option disabled selected>
                       請選擇
                     </option>
@@ -131,10 +151,10 @@ export default function PersonalInfo() {
 
                 {/* 喜歡的遊戲類型 */}
                 <div className="form-control">
-                  <label className="label">
+                  <label className="label text-gray-700 dark:text-gray-300">
                     <span className="label-text">喜歡的遊戲類型</span>
                   </label>
-                  <select className="select select-bordered w-full">
+                  <select className="select select-bordered border-[#036672] focus:border-[#024c52] w-full">
                     <option disabled selected>
                       請選擇
                     </option>
@@ -145,10 +165,10 @@ export default function PersonalInfo() {
 
                 {/* 常玩時段 */}
                 <div className="form-control">
-                  <label className="label">
+                  <label className="label text-gray-700 dark:text-gray-300">
                     <span className="label-text">常玩時段</span>
                   </label>
-                  <select className="select select-bordered w-full">
+                  <select className="select select-bordered border-[#036672] focus:border-[#024c52] w-full">
                     <option disabled selected>
                       請選擇
                     </option>
@@ -160,7 +180,9 @@ export default function PersonalInfo() {
 
               {/* 保存修改按鈕 */}
               <div className="form-control mt-6">
-                <button className="btn btn-primary w-full">保存修改</button>
+                <button className="btn btn-primary w-full bg-[#036672] hover:bg-[#024c52] border-none">
+                  保存修改
+                </button>
               </div>
             </form>
           </section>

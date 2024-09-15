@@ -35,7 +35,7 @@ const TableRow = ({ user }) => {
       <td>{user.favoriteColor}</td>
       <th>
         <Link href={"./order-details"}>
-          <button className="btn btn-primary bg-[#003E52] btn-xs transition-transform transform hover:scale-105">
+          <button className="btn btn-neutral bg-[#003E52] btn-xs transition-transform transform hover:scale-105">
             訂單詳情
           </button>
         </Link>
