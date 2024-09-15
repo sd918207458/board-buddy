@@ -6,7 +6,7 @@ export default function Login() {
   return (
     <>
       <Navbar />
-      <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="flex items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
         <div className="flex w-full max-w-sm mx-auto overflow-hidden bg-white rounded-lg shadow-lg dark:bg-gray-800 lg:max-w-4xl">
           <div
             className="hidden bg-cover lg:block lg:w-1/2"
@@ -99,7 +99,7 @@ export default function Login() {
               />
             </div>
             <div className="mt-6">
-              <button className="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-gray-800 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-50">
+              <button className="btn btn-neutral btn-block bg-[#003E52] w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform btn-neutral  rounded-lg  focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-50">
                 登入
               </button>
             </div>

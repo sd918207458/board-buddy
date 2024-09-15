@@ -6,7 +6,7 @@ export default function Register() {
   return (
     <>
       <Navbar />
-      <div className="flex items-center justify-center min-h-screen bg-base-200">
+      <div className="flex items-center justify-center min-h-screen bg-[#003E52]">
         <div className="card  max-w-sm lg:max-w-4xl bg-base-100 shadow-xl">
 
           <div className="card-body w-full  px-6 py-8">
@@ -42,7 +42,7 @@ export default function Register() {
               </label>
               <input
                 id="password"
-                type="password"
+                type="text"
                 placeholder="********"
                 className="input input-bordered w-full"
               />
@@ -55,7 +55,7 @@ export default function Register() {
               </label>
               <input
                 id="confirmPassword"
-                type="password"
+                type="text"
                 placeholder="********"
                 className="input input-bordered w-full"
               />
@@ -73,7 +73,7 @@ export default function Register() {
 
             {/* 註冊按鈕 */}
             <div className="mt-6">
-              <button className="btn btn-primary w-full">
+              <button className="btn  w-full  btn-neutral btn-block bg-[#003E52]">
                 註冊
               </button>
             </div>
