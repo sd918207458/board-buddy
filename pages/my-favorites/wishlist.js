@@ -13,7 +13,7 @@ export default function Wishlist() {
             <Breadcrumbs />
           </div>
           <section className="max-w-4xl p-6 mx-auto bg-white rounded-md dark:bg-gray-800 ">
-            <h2 className="text-lg font-semibold text-gray-700 capitalize dark:text-white ">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6 text-center">
               我的收藏
             </h2>
           </section>
@@ -62,7 +62,7 @@ export default function Wishlist() {
             </div>
           </div>
 
-          <div className="join">
+          <div className="join items-center w-full justify-center">
             <button className="join-item btn">«</button>
             <button className="join-item btn">Page 1</button>
             <button className="join-item btn">Page 2</button>

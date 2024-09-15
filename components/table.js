@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 // 定義表格行組件
 const TableRow = ({ user }) => {
@@ -31,7 +32,11 @@ const TableRow = ({ user }) => {
       </td>
       <td>{user.favoriteColor}</td>
       <th>
-        <button className="btn btn-primary btn-xs">訂單詳情</button>
+        <Link href={"./order-details"}>
+          <button className="btn btn-primary bg-[#003E52] btn-xs">
+            訂單詳情
+          </button>
+        </Link>
       </th>
     </tr>
   );

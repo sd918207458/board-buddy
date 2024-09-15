@@ -1,125 +1,73 @@
 import React from "react";
+import {
+  GiHouse,
+  GiThreeFriends,
+  GiShoppingBag,
+  GiTalk,
+  GiCat,
+  GiPerson,
+} from "react-icons/gi";
+import Link from "next/link";
 
 export default function Navbar() {
   return (
     <div className="navbar bg-[#003E52] text-white">
       {/* 左側 LOGO 與導航按鈕 */}
       <div className="flex-1">
-        <a className="btn btn-ghost normal-case text-xl text-white">
+        <Link href="/" className="btn btn-ghost normal-case text-xl text-white">
           <img
             src="https://your-logo-url-here.com"
-            alt="Logo"
             className="w-10 h-10 mr-2"
           />
-        </a>
+        </Link>
         <nav className="flex space-x-6">
-          <a className="btn btn-ghost text-white flex flex-col items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M3 3h18v18H3V3z"
-              />
-            </svg>
+          <Link
+            href="/"
+            className="btn btn-ghost text-white flex flex-col items-center"
+          >
+            <GiHouse className="w-6 h-6" />
             <span>首頁</span>
-          </a>
-          <a className="btn btn-ghost text-white flex flex-col items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 12l8-8m0 0v4.8a9.2 9.2 0 01-9.2 9.2H4"
-              />
-            </svg>
+          </Link>
+          <Link
+            href="/group"
+            className="btn btn-ghost text-white flex flex-col items-center"
+          >
+            <GiThreeFriends className="w-6 h-6" />
             <span>揪團</span>
-          </a>
-          <a className="btn btn-ghost text-white flex flex-col items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M3 3h18v18H3V3z"
-              />
-            </svg>
+          </Link>
+          <Link
+            href="/shop"
+            className="btn btn-ghost text-white flex flex-col items-center"
+          >
+            <GiShoppingBag className="w-6 h-6" />
             <span>商城</span>
-          </a>
-          <a className="btn btn-ghost text-white flex flex-col items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M3 3h18v18H3V3z"
-              />
-            </svg>
+          </Link>
+          <Link
+            href="/forum"
+            className="btn btn-ghost text-white flex flex-col items-center"
+          >
+            <GiTalk className="w-6 h-6" />
             <span>討論區</span>
-          </a>
-          <a className="btn btn-ghost text-white flex flex-col items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M3 3h18v18H3V3z"
-              />
-            </svg>
+          </Link>
+          <Link
+            href="/quiz"
+            className="btn btn-ghost text-white flex flex-col items-center"
+          >
+            <GiCat className="w-6 h-6" />
             <span>測驗</span>
-          </a>
+          </Link>
         </nav>
       </div>
 
       {/* 右側登入與購物車按鈕 */}
       <div className="flex items-center space-x-4">
-        <a className="btn btn-ghost text-white flex items-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            className="w-6 h-6 mr-2"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M5 3v4h4m6 16v-4h-4"
-            />
-          </svg>
+        <Link
+          href="/member/login"
+          className="btn btn-ghost text-white flex items-center"
+        >
+          <GiPerson className="w-6 h-6" />
           <span>Login</span>
-        </a>
+        </Link>
         <div className="dropdown dropdown-end">
           <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
             <div className="indicator">
@@ -148,7 +96,9 @@ export default function Navbar() {
               <span className="text-lg font-bold">8 Items</span>
               <span className="text-info">Subtotal: $999</span>
               <div className="card-actions">
-                <button className="btn btn-primary btn-block">View cart</button>
+                <button className="btn btn-primary bg-[#003E52] btn-block">
+                  View cart
+                </button>
               </div>
             </div>
           </div>
