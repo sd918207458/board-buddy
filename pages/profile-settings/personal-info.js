@@ -8,7 +8,7 @@ export default function PersonalInfo() {
   return (
     <>
       <Navbar />
-      <div className="flex flex-col items-center justify-center min-h-screen bg-base-200">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52]">
         <div className="card w-full max-w-lg mx-auto overflow-hidden bg-base-100 shadow-lg lg:max-w-4xl">
           <div className="w-full p-4">
             <Breadcrumbs />

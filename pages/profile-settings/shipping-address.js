@@ -83,7 +83,7 @@ export default function ShippingAddress() {
   return (
     <>
       <Navbar />
-      <div className="flex flex-col items-center justify-center min-h-screen bg-base-200">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52]">
         <div className="w-full max-w-lg mx-auto bg-base-100 shadow-lg rounded-lg lg:max-w-4xl">
           <div className="w-full p-4">
             <Breadcrumbs />
