@@ -4,7 +4,7 @@ import Link from "next/link";
 // 定義表格行組件
 const TableRow = ({ user }) => {
   return (
-    <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
+    <tr className="hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 ease-in-out">
       <th>
         <label>
           <input type="checkbox" className="checkbox" />
@@ -18,7 +18,9 @@ const TableRow = ({ user }) => {
             </div>
           </div>
           <div>
-            <div className="font-bold">{user.name}</div>
+            <div className="font-bold text-gray-800 dark:text-gray-200">
+              {user.name}
+            </div>
             <div className="text-sm text-gray-500 dark:text-gray-300">
               {user.location}
             </div>
@@ -26,14 +28,14 @@ const TableRow = ({ user }) => {
         </div>
       </td>
       <td>
-        {user.company}
+        <span className="text-gray-700 dark:text-gray-300">{user.company}</span>
         <br />
         <span className="badge badge-ghost badge-sm">{user.jobTitle}</span>
       </td>
       <td>{user.favoriteColor}</td>
       <th>
         <Link href={"./order-details"}>
-          <button className="btn btn-primary bg-[#003E52] btn-xs">
+          <button className="btn btn-primary bg-[#003E52] btn-xs transition-transform transform hover:scale-105">
             訂單詳情
           </button>
         </Link>
@@ -48,7 +50,7 @@ const UserTable = ({ users }) => {
     <div className="overflow-x-auto shadow-md rounded-lg">
       <table className="table w-full">
         {/* 表頭 */}
-        <thead className="bg-gray-200 dark:bg-gray-700">
+        <thead className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
           <tr>
             <th>
               <label>

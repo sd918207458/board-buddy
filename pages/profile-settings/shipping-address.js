@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { motion } from "framer-motion"; // 引入 Framer Motion
 
 export default function ShippingAddress() {
-  // 狀態管理所有地址和當前編輯的地址
   const [addresses, setAddresses] = useState([]);
   const [formData, setFormData] = useState({
     username: "",
@@ -14,12 +14,13 @@ export default function ShippingAddress() {
     street: "",
     detailedAddress: "",
     isDefault: false,
-    id: null, // 用來標識當前是否為編輯狀態
+    id: null,
   });
 
-  const [isEditing, setIsEditing] = useState(false); // 是否在編輯狀態
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // 處理表單輸入的變更
+  // 處理表單變更
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -28,34 +29,23 @@ export default function ShippingAddress() {
     }));
   };
 
-  // 處理表單提交
+  // 表單提交處理
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (isEditing) {
-      // 編輯模式，更新現有地址
-      setAddresses((prev) =>
-        prev.map((addr) => (addr.id === formData.id ? formData : addr))
-      );
-    } else {
-      // 新增模式，添加新地址
-      setAddresses((prev) => [
-        ...prev,
-        { ...formData, id: Date.now() }, // 使用時間戳作為唯一ID
-      ]);
-    }
-    // 重置表單和編輯狀態
-    setFormData({
-      username: "",
-      phone: "",
-      city: "",
-      area: "",
-      street: "",
-      detailedAddress: "",
-      isDefault: false,
-      id: null,
-    });
-    setIsEditing(false);
-    document.getElementById("my_modal_4").close();
+    setIsLoading(true);
+
+    setTimeout(() => {
+      if (isEditing) {
+        setAddresses((prev) =>
+          prev.map((addr) => (addr.id === formData.id ? formData : addr))
+        );
+      } else {
+        setAddresses((prev) => [...prev, { ...formData, id: Date.now() }]);
+      }
+
+      setIsLoading(false);
+      closeModal();
+    }, 1000);
   };
 
   // 編輯地址
@@ -75,9 +65,25 @@ export default function ShippingAddress() {
     setAddresses((prev) =>
       prev.map((addr) => ({
         ...addr,
-        isDefault: addr.id === id, // 只有當前選中的設為預設
+        isDefault: addr.id === id,
       }))
     );
+  };
+
+  // 關閉模態框
+  const closeModal = () => {
+    setFormData({
+      username: "",
+      phone: "",
+      city: "",
+      area: "",
+      street: "",
+      detailedAddress: "",
+      isDefault: false,
+      id: null,
+    });
+    setIsEditing(false);
+    document.getElementById("my_modal_4").close();
   };
 
   return (
@@ -101,9 +107,26 @@ export default function ShippingAddress() {
             </h3>
           </section>
 
+          {/* 空狀態提示 */}
+          {addresses.length === 0 && (
+            <motion.div
+              className="text-center text-gray-500"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              尚未添加任何地址，請新增一個地址。
+            </motion.div>
+          )}
+
           {/* 地址列表 */}
           {addresses.map((address) => (
-            <div key={address.id} className="p-4">
+            <motion.div
+              key={address.id}
+              className="p-4"
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -50 }}
+            >
               <div className="card bg-base-100 shadow-xl w-full">
                 <div className="card-body">
                   <h2 className="card-title">{address.username}</h2>
@@ -136,31 +159,41 @@ export default function ShippingAddress() {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
 
           {/* 新增地址按鈕 */}
           <div className="p-4">
-            <div className="card bg-base-100 shadow-xl w-full">
+            <motion.div
+              className="card bg-base-100 shadow-xl w-full"
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
               <div className="card-body flex justify-between">
                 <h2 className="card-title">新增地址</h2>
                 <button
                   className="btn btn-primary"
-                  onClick={() => document.getElementById("my_modal_4").showModal()}
+                  onClick={() =>
+                    document.getElementById("my_modal_4").showModal()
+                  }
                 >
                   新增
                 </button>
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* 地址表單 Modal */}
           <dialog id="my_modal_4" className="modal">
-            <form className="modal-box w-11/12 max-w-5xl" onSubmit={handleSubmit}>
-              <h3 className="font-bold text-lg mb-4">{isEditing ? "編輯地址" : "新增地址"}</h3>
+            <form
+              className="modal-box w-11/12 max-w-5xl"
+              onSubmit={handleSubmit}
+            >
+              <h3 className="font-bold text-lg mb-4">
+                {isEditing ? "編輯地址" : "新增地址"}
+              </h3>
 
               <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
-                {/* 收貨人姓名 */}
                 <div className="form-control">
                   <label className="label" htmlFor="username">
                     <span className="label-text">收貨人姓名</span>
@@ -177,7 +210,6 @@ export default function ShippingAddress() {
                   />
                 </div>
 
-                {/* 收貨人手機 */}
                 <div className="form-control">
                   <label className="label" htmlFor="phone">
                     <span className="label-text">收貨人手機</span>
@@ -194,13 +226,11 @@ export default function ShippingAddress() {
                   />
                 </div>
 
-                {/* 收貨地址 */}
                 <div className="form-control col-span-2">
                   <label className="label">
                     <span className="label-text">收貨地址</span>
                   </label>
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                    {/* 城市選擇 */}
                     <select
                       name="city"
                       value={formData.city}
@@ -213,7 +243,6 @@ export default function ShippingAddress() {
                       <option value="新北市">新北市</option>
                     </select>
 
-                    {/* 區域選擇 */}
                     <select
                       name="area"
                       value={formData.area}
@@ -227,7 +256,6 @@ export default function ShippingAddress() {
                     </select>
                   </div>
 
-                  {/* 街道輸入 */}
                   <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
                     <input
                       type="text"
@@ -235,7 +263,6 @@ export default function ShippingAddress() {
                       value={formData.street}
                       onChange={handleChange}
                       placeholder="請輸入街道"
-                     
                       className="input input-bordered w-full"
                       required
                     />
@@ -268,7 +295,11 @@ export default function ShippingAddress() {
 
               {/* Modal Actions */}
               <div className="modal-action">
-                <button type="submit" className="btn btn-primary">
+                <button
+                  type="submit"
+                  className={`btn btn-primary ${isLoading ? "loading" : ""}`}
+                  disabled={isLoading}
+                >
                   {isEditing ? "保存修改" : "新增地址"}
                 </button>
                 <button

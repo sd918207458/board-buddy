@@ -20,7 +20,7 @@ export default function OrderTracking() {
               我的訂單
             </h2>
           </section>
-          <div role="tablist" className="tabs tabs-bordered">
+          <div role="tablist" className="tabs tabs-bordered ">
             <input
               type="radio"
               name="my_tabs_1"
@@ -28,7 +28,7 @@ export default function OrderTracking() {
               className="tab"
               aria-label="全部訂單"
             />
-            <div role="tabpanel" className="tab-content p-10">
+            <div role="tabpanel" className="tab-content p-10  ">
               <UserTable users={users} />
             </div>
 
@@ -62,10 +62,10 @@ export default function OrderTracking() {
               className="tab"
               aria-label="取消訂單"
             />
+          </div>
 
-            <div role="tabpanel" className="tab-content p-10 detail">
-              <UserTable users={users_1} />
-            </div>
+          <div role="tabpanel" className="tab-content p-10 detail">
+            <UserTable users={users_1} />
           </div>
 
           <div className="join items-center w-full justify-center">

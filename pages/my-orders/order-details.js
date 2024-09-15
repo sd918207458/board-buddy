@@ -2,13 +2,19 @@ import React from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { motion } from "framer-motion"; // 加入 Framer Motion 提升互動效果
 
 export default function OrderDetails() {
   return (
     <>
       <Navbar />
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
-        <div className="w-full max-w-4xl mx-auto overflow-hidden bg-white rounded-lg shadow-lg dark:bg-gray-800">
+        <motion.div
+          className="w-full max-w-4xl mx-auto overflow-hidden bg-white rounded-lg shadow-lg dark:bg-gray-800"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
           {/* BreadCrumbs */}
           <div className="p-4">
             <Breadcrumbs />
@@ -22,15 +28,20 @@ export default function OrderDetails() {
 
             {/* 訂單進度追蹤 */}
             <ul className="steps steps-vertical lg:steps-horizontal justify-center w-full">
-              <li className="step step-primary">Register</li>
-              <li className="step step-primary">Choose plan</li>
-              <li className="step">Purchase</li>
-              <li className="step">Receive Product</li>
+              <li className="step step-primary">訂單建立</li>
+              <li className="step step-primary">處理中</li>
+              <li className="step">已出貨</li>
+              <li className="step">完成訂單</li>
             </ul>
           </section>
-          {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6"> */}
+
           {/* 收貨人訊息 */}
-          <div className="overflow-x-auto px-4 py-6 ">
+          <motion.div
+            className="overflow-x-auto px-4 py-6"
+            initial={{ opacity: 0, x: -100 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+          >
             <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4 text-center">
               收貨人訊息
             </h3>
@@ -45,17 +56,22 @@ export default function OrderDetails() {
               </thead>
               <tbody>
                 <tr>
-                  <td>Username</td>
+                  <td>王大明</td>
                   <td>801高雄市前金區中正四路211號8號樓之1</td>
                   <td>0912345678</td>
                   <td>7-11門市</td>
                 </tr>
               </tbody>
             </table>
-          </div>
+          </motion.div>
 
           {/* 付款訊息 */}
-          <div className="overflow-x-auto px-4 py-6">
+          <motion.div
+            className="overflow-x-auto px-4 py-6"
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+          >
             <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4 text-center">
               付款訊息
             </h3>
@@ -79,11 +95,15 @@ export default function OrderDetails() {
                 </tr>
               </tbody>
             </table>
-          </div>
-          {/* </div> */}
+          </motion.div>
 
           {/* 訂單商品表單 */}
-          <div className="overflow-x-auto px-4 py-6">
+          <motion.div
+            className="overflow-x-auto px-4 py-6"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+          >
             <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4 text-center">
               商品列表
             </h3>
@@ -123,13 +143,13 @@ export default function OrderDetails() {
                   <td>$999</td>
                   <td>1</td>
                   <td>
-                    <button className="btn btn-ghost btn-xs">再次購買</button>
+                    <button className="btn btn-primary btn-xs">再次購買</button>
                   </td>
                 </tr>
               </tbody>
             </table>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
       <Footer />
     </>

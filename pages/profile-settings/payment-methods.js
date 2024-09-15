@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { motion } from "framer-motion"; // 使用 Framer Motion 加入動畫效果
 
 export default function PaymentMethods() {
   const [paymentMethods, setPaymentMethods] = useState([
@@ -24,6 +25,7 @@ export default function PaymentMethods() {
   });
 
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // 增加加載狀態
 
   // 處理表單輸入變更
   const handleChange = (e) => {
@@ -36,36 +38,35 @@ export default function PaymentMethods() {
 
   // 保存付款方式（新增或編輯）
   const handleSubmit = () => {
-    if (isEditing) {
-      // 編輯現有的付款方式
-      setPaymentMethods((prev) =>
-        prev.map((method) =>
-          method.id === currentMethod.id ? currentMethod : method
-        )
-      );
-    } else {
-      // 新增付款方式
-      setPaymentMethods((prev) => [
-        ...prev,
-        { ...currentMethod, id: Date.now() },
-      ]);
-    }
+    setIsLoading(true); // 設置加載狀態
+    setTimeout(() => {
+      if (isEditing) {
+        setPaymentMethods((prev) =>
+          prev.map((method) =>
+            method.id === currentMethod.id ? currentMethod : method
+          )
+        );
+      } else {
+        setPaymentMethods((prev) => [
+          ...prev,
+          { ...currentMethod, id: Date.now() },
+        ]);
+      }
 
-    // 確保只有一張卡被設為預設卡
-    if (currentMethod.isDefault) {
-      setPaymentMethods((prev) =>
-        prev.map((method) =>
-          method.id === currentMethod.id
-            ? { ...method, isDefault: true }
-            : { ...method, isDefault: false }
-        )
-      );
-    }
-
-    closeModal();
+      if (currentMethod.isDefault) {
+        setPaymentMethods((prev) =>
+          prev.map((method) =>
+            method.id === currentMethod.id
+              ? { ...method, isDefault: true }
+              : { ...method, isDefault: false }
+          )
+        );
+      }
+      setIsLoading(false); // 解除加載狀態
+      closeModal();
+    }, 1000); // 模擬加載延遲
   };
 
-  // 設置為預設付款方式
   const handleSetDefault = (id) => {
     setPaymentMethods((prev) =>
       prev.map((method) =>
@@ -76,20 +77,24 @@ export default function PaymentMethods() {
     );
   };
 
-  // 編輯付款方式
   const handleEdit = (method) => {
     setCurrentMethod(method);
     setIsEditing(true);
-    document.getElementById("my_modal_4").showModal();
+    openModal();
   };
 
-  // 刪除付款方式
   const handleDelete = (id) => {
     setPaymentMethods((prev) => prev.filter((method) => method.id !== id));
   };
 
-  // 重置表單並關閉模態框
+  const openModal = () => {
+    const modal = document.getElementById("my_modal_4");
+    if (modal) modal.showModal();
+  };
+
   const closeModal = () => {
+    const modal = document.getElementById("my_modal_4");
+    if (modal) modal.close();
     setCurrentMethod({
       id: null,
       cardholderName: "",
@@ -99,7 +104,6 @@ export default function PaymentMethods() {
       isDefault: false,
     });
     setIsEditing(false);
-    document.getElementById("my_modal_4").close();
   };
 
   return (
@@ -122,7 +126,13 @@ export default function PaymentMethods() {
 
               {/* 現有付款方式卡片 */}
               {paymentMethods.map((method) => (
-                <div key={method.id} className="card bg-base-100 shadow-xl mb-4">
+                <motion.div
+                  key={method.id}
+                  className="card bg-base-100 shadow-xl mb-4"
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -50 }}
+                >
                   <div className="card-body">
                     <h2 className="card-title">付款方式</h2>
                     <p>卡號: {method.cardNumber}</p>
@@ -151,7 +161,7 @@ export default function PaymentMethods() {
                       </button>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
 
               {/* 新增付款方式卡片 */}
@@ -162,7 +172,7 @@ export default function PaymentMethods() {
                     className="btn btn-primary"
                     onClick={() => {
                       setIsEditing(false);
-                      document.getElementById("my_modal_4").showModal();
+                      openModal();
                     }}
                   >
                     新增
@@ -251,15 +261,17 @@ export default function PaymentMethods() {
                     onChange={handleChange}
                     className="checkbox"
                   />
-                  <span className="label-text ml-2">
-                    設為我的預設付款方式
-                  </span>
+                  <span className="label-text ml-2">設為我的預設付款方式</span>
                 </label>
               </div>
 
               {/* Modal Actions */}
               <div className="modal-action">
-                <button className="btn btn-success" onClick={handleSubmit}>
+                <button
+                  className={`btn btn-success ${isLoading ? "loading" : ""}`}
+                  onClick={handleSubmit}
+                  disabled={isLoading} // 加載中時禁用按鈕
+                >
                   {isEditing ? "保存修改" : "新增錢包"}
                 </button>
                 <button className="btn" onClick={closeModal}>
@@ -274,4 +286,3 @@ export default function PaymentMethods() {
     </>
   );
 }
-
