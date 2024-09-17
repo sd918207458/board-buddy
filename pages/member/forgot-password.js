@@ -3,18 +3,83 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { motion, AnimatePresence } from "framer-motion";
 
+// 可重用的輸入欄位組件
+const InputField = ({ label, type, id, placeholder, value, onChange }) => (
+  <div className="form-control mt-4">
+    <label htmlFor={id} className="label">
+      <span className="label-text">{label}</span>
+    </label>
+    <input
+      id={id}
+      type={type}
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange}
+      className="input input-bordered w-full"
+    />
+  </div>
+);
+
 export default function ForgotPassword() {
-  const [showVerificationCode, setShowVerificationCode] = useState(false); // 控制驗證碼欄位顯示
-  const [showNewPasswordFields, setShowNewPasswordFields] = useState(false); // 控制新密碼和確認新密碼欄位顯示
+  const [showVerificationCode, setShowVerificationCode] = useState(false);
+  const [showNewPasswordFields, setShowNewPasswordFields] = useState(false);
+  const [email, setEmail] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  // 驗證電子信箱格式
+  const validateEmail = (email) => {
+    return /\S+@\S+\.\S+/.test(email);
+  };
 
   // 點擊「取得驗證碼」按鈕時觸發
   const handleGetVerificationCode = () => {
-    setShowVerificationCode(true);
+    if (!validateEmail(email)) {
+      setErrorMessage("請輸入有效的電子信箱");
+      return;
+    }
+    setErrorMessage("");
+    setIsLoading(true);
+
+    // 模擬驗證碼請求
+    setTimeout(() => {
+      setIsLoading(false);
+      setShowVerificationCode(true);
+    }, 1500);
   };
 
   // 點擊「送出驗證碼」按鈕時觸發
   const handleSubmitVerificationCode = () => {
+    if (verificationCode.length !== 6) {
+      setErrorMessage("請輸入有效的6位數驗證碼");
+      return;
+    }
+    setErrorMessage("");
     setShowNewPasswordFields(true);
+  };
+
+  // 提交重設密碼表單
+  const handleSubmitNewPassword = () => {
+    if (newPassword.length < 6) {
+      setErrorMessage("密碼至少需要6個字元");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setErrorMessage("兩次輸入的密碼不一致");
+      return;
+    }
+
+    setIsLoading(true);
+
+    // 模擬密碼重置請求
+    setTimeout(() => {
+      setIsLoading(false);
+      alert("密碼重置成功！");
+    }, 1500);
   };
 
   return (
@@ -35,25 +100,32 @@ export default function ForgotPassword() {
               忘記密碼
             </h2>
 
-            {/* 電子信箱輸入欄 */}
-            <div className="form-control mt-4">
-              <label htmlFor="LoggingEmailAddress" className="label">
-                <span className="label-text">電子信箱</span>
-              </label>
-              <div className="flex items-center">
-                <input
-                  id="LoggingEmailAddress"
-                  type="email"
-                  placeholder="example@example.com"
-                  className="input input-bordered w-full"
-                />
-                <button
-                  className="btn btn-neutral ml-2 bg-[#003E52]"
-                  onClick={handleGetVerificationCode}
-                >
-                  取得驗證碼
-                </button>
+            {/* 錯誤提示 */}
+            {errorMessage && (
+              <div className="text-red-500 text-center mt-4">
+                {errorMessage}
               </div>
+            )}
+
+            {/* 電子信箱輸入欄 */}
+            <InputField
+              label="電子信箱"
+              type="email"
+              id="LoggingEmailAddress"
+              placeholder="example@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <div className="mt-4 flex items-center">
+              <button
+                className={`btn btn-neutral bg-[#003E52] ${
+                  isLoading ? "loading" : ""
+                }`}
+                onClick={handleGetVerificationCode}
+                disabled={isLoading}
+              >
+                取得驗證碼
+              </button>
             </div>
 
             {/* AnimatePresence 讓驗證碼欄位帶有動畫效果 */}
@@ -74,7 +146,9 @@ export default function ForgotPassword() {
                     <input
                       id="VerificationCode"
                       type="text"
-                      placeholder="驗證碼"
+                      placeholder="6位數驗證碼"
+                      value={verificationCode}
+                      onChange={(e) => setVerificationCode(e.target.value)}
                       className="input input-bordered w-1/2"
                     />
                     <button
@@ -103,12 +177,24 @@ export default function ForgotPassword() {
                     <label htmlFor="NewPassword" className="label">
                       <span className="label-text">新密碼</span>
                     </label>
-                    <input
-                      id="NewPassword"
-                      type="password"
-                      placeholder="********"
-                      className="input input-bordered w-full"
-                    />
+                    <div className="relative">
+                      <input
+                        id="NewPassword"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="********"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="input input-bordered w-full"
+                      />
+                      {/* 密碼顯示/隱藏按鈕 */}
+                      <button
+                        type="button"
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? "隱藏" : "顯示"}
+                      </button>
+                    </div>
                   </motion.div>
 
                   <motion.div
@@ -124,8 +210,10 @@ export default function ForgotPassword() {
                     </label>
                     <input
                       id="ConfirmNewPassword"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       placeholder="********"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
                       className="input input-bordered w-full"
                     />
                   </motion.div>
@@ -144,7 +232,15 @@ export default function ForgotPassword() {
                   transition={{ duration: 0.5 }}
                   className="mt-6"
                 >
-                  <button className="btn btn-neutral btn-block bg-[#003E52]">確認送出</button>
+                  <button
+                    className={`btn btn-neutral btn-block bg-[#003E52] ${
+                      isLoading ? "loading" : ""
+                    }`}
+                    onClick={handleSubmitNewPassword}
+                    disabled={isLoading}
+                  >
+                    確認送出
+                  </button>
                 </motion.div>
               )}
             </AnimatePresence>

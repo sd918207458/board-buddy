@@ -1,286 +1,100 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import { motion } from "framer-motion"; // 使用 Framer Motion 加入動畫效果
+import AddressCard from "@/components/address/AddressCard";
+import AddressForm from "@/components/address/AddressForm";
+import { motion } from "framer-motion";
+import { useModal } from "@/hooks/useModal";
 
-export default function PaymentMethods() {
-  const [paymentMethods, setPaymentMethods] = useState([
-    {
-      id: 1,
-      cardholderName: "王大明",
-      cardNumber: "0000 0000 0000 0000",
-      expiryDate: "12/24",
-      isDefault: true,
-    },
-  ]);
-
-  const [currentMethod, setCurrentMethod] = useState({
-    id: null,
-    cardholderName: "",
-    cardNumber: "",
-    expiryDate: "",
-    cvv: "",
+export default function ShippingAddress() {
+  const [addresses, setAddresses] = useState([]);
+  const [formData, setFormData] = useState({
+    username: "",
+    phone: "",
+    city: "",
+    area: "",
+    street: "",
+    detailedAddress: "",
     isDefault: false,
+    id: null,
   });
 
   const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // 增加加載狀態
+  const [isLoading, setIsLoading] = useState(false);
+  const { isOpen, openModal, closeModal } = useModal();
 
-  // 處理表單輸入變更
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setCurrentMethod((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
+  // 提交表單處理
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsLoading(true);
 
-  // 保存付款方式（新增或編輯）
-  const handleSubmit = () => {
-    setIsLoading(true); // 設置加載狀態
     setTimeout(() => {
       if (isEditing) {
-        setPaymentMethods((prev) =>
-          prev.map((method) =>
-            method.id === currentMethod.id ? currentMethod : method
-          )
+        setAddresses((prev) =>
+          prev.map((addr) => (addr.id === formData.id ? formData : addr))
         );
       } else {
-        setPaymentMethods((prev) => [
-          ...prev,
-          { ...currentMethod, id: Date.now() },
-        ]);
+        setAddresses((prev) => [...prev, { ...formData, id: Date.now() }]);
       }
-
-      if (currentMethod.isDefault) {
-        setPaymentMethods((prev) =>
-          prev.map((method) =>
-            method.id === currentMethod.id
-              ? { ...method, isDefault: true }
-              : { ...method, isDefault: false }
-          )
-        );
-      }
-      setIsLoading(false); // 解除加載狀態
+      setIsLoading(false);
       closeModal();
-    }, 1000); // 模擬加載延遲
-  };
-
-  const handleSetDefault = (id) => {
-    setPaymentMethods((prev) =>
-      prev.map((method) =>
-        method.id === id
-          ? { ...method, isDefault: true }
-          : { ...method, isDefault: false }
-      )
-    );
-  };
-
-  const handleEdit = (method) => {
-    setCurrentMethod(method);
-    setIsEditing(true);
-    openModal();
-  };
-
-  const handleDelete = (id) => {
-    setPaymentMethods((prev) => prev.filter((method) => method.id !== id));
-  };
-
-  const openModal = () => {
-    const modal = document.getElementById("my_modal_4");
-    if (modal) modal.showModal();
-  };
-
-  const closeModal = () => {
-    const modal = document.getElementById("my_modal_4");
-    if (modal) modal.close();
-    setCurrentMethod({
-      id: null,
-      cardholderName: "",
-      cardNumber: "",
-      expiryDate: "",
-      cvv: "",
-      isDefault: false,
-    });
-    setIsEditing(false);
+    }, 1000);
   };
 
   return (
     <>
       <Navbar />
-      <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
-        <div className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-          <div className="px-6 py-4">
-            <Breadcrumbs />
-            <section className="max-w-4xl mx-auto mt-6">
-              <h2 className="text-lg font-semibold text-gray-700 capitalize dark:text-white mb-4">
-                我的錢包
-              </h2>
-            </section>
-
-            <section className="max-w-4xl mx-auto">
-              <h3 className="text-l font-semibold text-gray-700 capitalize dark:text-white mb-6">
-                常用錢包
-              </h3>
-
-              {/* 現有付款方式卡片 */}
-              {paymentMethods.map((method) => (
-                <motion.div
-                  key={method.id}
-                  className="card bg-base-100 shadow-xl mb-4"
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -50 }}
-                >
-                  <div className="card-body">
-                    <h2 className="card-title">付款方式</h2>
-                    <p>卡號: {method.cardNumber}</p>
-                    <p>到期日: {method.expiryDate}</p>
-                    {method.isDefault && (
-                      <span className="badge badge-primary">預設</span>
-                    )}
-                    <div className="flex justify-between">
-                      <button
-                        className="btn btn-primary"
-                        onClick={() => handleEdit(method)}
-                      >
-                        編輯
-                      </button>
-                      <button
-                        className="btn btn-error"
-                        onClick={() => handleDelete(method.id)}
-                      >
-                        刪除
-                      </button>
-                      <button
-                        className="btn btn-outline"
-                        onClick={() => handleSetDefault(method.id)}
-                      >
-                        設為預設
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-
-              {/* 新增付款方式卡片 */}
-              <div className="card bg-base-100 shadow-xl">
-                <div className="card-body flex justify-between">
-                  <h2 className="card-title">新增錢包</h2>
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => {
-                      setIsEditing(false);
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52]">
+        <div className="container mx-auto p-6 bg-white rounded-lg shadow-xl">
+          <Breadcrumbs />
+          <h2 className="text-2xl font-bold text-center text-gray-800">
+            我的地址
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6">
+            <div className="space-y-4">
+              {addresses.length > 0 ? (
+                addresses.map((address) => (
+                  <AddressCard
+                    key={address.id}
+                    address={address}
+                    handleEdit={() => {
+                      setIsEditing(true);
+                      setFormData(address);
                       openModal();
                     }}
-                  >
-                    新增
-                  </button>
-                </div>
-              </div>
-            </section>
-          </div>
-
-          {/* Modal for Editing/Adding Payment Method */}
-          <dialog id="my_modal_4" className="modal">
-            <div className="modal-box">
-              <h3 className="font-bold text-lg">
-                {isEditing ? "編輯錢包" : "新增錢包"}
-              </h3>
-
-              <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
-                {/* Cardholder's Name */}
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">付款人姓名</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="cardholderName"
-                    value={currentMethod.cardholderName}
-                    onChange={handleChange}
-                    placeholder="請輸入姓名"
-                    className="input input-bordered w-full"
+                    handleDelete={() => handleDelete(address.id)}
+                    handleSetDefault={() => handleSetDefault(address.id)}
                   />
+                ))
+              ) : (
+                <div className="text-center p-4 text-gray-800">
+                  <p>您目前沒有地址，請新增地址。</p>
                 </div>
-
-                {/* Credit Card Number */}
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">信用卡卡號</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="cardNumber"
-                    value={currentMethod.cardNumber}
-                    onChange={handleChange}
-                    placeholder="0000 0000 0000 0000"
-                    className="input input-bordered w-full"
-                  />
-                </div>
-
-                {/* Expiry Date */}
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">到期日</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="expiryDate"
-                    value={currentMethod.expiryDate}
-                    onChange={handleChange}
-                    placeholder="MM/YY"
-                    className="input input-bordered w-full"
-                  />
-                </div>
-
-                {/* CVV */}
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">驗證碼</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="cvv"
-                    value={currentMethod.cvv}
-                    onChange={handleChange}
-                    placeholder="CVV"
-                    className="input input-bordered w-full"
-                  />
-                </div>
-              </div>
-
-              {/* Set Default Payment Method */}
-              <div className="form-control mt-4">
-                <label className="cursor-pointer label">
-                  <input
-                    type="checkbox"
-                    name="isDefault"
-                    checked={currentMethod.isDefault}
-                    onChange={handleChange}
-                    className="checkbox"
-                  />
-                  <span className="label-text ml-2">設為我的預設付款方式</span>
-                </label>
-              </div>
-
-              {/* Modal Actions */}
-              <div className="modal-action">
-                <button
-                  className={`btn btn-success ${isLoading ? "loading" : ""}`}
-                  onClick={handleSubmit}
-                  disabled={isLoading} // 加載中時禁用按鈕
-                >
-                  {isEditing ? "保存修改" : "新增錢包"}
-                </button>
-                <button className="btn" onClick={closeModal}>
-                  取消
-                </button>
-              </div>
+              )}
             </div>
-          </dialog>
+          </div>
+          <button
+            className="btn btn-primary w-full bg-[#003E52]"
+            onClick={openModal}
+          >
+            新增地址
+          </button>
         </div>
+        {isOpen && (
+          <dialog open className="modal" onClose={closeModal}>
+            <AddressForm
+              formData={formData}
+              handleChange={(e) =>
+                setFormData({ ...formData, [e.target.name]: e.target.value })
+              }
+              handleSubmit={handleSubmit}
+              isEditing={isEditing}
+              isLoading={isLoading}
+              closeModal={closeModal}
+            />
+          </dialog>
+        )}
       </div>
       <Footer />
     </>
