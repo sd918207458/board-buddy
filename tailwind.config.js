@@ -12,13 +12,11 @@ module.exports = {
         background: "var(--background)",
         foreground: "var(--foreground)",
         primaryColor: {
-          DEFAULT: "#5C6FC7", // 默認主色
-          dark: '#4D5DA7',   // 暗色版本
-        } ,    //board-buddy:primary color
-        secondaryColor:{
-          DEFAULT: "#F9C748", // 默認主色
-          light: '#FAD065',   // 亮色版本
-        } ,    //board-buddy:secondary color
+          DEFAULT: "#0A4580", // 默認主色
+        }, //board-buddy:primary color
+        secondaryColor: {
+          DEFAULT: "#EFB880", // 默認主色
+        }, //board-buddy:secondary color
       },
     },
   },
