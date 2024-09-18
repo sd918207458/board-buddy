@@ -1,7 +1,13 @@
-<<<<<<< HEAD
-import Image from "next/image";
+
+import React from "react";
+
+
+export default function Home() {
+  return <div>Home</div>;
+}
+
+
 import localFont from "next/font/local";
-import ProductList from '../components/ProductList/ProductList'; // 导入 ProductList 组件
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -13,10 +19,3 @@ const geistMono = localFont({
   variable: "--font-geist-mono",
   weight: "100 900",
 });
-=======
-import React from "react";
->>>>>>> origin/main
-
-export default function Home() {
-  return <div>Home</div>;
-}
