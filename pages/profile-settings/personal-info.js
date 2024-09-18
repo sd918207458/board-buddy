@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -131,7 +131,7 @@ export default function PersonalInfo() {
                   <label className="label text-gray-700 dark:text-gray-300">
                     <span className="label-text">生日</span>
                   </label>
-                  <DatePicker1 />
+                  <DatePicker1 style="border-[#036672]" />
                 </div>
 
                 {/* 性別選擇 */}
@@ -159,7 +159,6 @@ export default function PersonalInfo() {
                       請選擇
                     </option>
                     <option>派對遊戲</option>
-                    <option>策略遊戲</option>
                   </select>
                 </div>
 
@@ -172,8 +171,6 @@ export default function PersonalInfo() {
                     <option disabled selected>
                       請選擇
                     </option>
-                    <option>上午10:00-12:00</option>
-                    <option>下午8:00-10:00</option>
                   </select>
                 </div>
               </div>
