@@ -1,0 +1,93 @@
+[
+    {
+      "order_id": "ORD001",
+      "member_id": "MEM001",
+      "order_date": "2024-09-01",
+      "order_status": "pending",
+      "total_amount": 120.50,
+      "shipping_address_id": "ADDR001",
+      "payment_method_id": "PAY001"
+    },
+    {
+      "order_id": "ORD002",
+      "member_id": "MEM002",
+      "order_date": "2024-09-03",
+      "order_status": "shipped",
+      "total_amount": 75.00,
+      "shipping_address_id": "ADDR002",
+      "payment_method_id": "PAY002"
+    },
+    {
+      "order_id": "ORD003",
+      "member_id": "MEM003",
+      "order_date": "2024-09-05",
+      "order_status": "delivered",
+      "total_amount": 320.75,
+      "shipping_address_id": "ADDR003",
+      "payment_method_id": "PAY003"
+    },
+    {
+      "order_id": "ORD004",
+      "member_id": "MEM004",
+      "order_date": "2024-09-07",
+      "order_status": "cancelled",
+      "total_amount": 50.00,
+      "shipping_address_id": "ADDR004",
+      "payment_method_id": "PAY004"
+    },
+    {
+      "order_id": "ORD005",
+      "member_id": "MEM005",
+      "order_date": "2024-09-10",
+      "order_status": "pending",
+      "total_amount": 200.99,
+      "shipping_address_id": "ADDR005",
+      "payment_method_id": "PAY005"
+    },
+    {
+      "order_id": "ORD006",
+      "member_id": "MEM006",
+      "order_date": "2024-09-12",
+      "order_status": "shipped",
+      "total_amount": 89.30,
+      "shipping_address_id": "ADDR006",
+      "payment_method_id": "PAY006"
+    },
+    {
+      "order_id": "ORD007",
+      "member_id": "MEM007",
+      "order_date": "2024-09-14",
+      "order_status": "delivered",
+      "total_amount": 140.20,
+      "shipping_address_id": "ADDR007",
+      "payment_method_id": "PAY007"
+    },
+    {
+      "order_id": "ORD008",
+      "member_id": "MEM008",
+      "order_date": "2024-09-15",
+      "order_status": "pending",
+      "total_amount": 60.45,
+      "shipping_address_id": "ADDR008",
+      "payment_method_id": "PAY008"
+    },
+    {
+      "order_id": "ORD009",
+      "member_id": "MEM009",
+      "order_date": "2024-09-18",
+      "order_status": "shipped",
+      "total_amount": 255.60,
+      "shipping_address_id": "ADDR009",
+      "payment_method_id": "PAY009"
+    },
+    {
+      "order_id": "ORD010",
+      "member_id": "MEM010",
+      "order_date": "2024-09-20",
+      "order_status": "delivered",
+      "total_amount": 170.80,
+      "shipping_address_id": "ADDR010",
+      "payment_method_id": "PAY010"
+    }
+  ]
+  
