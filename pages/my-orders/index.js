@@ -15,7 +15,7 @@ const Card = ({ title, description, href, image }) => (
     whileTap={{ scale: 0.95 }}
     className="card bg-[#036672] text-white shadow-lg hover:shadow-2xl transition-shadow w-full md:w-80 lg:w-96 cursor-pointer"
   >
-    <Link href={href} passHref>
+    <Link href={href}>
       <div className="card-body flex flex-row items-center">
         <div className="avatar">
           <div className="w-24 rounded-full ring ring-white ring-offset-base-100 ring-offset-2">
@@ -42,21 +42,21 @@ export default function MemberAccount() {
               <Breadcrumbs />
             </div>
 
-            {/* 第一行卡片 */}
+            {/* First row of cards */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10">
               {cardData.slice(0, 2).map((item, index) => (
                 <Card key={index} {...item} />
               ))}
             </div>
 
-            {/* 第二行卡片 */}
+            {/* Second row of cards */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10">
               {cardData.slice(2, 4).map((item, index) => (
                 <Card key={index} {...item} />
               ))}
             </div>
 
-            {/* 第三行卡片 */}
+            {/* Third row of cards */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10">
               {cardData.slice(4).map((item, index) => (
                 <Card key={index} {...item} />

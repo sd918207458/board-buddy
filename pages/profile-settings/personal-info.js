@@ -4,7 +4,6 @@ import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import dynamic from "next/dynamic";
 
-
 // 動態加載 DatePicker1 來避免 SSR 問題
 const DatePicker1 = dynamic(() => import("@/components/datepicker"), {
   ssr: false,
@@ -40,7 +39,7 @@ export default function PersonalInfo() {
             </h2>
 
             <form>
-              {/* 上傳頭像 */}
+              {/* Upload avatar */}
               <div className="form-control my-4 items-center">
                 <label className="label text-gray-700 dark:text-gray-300">
                   上傳頭像
@@ -60,7 +59,7 @@ export default function PersonalInfo() {
                 </div>
               </div>
 
-              {/* 使用者資料輸入 */}
+              {/* User information input */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="form-control">
                   <label
@@ -146,17 +145,15 @@ export default function PersonalInfo() {
                   />
                 </div>
 
-                {/* 生日選擇器 */}
+                {/* Date Picker */}
                 <div className="form-control">
                   <label className="label text-gray-700 dark:text-gray-300">
                     <span className="label-text">生日</span>
                   </label>
-                  <div className="flex">
-                    <DatePicker1 />
-                  </div>
+                  <DatePicker1 />
                 </div>
 
-                {/* 性別選擇 */}
+                {/* Gender selection */}
                 <div className="form-control">
                   <label className="label text-gray-700 dark:text-gray-300">
                     <span className="label-text">性別</span>
@@ -174,8 +171,7 @@ export default function PersonalInfo() {
                     <option>其他</option>
                   </select>
                 </div>
-
-                {/* 喜歡的遊戲類型 */}
+                {/* Game Type Selection */}
                 <div className="form-control">
                   <label className="label text-gray-700 dark:text-gray-300">
                     <span className="label-text">喜歡的遊戲類型</span>
@@ -188,11 +184,13 @@ export default function PersonalInfo() {
                     <option disabled value="">
                       請選擇
                     </option>
-                    <option>派對遊戲</option>
+                    <option value="party">派對遊戲</option>
+                    <option value="strategy">策略遊戲</option>
+                    <option value="role_playing">角色扮演遊戲</option>
                   </select>
                 </div>
 
-                {/* 常玩時段 */}
+                {/* Play Time Selection */}
                 <div className="form-control">
                   <label className="label text-gray-700 dark:text-gray-300">
                     <span className="label-text">常玩時段</span>
@@ -205,11 +203,13 @@ export default function PersonalInfo() {
                     <option disabled value="">
                       請選擇
                     </option>
+                    <option value="morning">上午10:00-12:00</option>
+                    <option value="evening">晚上8:00-10:00</option>
                   </select>
                 </div>
               </div>
 
-              {/* 保存修改按鈕 */}
+              {/* Save Changes Button */}
               <div className="form-control mt-6">
                 <button className="btn btn-primary w-full bg-[#036672] hover:bg-[#024c52] border-none">
                   保存修改
