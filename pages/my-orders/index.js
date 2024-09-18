@@ -9,7 +9,7 @@ import card_data from "../../components/UI.json/card_data.json";
 const cardData = card_data;
 
 // 統一色系的卡片組件
-const Card = ({ title, description, href }) => (
+const Card = ({ title, description, href, image }) => (
   <motion.div
     whileHover={{ scale: 1.05 }}
     whileTap={{ scale: 0.95 }}
@@ -19,7 +19,7 @@ const Card = ({ title, description, href }) => (
       <div className="card-body flex flex-row items-center">
         <div className="avatar">
           <div className="w-24 rounded-full ring ring-white ring-offset-base-100 ring-offset-2">
-            <img src="https://placekitten.com/200/200" alt="Avatar" />
+            <img src={image} alt="Avatar" />
           </div>
         </div>
         <div className="ml-4">

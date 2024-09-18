@@ -1,10 +1,30 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import DatePicker1 from "@/components/datepicker";
+import dynamic from "next/dynamic";
+
+
+// 動態加載 DatePicker1 來避免 SSR 問題
+const DatePicker1 = dynamic(() => import("@/components/datepicker"), {
+  ssr: false,
+});
 
 export default function PersonalInfo() {
+  const [gender, setGender] = useState("");
+  const [gameType, setGameType] = useState("");
+  const [playTime, setPlayTime] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
+
+  // 使用 useEffect 確保只在客戶端渲染
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null; // 在服務端渲染階段不渲染任何內容
+  }
+
   return (
     <>
       <Navbar />
@@ -131,7 +151,9 @@ export default function PersonalInfo() {
                   <label className="label text-gray-700 dark:text-gray-300">
                     <span className="label-text">生日</span>
                   </label>
-                  <DatePicker1 style="border-[#036672]" />
+                  <div className="flex">
+                    <DatePicker1 />
+                  </div>
                 </div>
 
                 {/* 性別選擇 */}
@@ -139,8 +161,12 @@ export default function PersonalInfo() {
                   <label className="label text-gray-700 dark:text-gray-300">
                     <span className="label-text">性別</span>
                   </label>
-                  <select className="select select-bordered border-[#036672] focus:border-[#024c52] w-full mt-4">
-                    <option disabled selected>
+                  <select
+                    className="select select-bordered border-[#036672] focus:border-[#024c52] w-full mt-4"
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value)}
+                  >
+                    <option disabled value="">
                       請選擇
                     </option>
                     <option>男</option>
@@ -154,8 +180,12 @@ export default function PersonalInfo() {
                   <label className="label text-gray-700 dark:text-gray-300">
                     <span className="label-text">喜歡的遊戲類型</span>
                   </label>
-                  <select className="select select-bordered border-[#036672] focus:border-[#024c52] w-full">
-                    <option disabled selected>
+                  <select
+                    className="select select-bordered border-[#036672] focus:border-[#024c52] w-full"
+                    value={gameType}
+                    onChange={(e) => setGameType(e.target.value)}
+                  >
+                    <option disabled value="">
                       請選擇
                     </option>
                     <option>派對遊戲</option>
@@ -167,8 +197,12 @@ export default function PersonalInfo() {
                   <label className="label text-gray-700 dark:text-gray-300">
                     <span className="label-text">常玩時段</span>
                   </label>
-                  <select className="select select-bordered border-[#036672] focus:border-[#024c52] w-full">
-                    <option disabled selected>
+                  <select
+                    className="select select-bordered border-[#036672] focus:border-[#024c52] w-full"
+                    value={playTime}
+                    onChange={(e) => setPlayTime(e.target.value)}
+                  >
+                    <option disabled value="">
                       請選擇
                     </option>
                   </select>

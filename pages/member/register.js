@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
+import { FaRegEye } from "react-icons/fa6";
+import { FaRegEyeSlash } from "react-icons/fa6";
 
 const InputField = ({ label, type, id, placeholder, value, onChange }) => (
   <div className="form-control mt-4">
@@ -112,7 +114,7 @@ export default function Register() {
                     className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? "隱藏" : "顯示"}
+                      {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
                   </button>
                 </div>
               </div>

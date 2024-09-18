@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { motion, AnimatePresence } from "framer-motion";
+import { FaRegEye } from "react-icons/fa6";
+import { FaRegEyeSlash } from "react-icons/fa6";
 
 // 可重用的輸入欄位組件
 const InputField = ({ label, type, id, placeholder, value, onChange }) => (
@@ -192,7 +194,7 @@ export default function ForgotPassword() {
                         className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600"
                         onClick={() => setShowPassword(!showPassword)}
                       >
-                        {showPassword ? "隱藏" : "顯示"}
+                        {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
                       </button>
                     </div>
                   </motion.div>
