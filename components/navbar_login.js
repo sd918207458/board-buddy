@@ -65,9 +65,14 @@ export default function Navbar() {
           href="/member/login"
           className="btn btn-ghost text-white flex items-center"
         >
-          <GiPerson className="w-6 h-6" />
-          <span>Login</span>
+          <div className="avatar">
+            <div className="w-12 rounded-full">
+              <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+            </div>
+          </div>
+          <span>Logout</span>
         </Link>
+
         <div className="dropdown dropdown-end">
           <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
             <div className="indicator">

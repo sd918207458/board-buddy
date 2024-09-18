@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useRouter } from "next/router";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { FaRegEye } from "react-icons/fa6";
@@ -11,7 +12,7 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-
+  const router = useRouter();
   // 模擬登入處理
   const handleLogin = (e) => {
     e.preventDefault();
@@ -21,11 +22,12 @@ export default function Login() {
     // 模擬一個假的登入請求
     setTimeout(() => {
       setIsLoading(false);
-      if (email !== "test@example.com" || password !== "password123") {
+      if (email !== "test@example.com" || password !== "123") {
         setErrorMessage("電子信箱或密碼錯誤");
       } else {
         // 登入成功，這裡可以進行跳轉或其他處理
         alert("登入成功！");
+        router.push("/profile-settings");
       }
     }, 1500);
   };
