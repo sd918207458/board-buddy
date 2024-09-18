@@ -1,5 +1,5 @@
 import React from "react";
-import Navbar from "@/components/navbar";
+import Navbar from "@/components/navbar_login";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Link from "next/link";
