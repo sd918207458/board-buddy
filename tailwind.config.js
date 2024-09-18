@@ -11,6 +11,12 @@ module.exports = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        primaryColor: {
+          DEFAULT: "#0A4580", // 默認主色
+        }, //board-buddy:primary color
+        secondaryColor: {
+          DEFAULT: "#EFB880", // 默認主色
+        }, //board-buddy:secondary color
       },
     },
   },
