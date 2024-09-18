@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { motion } from "framer-motion"; // 加入動畫
 
 export default function FAQ() {
   const [FAQData, setFAQData] = useState([]);
@@ -25,7 +26,7 @@ export default function FAQ() {
   return (
     <>
       <Navbar />
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
         <div className="w-full max-w-sm mx-auto overflow-hidden bg-white rounded-lg shadow-lg dark:bg-gray-800 lg:max-w-4xl p-6">
           <div className="w-full max-w-sm mx-auto lg:max-w-4xl mb-4">
             <Breadcrumbs />
@@ -37,15 +38,34 @@ export default function FAQ() {
 
           {/* 加載中或錯誤提示 */}
           {loading ? (
-            <p className="text-center text-gray-500 dark:text-gray-400">加載中...</p>
+            <div className="flex justify-center">
+              <motion.div
+                className="loader"
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 1 }}
+              >
+                <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+              </motion.div>
+            </div>
           ) : error ? (
-            <p className="text-center text-red-500">{error}</p>
+            <div className="text-center">
+              <p className="text-red-500 mb-4">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="btn btn-primary"
+              >
+                重新加載
+              </button>
+            </div>
           ) : (
             <div className="space-y-4">
               {FAQData.map((v, i) => (
-                <div
+                <motion.div
                   key={i}
                   className="collapse collapse-arrow border border-base-300 bg-base-200 rounded-box"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
                 >
                   <input type="checkbox" />
                   <div className="collapse-title text-xl font-medium">
@@ -54,7 +74,7 @@ export default function FAQ() {
                   <div className="collapse-content">
                     <p>{v.content}</p>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           )}

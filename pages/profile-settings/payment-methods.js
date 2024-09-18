@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { motion } from "framer-motion"; // 使用 Framer Motion 加入動畫效果
 
 export default function PaymentMethods() {
   const [paymentMethods, setPaymentMethods] = useState([
@@ -14,6 +15,12 @@ export default function PaymentMethods() {
     },
   ]);
 
+  const [isMounted, setIsMounted] = useState(false); // 用於追踪是否在客戶端
+
+  useEffect(() => {
+    setIsMounted(true); // 在客戶端掛載時設置
+  }, []);
+
   const [currentMethod, setCurrentMethod] = useState({
     id: null,
     cardholderName: "",
@@ -24,8 +31,8 @@ export default function PaymentMethods() {
   });
 
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // 增加加載狀態
 
-  // 處理表單輸入變更
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setCurrentMethod((prev) => ({
@@ -34,38 +41,36 @@ export default function PaymentMethods() {
     }));
   };
 
-  // 保存付款方式（新增或編輯）
   const handleSubmit = () => {
-    if (isEditing) {
-      // 編輯現有的付款方式
-      setPaymentMethods((prev) =>
-        prev.map((method) =>
-          method.id === currentMethod.id ? currentMethod : method
-        )
-      );
-    } else {
-      // 新增付款方式
-      setPaymentMethods((prev) => [
-        ...prev,
-        { ...currentMethod, id: Date.now() },
-      ]);
-    }
+    setIsLoading(true); // 設置加載狀態
+    setTimeout(() => {
+      if (isEditing) {
+        setPaymentMethods((prev) =>
+          prev.map((method) =>
+            method.id === currentMethod.id ? currentMethod : method
+          )
+        );
+      } else {
+        setPaymentMethods((prev) => [
+          ...prev,
+          { ...currentMethod, id: Date.now() },
+        ]);
+      }
 
-    // 確保只有一張卡被設為預設卡
-    if (currentMethod.isDefault) {
-      setPaymentMethods((prev) =>
-        prev.map((method) =>
-          method.id === currentMethod.id
-            ? { ...method, isDefault: true }
-            : { ...method, isDefault: false }
-        )
-      );
-    }
-
-    closeModal();
+      if (currentMethod.isDefault) {
+        setPaymentMethods((prev) =>
+          prev.map((method) =>
+            method.id === currentMethod.id
+              ? { ...method, isDefault: true }
+              : { ...method, isDefault: false }
+          )
+        );
+      }
+      setIsLoading(false); // 解除加載狀態
+      closeModal();
+    }, 1000); // 模擬加載延遲
   };
 
-  // 設置為預設付款方式
   const handleSetDefault = (id) => {
     setPaymentMethods((prev) =>
       prev.map((method) =>
@@ -76,20 +81,24 @@ export default function PaymentMethods() {
     );
   };
 
-  // 編輯付款方式
   const handleEdit = (method) => {
     setCurrentMethod(method);
     setIsEditing(true);
-    document.getElementById("my_modal_4").showModal();
+    openModal();
   };
 
-  // 刪除付款方式
   const handleDelete = (id) => {
     setPaymentMethods((prev) => prev.filter((method) => method.id !== id));
   };
 
-  // 重置表單並關閉模態框
+  const openModal = () => {
+    const modal = document.getElementById("my_modal_4");
+    if (modal) modal.showModal();
+  };
+
   const closeModal = () => {
+    const modal = document.getElementById("my_modal_4");
+    if (modal) modal.close();
     setCurrentMethod({
       id: null,
       cardholderName: "",
@@ -99,13 +108,12 @@ export default function PaymentMethods() {
       isDefault: false,
     });
     setIsEditing(false);
-    document.getElementById("my_modal_4").close();
   };
 
   return (
     <>
       <Navbar />
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
         <div className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
           <div className="px-6 py-4">
             <Breadcrumbs />
@@ -115,44 +123,50 @@ export default function PaymentMethods() {
               </h2>
             </section>
 
-            <section className="max-w-4xl mx-auto">
-              <h3 className="text-l font-semibold text-gray-700 capitalize dark:text-white mb-6">
-                常用錢包
-              </h3>
-
-              {/* 現有付款方式卡片 */}
-              {paymentMethods.map((method) => (
-                <div key={method.id} className="card bg-base-100 shadow-xl mb-4">
-                  <div className="card-body">
-                    <h2 className="card-title">付款方式</h2>
-                    <p>卡號: {method.cardNumber}</p>
-                    <p>到期日: {method.expiryDate}</p>
-                    {method.isDefault && (
-                      <span className="badge badge-primary">預設</span>
-                    )}
-                    <div className="flex justify-between">
-                      <button
-                        className="btn btn-primary"
-                        onClick={() => handleEdit(method)}
-                      >
-                        編輯
-                      </button>
-                      <button
-                        className="btn btn-error"
-                        onClick={() => handleDelete(method.id)}
-                      >
-                        刪除
-                      </button>
-                      <button
-                        className="btn btn-outline"
-                        onClick={() => handleSetDefault(method.id)}
-                      >
-                        設為預設
-                      </button>
+            <h3 className="text-l font-semibold text-gray-700 capitalize dark:text-white mb-6">
+              常用錢包
+            </h3>
+            <section className="max-w-4xl mx-auto grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
+              {/* 只有在客戶端掛載後才渲染 Framer Motion */}
+              {isMounted &&
+                paymentMethods.map((method) => (
+                  <motion.div
+                    key={method.id}
+                    className="card bg-base-100 shadow-xl mb-4 "
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -50 }}
+                  >
+                    <div className="card-body ">
+                      <h2 className="card-title">付款方式</h2>
+                      <p>卡號: {method.cardNumber}</p>
+                      <p>到期日: {method.expiryDate}</p>
+                      {method.isDefault && (
+                        <span className="badge badge-primary">預設</span>
+                      )}
+                      <div className="flex justify-between">
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => handleEdit(method)}
+                        >
+                          編輯
+                        </button>
+                        <button
+                          className="btn btn-error"
+                          onClick={() => handleDelete(method.id)}
+                        >
+                          刪除
+                        </button>
+                        <button
+                          className="btn btn-outline"
+                          onClick={() => handleSetDefault(method.id)}
+                        >
+                          設為預設
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              ))}
+                  </motion.div>
+                ))}
 
               {/* 新增付款方式卡片 */}
               <div className="card bg-base-100 shadow-xl">
@@ -162,7 +176,7 @@ export default function PaymentMethods() {
                     className="btn btn-primary"
                     onClick={() => {
                       setIsEditing(false);
-                      document.getElementById("my_modal_4").showModal();
+                      openModal();
                     }}
                   >
                     新增
@@ -180,21 +194,6 @@ export default function PaymentMethods() {
               </h3>
 
               <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
-                {/* Cardholder's Name */}
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">付款人姓名</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="cardholderName"
-                    value={currentMethod.cardholderName}
-                    onChange={handleChange}
-                    placeholder="請輸入姓名"
-                    className="input input-bordered w-full"
-                  />
-                </div>
-
                 {/* Credit Card Number */}
                 <div className="form-control">
                   <label className="label">
@@ -224,21 +223,6 @@ export default function PaymentMethods() {
                     className="input input-bordered w-full"
                   />
                 </div>
-
-                {/* CVV */}
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">驗證碼</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="cvv"
-                    value={currentMethod.cvv}
-                    onChange={handleChange}
-                    placeholder="CVV"
-                    className="input input-bordered w-full"
-                  />
-                </div>
               </div>
 
               {/* Set Default Payment Method */}
@@ -251,15 +235,17 @@ export default function PaymentMethods() {
                     onChange={handleChange}
                     className="checkbox"
                   />
-                  <span className="label-text ml-2">
-                    設為我的預設付款方式
-                  </span>
+                  <span className="label-text ml-2">設為我的預設付款方式</span>
                 </label>
               </div>
 
               {/* Modal Actions */}
               <div className="modal-action">
-                <button className="btn btn-success" onClick={handleSubmit}>
+                <button
+                  className={`btn btn-success ${isLoading ? "loading" : ""}`}
+                  onClick={handleSubmit}
+                  disabled={isLoading} // 加載中時禁用按鈕
+                >
                   {isEditing ? "保存修改" : "新增錢包"}
                 </button>
                 <button className="btn" onClick={closeModal}>
@@ -274,4 +260,3 @@ export default function PaymentMethods() {
     </>
   );
 }
-

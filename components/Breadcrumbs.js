@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 const Breadcrumbs = ({ customCrumbs }) => {
   const router = useRouter();
@@ -10,13 +11,26 @@ const Breadcrumbs = ({ customCrumbs }) => {
   // 如果有自定義 breadcrumbs 項，使用自定義的，否則使用當前路徑
   const breadcrumbs = customCrumbs || pathnames;
 
+  // 可以添加一個字典來映射更友好的名稱
+  const nameMapping = {
+    "profile-settings": "會員中心",
+    "my-favorites": "會員中心",
+    "my-orders": "會員中心",
+    "personal-info": "個人資料",
+    "FAQ": "常見問題",
+    "payment-methods": "付款方式",
+    "wishlist": "我的收藏",
+    "order-tracking": "訂單追蹤",
+    "order-details": "訂單明細",
+  };
+
   return (
-    <div className="breadcrumbs text-sm w-full rounded">
-      <ul className="flex">
+    <div className="breadcrumbs text-sm w-full rounded" aria-label="breadcrumb">
+      <ul className="flex items-center gap-2">
         {/* 第一個項目 "Home" */}
         <li>
           <Link href="/">
-            <div className="inline-flex items-center gap-2">
+            <div className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -35,37 +49,49 @@ const Breadcrumbs = ({ customCrumbs }) => {
           </Link>
         </li>
 
-        {/* 動態生成 breadcrumbs 項目 */}
-        {pathnames.map((name, index) => {
-          const routeTo = `/${pathnames.slice(0, index + 1).join("/")}`;
-          const isLast = index === pathnames.length - 1;
+        {/* 使用分隔符號 */}
+        {breadcrumbs.map((name, index) => {
+          const routeTo = `/${breadcrumbs.slice(0, index + 1).join("/")}`;
+          const isLast = index === breadcrumbs.length - 1;
 
-          return isLast ? (
-            // 如果是最後一個 breadcrumb 項，顯示 span (非鏈接)
-            <li key={index}>
-              <span className="inline-flex items-center gap-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  className="h-4 w-4 stroke-current"
+          const displayName =
+            nameMapping[name] || name.charAt(0).toUpperCase() + name.slice(1);
+
+          return (
+            <li key={index} className="flex items-center gap-2">
+              <span className="text-gray-500">/</span>
+
+              {isLast ? (
+                <motion.span
+                  className="inline-flex items-center gap-2 text-gray-700"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  ></path>
-                </svg>
-                {name.charAt(0).toUpperCase() + name.slice(1)}
-              </span>
-            </li>
-          ) : (
-            // 中間項顯示鏈接
-            <li key={index}>
-              <Link href={routeTo}>
-                <div>{name.charAt(0).toUpperCase() + name.slice(1)}</div>
-              </Link>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    className="h-4 w-4 stroke-current"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    ></path>
+                  </svg>
+                  {displayName}
+                </motion.span>
+              ) : (
+                <Link href={routeTo}>
+                  <motion.a
+                    className="text-blue-600 hover:text-blue-800 inline-flex items-center gap-2"
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    {displayName}
+                  </motion.a>
+                </Link>
+              )}
             </li>
           );
         })}
