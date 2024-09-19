@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import { motion } from "framer-motion";
+import { CSSTransition, TransitionGroup } from "react-transition-group";
 
 export default function FAQ() {
   const [FAQData, setFAQData] = useState([]);
@@ -53,25 +53,21 @@ export default function FAQ() {
               </button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <TransitionGroup className="space-y-4">
               {FAQData.map((faq, index) => (
-                <motion.div
-                  key={index}
-                  className="collapse collapse-arrow border border-base-300 bg-base-100 rounded-box"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <input type="checkbox" />
-                  <div className="collapse-title text-xl font-medium">
-                    {faq.title}
+                <CSSTransition key={index} timeout={300} classNames="fade">
+                  <div className="collapse collapse-arrow border border-base-300 bg-base-100 rounded-box">
+                    <input type="checkbox" />
+                    <div className="collapse-title text-xl font-medium">
+                      {faq.title}
+                    </div>
+                    <div className="collapse-content">
+                      <p>{faq.content}</p>
+                    </div>
                   </div>
-                  <div className="collapse-content">
-                    <p>{faq.content}</p>
-                  </div>
-                </motion.div>
+                </CSSTransition>
               ))}
-            </div>
+            </TransitionGroup>
           )}
         </div>
       </div>

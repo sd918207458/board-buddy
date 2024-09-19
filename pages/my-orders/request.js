@@ -2,6 +2,33 @@ import React, { useState, useEffect } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { CSSTransition } from "react-transition-group";
+
+// 可重用的輸入欄位組件
+const InputField = ({
+  label,
+  name,
+  type = "text",
+  value,
+  onChange,
+  required,
+}) => (
+  <div className="form-control">
+    <label htmlFor={name} className="label text-gray-700 dark:text-gray-300">
+      <span className="label-text">{label}</span>
+    </label>
+    <input
+      id={name}
+      name={name}
+      type={type}
+      value={value}
+      onChange={onChange}
+      className="input input-bordered border-[#036672] focus:border-[#024c52]"
+      placeholder={`請輸入${label}`}
+      required={required}
+    />
+  </div>
+);
 
 export default function Request() {
   const [isMounted, setIsMounted] = useState(false);
@@ -18,18 +45,13 @@ export default function Request() {
     returnReason: "",
   });
   const [submitMessage, setSubmitMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); // To show errors
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // Handle input changes
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  // Form validation
+  // 表單驗證邏輯
   const validateForm = () => {
     const {
       name,
@@ -60,11 +82,11 @@ export default function Request() {
     return null;
   };
 
-  // Handle form submission
+  // 表單提交處理
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setErrorMessage(""); // Reset error message
+    setErrorMessage("");
 
     const validationError = validateForm();
     if (validationError) {
@@ -74,7 +96,6 @@ export default function Request() {
     }
 
     try {
-      // Simulating form submission delay
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setSubmitMessage("提交成功！我們已收到您的退換貨申請。");
     } catch (error) {
@@ -84,9 +105,7 @@ export default function Request() {
     }
   };
 
-  if (!isMounted) {
-    return null; // Skip rendering on server
-  }
+  if (!isMounted) return null;
 
   return (
     <>
@@ -103,180 +122,99 @@ export default function Request() {
             </h2>
           </section>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="font m-4">
+          <form onSubmit={handleSubmit} className="m-4">
             <h2 className="text-xl font-semibold text-[#003E52] dark:text-white text-center">
               訂單資料
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {/* Name */}
-              <div className="form-control">
-                <label
-                  htmlFor="name"
-                  className="label text-gray-700 dark:text-gray-300"
-                >
-                  <span className="label-text">姓名</span>
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="input input-bordered border-[#036672] focus:border-[#024c52]"
-                  placeholder="請輸入姓名"
-                  required
-                />
-              </div>
-
-              {/* Email */}
-              <div className="form-control">
-                <label
-                  htmlFor="email"
-                  className="label text-gray-700 dark:text-gray-300"
-                >
-                  <span className="label-text">信箱</span>
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="input input-bordered border-[#036672] focus:border-[#024c52]"
-                  placeholder="請輸入信箱"
-                  required
-                />
-              </div>
+              <InputField
+                label="姓名"
+                name="name"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, [e.target.name]: e.target.value })
+                }
+                required
+              />
+              <InputField
+                label="信箱"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, [e.target.name]: e.target.value })
+                }
+                required
+              />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {/* Phone */}
-              <div className="form-control">
-                <label
-                  htmlFor="phone"
-                  className="label text-gray-700 dark:text-gray-300"
-                >
-                  <span className="label-text">手機號碼</span>
-                </label>
-                <input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="input input-bordered border-[#036672] focus:border-[#024c52]"
-                  placeholder="請輸入手機號碼"
-                  required
-                />
-              </div>
-
-              {/* Order Number */}
-              <div className="form-control">
-                <label
-                  htmlFor="orderNumber"
-                  className="label text-gray-700 dark:text-gray-300"
-                >
-                  <span className="label-text">訂單編號</span>
-                </label>
-                <input
-                  id="orderNumber"
-                  name="orderNumber"
-                  type="text"
-                  value={formData.orderNumber}
-                  onChange={handleChange}
-                  className="input input-bordered border-[#036672] focus:border-[#024c52]"
-                  placeholder="請輸入訂單編號"
-                  required
-                />
-              </div>
+              <InputField
+                label="手機號碼"
+                name="phone"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) =>
+                  setFormData({ ...formData, [e.target.name]: e.target.value })
+                }
+                required
+              />
+              <InputField
+                label="訂單編號"
+                name="orderNumber"
+                value={formData.orderNumber}
+                onChange={(e) =>
+                  setFormData({ ...formData, [e.target.name]: e.target.value })
+                }
+                required
+              />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {/* Order Date */}
-              <div className="form-control">
-                <label
-                  htmlFor="orderDate"
-                  className="label text-gray-700 dark:text-gray-300"
-                >
-                  <span className="label-text">訂單日期</span>
-                </label>
-                <input
-                  id="orderDate"
-                  name="orderDate"
-                  type="date"
-                  value={formData.orderDate}
-                  onChange={handleChange}
-                  className="input input-bordered border-[#036672] focus:border-[#024c52]"
-                  required
-                />
-              </div>
-
-              {/* Product Name */}
-              <div className="form-control">
-                <label
-                  htmlFor="productName"
-                  className="label text-gray-700 dark:text-gray-300"
-                >
-                  <span className="label-text">商品名稱</span>
-                </label>
-                <input
-                  id="productName"
-                  name="productName"
-                  type="text"
-                  value={formData.productName}
-                  onChange={handleChange}
-                  className="input input-bordered border-[#036672] focus:border-[#024c52]"
-                  placeholder="請輸入商品名稱"
-                  required
-                />
-              </div>
+              <InputField
+                label="訂單日期"
+                name="orderDate"
+                type="date"
+                value={formData.orderDate}
+                onChange={(e) =>
+                  setFormData({ ...formData, [e.target.name]: e.target.value })
+                }
+                required
+              />
+              <InputField
+                label="商品名稱"
+                name="productName"
+                value={formData.productName}
+                onChange={(e) =>
+                  setFormData({ ...formData, [e.target.name]: e.target.value })
+                }
+                required
+              />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {/* Product Model */}
-              <div className="form-control">
-                <label
-                  htmlFor="productModel"
-                  className="label text-gray-700 dark:text-gray-300"
-                >
-                  <span className="label-text">商品型號</span>
-                </label>
-                <input
-                  id="productModel"
-                  name="productModel"
-                  type="text"
-                  value={formData.productModel}
-                  onChange={handleChange}
-                  className="input input-bordered border-[#036672] focus:border-[#024c52]"
-                  placeholder="請輸入商品型號"
-                  required
-                />
-              </div>
-
-              {/* Product Quantity */}
-              <div className="form-control">
-                <label
-                  htmlFor="productQuantity"
-                  className="label text-gray-700 dark:text-gray-300"
-                >
-                  <span className="label-text">商品數量</span>
-                </label>
-                <input
-                  id="productQuantity"
-                  name="productQuantity"
-                  type="number"
-                  value={formData.productQuantity}
-                  onChange={handleChange}
-                  className="input input-bordered border-[#036672] focus:border-[#024c52]"
-                  placeholder="請輸入商品數量"
-                  required
-                />
-              </div>
+              <InputField
+                label="商品型號"
+                name="productModel"
+                value={formData.productModel}
+                onChange={(e) =>
+                  setFormData({ ...formData, [e.target.name]: e.target.value })
+                }
+                required
+              />
+              <InputField
+                label="商品數量"
+                name="productQuantity"
+                type="number"
+                value={formData.productQuantity}
+                onChange={(e) =>
+                  setFormData({ ...formData, [e.target.name]: e.target.value })
+                }
+                required
+              />
             </div>
 
-            {/* Return Reason */}
             <div className="form-control">
               <label
                 htmlFor="returnReason"
@@ -288,21 +226,27 @@ export default function Request() {
                 id="returnReason"
                 name="returnReason"
                 value={formData.returnReason}
-                onChange={handleChange}
+                onChange={(e) =>
+                  setFormData({ ...formData, [e.target.name]: e.target.value })
+                }
                 className="textarea textarea-bordered border-[#036672] focus:border-[#024c52]"
                 placeholder="請輸入退貨原因"
                 required
               ></textarea>
             </div>
 
-            {/* Error Message */}
-            {errorMessage && (
+            {/* CSSTransition 動畫效果 */}
+            <CSSTransition
+              in={!!errorMessage}
+              timeout={300}
+              classNames="fade"
+              unmountOnExit
+            >
               <div className="mt-4 text-center text-red-500">
                 {errorMessage}
               </div>
-            )}
+            </CSSTransition>
 
-            {/* Submit Button */}
             <div className="form-control mt-6">
               <button
                 type="submit"
@@ -315,12 +259,16 @@ export default function Request() {
               </button>
             </div>
 
-            {/* Success Message */}
-            {submitMessage && (
+            <CSSTransition
+              in={!!submitMessage}
+              timeout={300}
+              classNames="fade"
+              unmountOnExit
+            >
               <div className="mt-4 text-center text-green-500">
                 {submitMessage}
               </div>
-            )}
+            </CSSTransition>
           </form>
         </div>
       </div>

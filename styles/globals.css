@@ -25,3 +25,39 @@ body {
     text-wrap: balance;
   }
 }
+
+/* 通用的 fade-in/fade-out 動畫 */
+.fade-enter,
+.fade-exit-active {
+  opacity: 0;
+}
+
+.fade-enter-active,
+.fade-exit {
+  opacity: 1;
+  transition: opacity 300ms ease-in-out;
+}
+
+/* 通用的 scale 動畫 */
+.scale-enter,
+.scale-exit-active {
+  transform: scale(0.9);
+}
+
+.scale-enter-active,
+.scale-exit {
+  transform: scale(1);
+  transition: transform 300ms ease-in-out;
+}
+
+/* 通用的 translateY 動畫 */
+.translate-enter,
+.translate-exit-active {
+  transform: translateY(20px);
+}
+
+.translate-enter-active,
+.translate-exit {
+  transform: translateY(0);
+  transition: transform 300ms ease-in-out;
+}

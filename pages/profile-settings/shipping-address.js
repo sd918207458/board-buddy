@@ -5,6 +5,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import AddressCard from "@/components/address/AddressCard";
 import AddressForm from "@/components/address/AddressForm";
 import { useModal } from "@/hooks/useModal"; // 引入 useModal hook
+import { CSSTransition, TransitionGroup } from "react-transition-group";
 
 export default function ShippingAddress() {
   const [addresses, setAddresses] = useState([]);
@@ -19,13 +20,7 @@ export default function ShippingAddress() {
     id: null,
   });
 
-  const [isMounted, setIsMounted] = useState(false); // 用於追踪是否在客戶端
-
-  useEffect(() => {
-    setIsMounted(true); // 在客戶端掛載時設置
-  }, []);
-
-  const { isOpen, openModal, closeModal } = useModal(); // 使用 useModal hook
+  const { isOpen, openModal, closeModal } = useModal(); // 使用自定義 useModal hook
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -75,68 +70,81 @@ export default function ShippingAddress() {
               </h2>
             </section>
 
-            {/* 只有在掛載完成後才渲染地址列表 */}
-            {isMounted && (
-              <section className="max-w-4xl mx-auto grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
-                <div className=" space-y-4">
-                  {addresses.length > 0 ? (
-                    addresses.map((address) => (
-                      <AddressCard
+            <section className="max-w-4xl mx-auto grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
+              <div className="space-y-4">
+                {addresses.length > 0 ? (
+                  <TransitionGroup>
+                    {addresses.map((address) => (
+                      <CSSTransition
                         key={address.id}
-                        address={address}
-                        handleEdit={() => {
-                          setIsEditing(true);
-                          setFormData(address);
-                          openModal();
-                        }}
-                        handleDelete={() => handleDelete(address.id)}
-                        handleSetDefault={() => handleSetDefault(address.id)}
-                      />
-                    ))
-                  ) : (
-                    <div className="card text-center p-4 text-gray-800">
-                      <p>您目前沒有地址，請新增地址。</p>
-                      <button
-                        className="btn btn-primary mt-4 w-full bg-[#003E52]"
-                        onClick={() => {
-                          setIsEditing(false);
-                          setFormData({
-                            username: "",
-                            phone: "",
-                            city: "",
-                            area: "",
-                            street: "",
-                            detailedAddress: "",
-                            isDefault: false,
-                            id: null,
-                          });
-                          openModal();
-                        }}
+                        timeout={300}
+                        classNames="fade"
                       >
-                        新增地址
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </section>
-            )}
+                        <AddressCard
+                          address={address}
+                          handleEdit={() => {
+                            setIsEditing(true);
+                            setFormData(address);
+                            openModal();
+                          }}
+                          handleDelete={() => handleDelete(address.id)}
+                          handleSetDefault={() => handleSetDefault(address.id)}
+                        />
+                      </CSSTransition>
+                    ))}
+                  </TransitionGroup>
+                ) : (
+                  <div className="card text-center p-4 text-gray-800">
+                    <p>您目前沒有地址，請新增地址。</p>
+                    <button
+                      className="btn btn-primary mt-4 w-full bg-[#003E52]"
+                      onClick={() => {
+                        setIsEditing(false);
+                        setFormData({
+                          username: "",
+                          phone: "",
+                          city: "",
+                          area: "",
+                          street: "",
+                          detailedAddress: "",
+                          isDefault: false,
+                          id: null,
+                        });
+                        openModal();
+                      }}
+                    >
+                      新增地址
+                    </button>
+                  </div>
+                )}
+              </div>
+            </section>
           </div>
 
-          {/* 只有在掛載完成後才渲染模態窗口 */}
-          {isMounted && isOpen && (
-            <dialog open className="modal" onClose={closeModal}>
-              <AddressForm
-                formData={formData}
-                handleChange={(e) =>
-                  setFormData({ ...formData, [e.target.name]: e.target.value })
-                }
-                handleSubmit={handleSubmit}
-                isEditing={isEditing}
-                isLoading={isLoading}
-                closeModal={closeModal}
-              />
-            </dialog>
-          )}
+          {/* 使用 TransitionGroup 來包裝模態 */}
+          <TransitionGroup>
+            {isOpen && (
+              <CSSTransition timeout={300} classNames="fade">
+                <div className="modal-backdrop">
+                  <div className="modal-box">
+                    <AddressForm
+                      formData={formData}
+                      handleChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          [e.target.name]: e.target.value,
+                        })
+                      }
+                      handleSubmit={handleSubmit}
+                      isEditing={isEditing}
+                      isLoading={isLoading}
+                      closeModal={closeModal}
+                    />
+                  </div>
+                </div>
+              </CSSTransition>
+            )}
+          </TransitionGroup>
         </div>
       </div>
       <Footer />

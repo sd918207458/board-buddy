@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import { motion } from "framer-motion"; // 使用 Framer Motion 加入動畫效果
+import { CSSTransition, TransitionGroup } from "react-transition-group"; // 替換為 React Transition Group
 
 export default function PaymentMethods() {
   const [paymentMethods, setPaymentMethods] = useState([
@@ -124,46 +124,49 @@ export default function PaymentMethods() {
               常用錢包
             </h3>
             <section className="max-w-4xl mx-auto grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
-              {/* 只有在客戶端掛載後才渲染 Framer Motion */}
-              {isMounted &&
-                paymentMethods.map((method) => (
-                  <motion.div
-                    key={method.id}
-                    className="card bg-base-100 shadow-xl mb-4 "
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -50 }}
-                  >
-                    <div className="card-body ">
-                      <h2 className="card-title">付款方式</h2>
-                      <p>卡號: {method.cardNumber}</p>
-                      <p>到期日: {method.expiryDate}</p>
-                      {method.isDefault && (
-                        <span className="badge badge-primary">預設</span>
-                      )}
-                      <div className="flex justify-between">
-                        <button
-                          className="btn btn-primary"
-                          onClick={() => handleEdit(method)}
-                        >
-                          編輯
-                        </button>
-                        <button
-                          className="btn btn-error"
-                          onClick={() => handleDelete(method.id)}
-                        >
-                          刪除
-                        </button>
-                        <button
-                          className="btn btn-outline"
-                          onClick={() => handleSetDefault(method.id)}
-                        >
-                          設為預設
-                        </button>
+              {/* 使用 CSSTransition 和 TransitionGroup */}
+              {isMounted && (
+                <TransitionGroup component={null}>
+                  {paymentMethods.map((method) => (
+                    <CSSTransition
+                      key={method.id}
+                      timeout={300}
+                      classNames="fade"
+                    >
+                      <div className="card bg-base-100 shadow-xl mb-4">
+                        <div className="card-body ">
+                          <h2 className="card-title">付款方式</h2>
+                          <p>卡號: {method.cardNumber}</p>
+                          <p>到期日: {method.expiryDate}</p>
+                          {method.isDefault && (
+                            <span className="badge badge-primary">預設</span>
+                          )}
+                          <div className="flex justify-between">
+                            <button
+                              className="btn btn-primary"
+                              onClick={() => handleEdit(method)}
+                            >
+                              編輯
+                            </button>
+                            <button
+                              className="btn btn-error"
+                              onClick={() => handleDelete(method.id)}
+                            >
+                              刪除
+                            </button>
+                            <button
+                              className="btn btn-outline"
+                              onClick={() => handleSetDefault(method.id)}
+                            >
+                              設為預設
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </motion.div>
-                ))}
+                    </CSSTransition>
+                  ))}
+                </TransitionGroup>
+              )}
 
               {/* 新增付款方式卡片 */}
               <div className="card bg-base-100 shadow-xl">

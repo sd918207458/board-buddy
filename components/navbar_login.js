@@ -1,105 +1,83 @@
 import React from "react";
-import {
-  GiHouse,
-  GiThreeFriends,
-  GiShoppingBag,
-  GiTalk,
-  GiCat,
-  GiPerson,
-} from "react-icons/gi";
+import { GiHouse, GiThreeFriends, GiShoppingBag, GiTalk } from "react-icons/gi";
 import Link from "next/link";
+import { CSSTransition, TransitionGroup } from "react-transition-group";
 
 export default function Navbar() {
   return (
     <div className="navbar bg-[#003E52] text-white">
       {/* 左側 LOGO 與導航按鈕 */}
       <div className="flex-1">
-        <Link href="/" className="btn btn-ghost normal-case text-xl text-white">
-          <img
-            src="https://your-logo-url-here.com"
-            className="w-10 h-10 mr-2"
-          />
+        <Link href="/" legacyBehavior>
+          <a className="btn btn-ghost normal-case text-xl text-white">
+            <img
+              src="https://your-logo-url-here.com"
+              className="w-10 h-10 mr-2"
+              alt="Logo"
+            />
+          </a>
         </Link>
         <nav className="flex space-x-6">
-          <Link
-            href="/"
-            className="btn btn-ghost text-white flex flex-col items-center"
-          >
-            <GiHouse className="w-6 h-6" />
-            <span>首頁</span>
+          <Link href="/" legacyBehavior>
+            <a className="btn btn-ghost text-white flex flex-col items-center">
+              <GiHouse className="w-6 h-6" />
+              <span>首頁</span>
+            </a>
           </Link>
-          <Link
-            href="/group"
-            className="btn btn-ghost text-white flex flex-col items-center"
-          >
-            <GiThreeFriends className="w-6 h-6" />
-            <span>揪團</span>
+          <Link href="/group" legacyBehavior>
+            <a className="btn btn-ghost text-white flex flex-col items-center">
+              <GiThreeFriends className="w-6 h-6" />
+              <span>揪團</span>
+            </a>
           </Link>
-          <Link
-            href="/shop"
-            className="btn btn-ghost text-white flex flex-col items-center"
-          >
-            <GiShoppingBag className="w-6 h-6" />
-            <span>商城</span>
+          <Link href="/shop" legacyBehavior>
+            <a className="btn btn-ghost text-white flex flex-col items-center">
+              <GiShoppingBag className="w-6 h-6" />
+              <span>商城</span>
+            </a>
           </Link>
-          <Link
-            href="/forum"
-            className="btn btn-ghost text-white flex flex-col items-center"
-          >
-            <GiTalk className="w-6 h-6" />
-            <span>討論區</span>
+          <Link href="/forum" legacyBehavior>
+            <a className="btn btn-ghost text-white flex flex-col items-center">
+              <GiTalk className="w-6 h-6" />
+              <span>討論區</span>
+            </a>
           </Link>
-          {/* <Link
-            href="/quiz"
-            className="btn btn-ghost text-white flex flex-col items-center"
-          >
-            <GiCat className="w-6 h-6" />
-            <span>測驗</span>
-          </Link> */}
         </nav>
       </div>
 
       {/* 右側登入與購物車按鈕 */}
       <div className="flex items-center space-x-4">
-        <Link
-          href="/member/login"
-          className="btn btn-ghost text-white flex items-center"
-        >
-          <div className="dropdown dropdown-hover dropdown-bottom dropdown-end">
-            <div tabIndex={0} role="button" className="btn m-1">
-              Login
-            </div>
-            <ul
-              tabIndex={0}
-              className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
-            >
-              <li>
-                <Link
-                  href="/profile-settings"
-                  className="btn btn-ghost text-black flex items-center"
-                >
-                  會員中心
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/member/login"
-                  className="btn btn-ghost text-black flex items-center"
-                >
-                  管理訂單
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/member/login"
-                  className="btn btn-ghost text-black flex items-center"
-                >
-                  登出
-                </Link>
-              </li>
-            </ul>
+        <div className="dropdown dropdown-hover dropdown-bottom dropdown-end">
+          <div tabIndex={0} role="button" className="btn m-1">
+            Login
           </div>
-        </Link>
+          <ul
+            tabIndex={0}
+            className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+          >
+            <li>
+              <Link href="/profile-settings" legacyBehavior>
+                <a className="btn btn-ghost text-black flex items-center">
+                  會員中心
+                </a>
+              </Link>
+            </li>
+            <li>
+              <Link href="/member/login" legacyBehavior>
+                <a className="btn btn-ghost text-black flex items-center">
+                  管理訂單
+                </a>
+              </Link>
+            </li>
+            <li>
+              <Link href="/member/logout" legacyBehavior>
+                <a className="btn btn-ghost text-black flex items-center">
+                  登出
+                </a>
+              </Link>
+            </li>
+          </ul>
+        </div>
 
         <div className="dropdown dropdown-end">
           <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">

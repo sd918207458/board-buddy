@@ -3,6 +3,7 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import dynamic from "next/dynamic";
+import { CSSTransition } from "react-transition-group";
 
 // 動態加載 DatePicker1 來避免 SSR 問題
 const DatePicker1 = dynamic(() => import("@/components/datepicker"), {
@@ -14,7 +15,6 @@ export default function PersonalInfo() {
   const [gameType, setGameType] = useState("");
   const [playTime, setPlayTime] = useState("");
   const [gameTypes, setGameTypes] = useState([]);
-
   const [formData, setFormData] = useState({
     username: "",
     phone: "",
@@ -47,6 +47,7 @@ export default function PersonalInfo() {
     fetchGameTypes();
     setIsMounted(true);
   }, []);
+
   useEffect(() => {
     const fetchPlayTime = async () => {
       try {
@@ -54,7 +55,7 @@ export default function PersonalInfo() {
         const data = await response.json();
         setPlayTime(data.timeSlots);
       } catch (error) {
-        console.error("Failed to load game types", error);
+        console.error("Failed to load play times", error);
       }
     };
 
@@ -90,7 +91,6 @@ export default function PersonalInfo() {
     ) {
       return "所有欄位都是必填的";
     }
-    // 可以加入更多的驗證規則，比如正則表達式驗證
     return "";
   };
 
@@ -98,7 +98,6 @@ export default function PersonalInfo() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // 驗證表單
     const validationError = validateForm();
     if (validationError) {
       setErrorMessage(validationError);
@@ -107,11 +106,9 @@ export default function PersonalInfo() {
     }
 
     try {
-      // 模擬提交API
       setTimeout(() => {
         setSubmitMessage("提交成功！資料已儲存。");
         setErrorMessage("");
-        // 清除表單數據
         setFormData({
           username: "",
           phone: "",
@@ -133,7 +130,7 @@ export default function PersonalInfo() {
   };
 
   if (!isMounted) {
-    return null; // 在服務端渲染階段不渲染任何內容
+    return null;
   }
 
   return (
@@ -310,18 +307,28 @@ export default function PersonalInfo() {
               </div>
 
               {/* 錯誤消息 */}
-              {errorMessage && (
+              <CSSTransition
+                in={!!errorMessage}
+                timeout={300}
+                classNames="fade"
+                unmountOnExit
+              >
                 <div className="mt-4 text-center text-red-500">
                   {errorMessage}
                 </div>
-              )}
+              </CSSTransition>
 
               {/* 成功訊息 */}
-              {submitMessage && (
+              <CSSTransition
+                in={!!submitMessage}
+                timeout={300}
+                classNames="fade"
+                unmountOnExit
+              >
                 <div className="mt-4 text-center text-green-500">
                   {submitMessage}
                 </div>
-              )}
+              </CSSTransition>
 
               {/* 保存修改按鈕 */}
               <div className="form-control mt-6">

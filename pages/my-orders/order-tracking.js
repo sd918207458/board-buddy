@@ -5,6 +5,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import UserTable from "@/components/table";
 import users from "./../../public/user_table";
 import users_1 from "./../../public/users_1";
+import { CSSTransition, TransitionGroup } from "react-transition-group"; // 引入 React Transition Group
 
 export default function OrderTracking() {
   const [isMounted, setIsMounted] = useState(false); // 判斷是否在客戶端
@@ -101,8 +102,14 @@ export default function OrderTracking() {
             </div>
           )}
 
-          {/* 渲染表格 */}
-          {isMounted && <div className="p-6">{renderTable()}</div>}
+          {/* 使用 React Transition Group 來處理表格切換的動畫效果 */}
+          {isMounted && (
+            <TransitionGroup className="p-6">
+              <CSSTransition key={activeTab} timeout={300} classNames="fade">
+                <div>{renderTable()}</div>
+              </CSSTransition>
+            </TransitionGroup>
+          )}
 
           {/* 分頁按鈕 */}
           <div className="join items-center justify-center mt-4 mb-6">
