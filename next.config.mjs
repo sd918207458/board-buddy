@@ -10,6 +10,7 @@ const nextConfig = {
         pathname: '/account123/**',
       },
     ],
+    domains: ['i.postimg.cc'], // 添加你圖片來源的域名
   },
 };
 

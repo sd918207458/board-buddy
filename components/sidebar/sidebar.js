@@ -25,6 +25,20 @@ const Sidebar = () => {
             <p>UNO</p>
           </div>
         </div>
+        <div className="collapse collapse-arrow join-item border-base-300 border">
+          <input type="radio" name="my-accordion-4" />
+          <div className="collapse-title text-xl font-medium">多人遊戲</div>
+          <div className="collapse-content">
+            <p>UNO</p>
+          </div>
+        </div>
+        <div className="collapse collapse-arrow join-item border-base-300 border">
+          <input type="radio" name="my-accordion-4" />
+          <div className="collapse-title text-xl font-medium">多人遊戲</div>
+          <div className="collapse-content">
+            <p>UNO</p>
+          </div>
+        </div>
       </div>
     </div>
   );
