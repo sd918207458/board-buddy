@@ -15,6 +15,7 @@ export default function PersonalInfo() {
   const [gameType, setGameType] = useState("");
   const [playTime, setPlayTime] = useState("");
   const [gameTypes, setGameTypes] = useState([]);
+  const [playTimes, setPlayTimes] = useState([]);
   const [formData, setFormData] = useState({
     username: "",
     phone: "",
@@ -34,32 +35,24 @@ export default function PersonalInfo() {
 
   // 使用 useEffect 確保只在客戶端渲染
   useEffect(() => {
-    const fetchGameTypes = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch("@/public/game_type.json");
-        const data = await response.json();
-        setGameTypes(data.gameTypes);
+        const [gameTypesRes, playTimesRes] = await Promise.all([
+          fetch("/game_type.json"),
+          fetch("/play_time.json"),
+        ]);
+
+        const gameTypesData = await gameTypesRes.json();
+        const playTimesData = await playTimesRes.json();
+
+        setGameTypes(gameTypesData.gameTypes || []);
+        setPlayTimes(playTimesData.timeSlots || []);
       } catch (error) {
-        console.error("Failed to load game types", error);
+        console.error("Failed to load data", error);
       }
     };
 
-    fetchGameTypes();
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    const fetchPlayTime = async () => {
-      try {
-        const response = await fetch("@/public/play_time.json");
-        const data = await response.json();
-        setPlayTime(data.timeSlots);
-      } catch (error) {
-        console.error("Failed to load play times", error);
-      }
-    };
-
-    fetchPlayTime();
+    fetchData();
     setIsMounted(true);
   }, []);
 
@@ -170,6 +163,7 @@ export default function PersonalInfo() {
 
               {/* 使用者資料輸入 */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {/* 動態生成輸入欄位 */}
                 {[
                   {
                     id: "username",
@@ -297,7 +291,7 @@ export default function PersonalInfo() {
                     <option disabled value="">
                       請選擇
                     </option>
-                    {gameTypes.map((time) => (
+                    {playTimes.map((time) => (
                       <option key={time.day} value={time.day}>
                         {time.label}
                       </option>
