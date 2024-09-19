@@ -1,68 +1,103 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import UserTable from "@/components/table";
+import users from "./../../public/user_table";
+import users_1 from "./../../public/users_1";
 
-export default function Wishlist() {
+export default function OrderTracking() {
+  const [isMounted, setIsMounted] = useState(false); // 判斷是否在客戶端
+  const [activeTab, setActiveTab] = useState("all"); // 管理當前選擇的 Tab
+  const [hasError, setHasError] = useState(false); // 用來追踪錯誤
+
+  useEffect(() => {
+    try {
+      setIsMounted(true);
+    } catch (error) {
+      console.error("Error mounting component: ", error);
+      setHasError(true);
+    }
+  }, []);
+
+  // 渲染對應的表格
+  const renderTable = () => {
+    try {
+      switch (activeTab) {
+        case "all":
+          return <UserTable users={users} />;
+        case "pending":
+          return <UserTable users={users_1} />;
+        case "history":
+          return <UserTable users={users} />;
+        case "canceled":
+          return <UserTable users={users_1} />;
+        default:
+          return null;
+      }
+    } catch (error) {
+      console.error("Error rendering table: ", error);
+      setHasError(true); // 捕獲渲染表格過程中的錯誤
+      return null;
+    }
+  };
+
+  if (hasError) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-red-100">
+        <div className="p-6 bg-white shadow-md rounded-lg">
+          <h2 className="text-2xl font-bold text-red-600">
+            發生錯誤，請稍後再試。
+          </h2>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <Navbar />
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
-        <div className=" w-full max-w-sm mx-auto overflow-hidden bg-white rounded-lg shadow-lg dark:bg-gray-800 lg:max-w-4xl">
-          <div className="w-full max-w-sm mx-auto lg:max-w-4xl mb-4">
+        <div className="w-full max-w-4xl mx-auto bg-white rounded-lg shadow-lg dark:bg-gray-800">
+          <div className="w-full p-4">
             <Breadcrumbs />
           </div>
-          <section className="max-w-4xl p-6 mx-auto bg-white rounded-md dark:bg-gray-800 ">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6 text-center">
+
+          <section className="p-6">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white text-center">
               我的收藏
             </h2>
           </section>
-          <div role="tablist" className="tabs tabs-lifted">
-            <input
-              type="radio"
-              name="my_tabs_2"
-              role="tab"
-              className="tab"
-              aria-label="收藏商品"
-            />
-            <div
-              role="tabpanel"
-              className="tab-content bg-base-100 border-base-300 rounded-box p-6"
-            >
-              收藏商品
-            </div>
 
-            <input
-              type="radio"
-              name="my_tabs_2"
-              role="tab"
-              className="tab"
-              aria-label="收藏店家"
-              defaultChecked
-            />
-            <div
-              role="tabpanel"
-              className="tab-content bg-base-100 border-base-300 rounded-box p-6"
-            >
-              收藏店家
+          {/* Tabs 選項卡 */}
+          {isMounted && (
+            <div className="tabs tabs-boxed justify-center mb-6">
+              <button
+                className={`tab ${activeTab === "all" ? "tab-active" : ""}`}
+                onClick={() => setActiveTab("all")}
+              >
+                收藏商品
+              </button>
+              <button
+                className={`tab ${activeTab === "pending" ? "tab-active" : ""}`}
+                onClick={() => setActiveTab("pending")}
+              >
+                收藏店家
+              </button>
+              <button
+                className={`tab ${activeTab === "history" ? "tab-active" : ""}`}
+                onClick={() => setActiveTab("history")}
+              >
+                收藏文章
+              </button>
             </div>
+          )}
 
-            <input
-              type="radio"
-              name="my_tabs_2"
-              role="tab"
-              className="tab"
-              aria-label="收藏文章"
-            />
-            <div
-              role="tabpanel"
-              className="tab-content bg-base-100 border-base-300 rounded-box p-6"
-            >
-              收藏文章
-            </div>
-          </div>
+          {/* 渲染表格 */}
+          {isMounted && <div className="p-6">{renderTable()}</div>}
 
-          <div className="join items-center w-full justify-center">
+          {/* 分頁按鈕 */}
+          <div className="join items-center justify-center mt-4 mb-6">
             <button className="join-item btn">«</button>
             <button className="join-item btn">Page 1</button>
             <button className="join-item btn">Page 2</button>

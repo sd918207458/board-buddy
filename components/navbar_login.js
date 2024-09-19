@@ -65,12 +65,40 @@ export default function Navbar() {
           href="/member/login"
           className="btn btn-ghost text-white flex items-center"
         >
-          <div className="avatar">
-            <div className="w-12 rounded-full">
-              <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+          <div className="dropdown dropdown-hover dropdown-bottom dropdown-end">
+            <div tabIndex={0} role="button" className="btn m-1">
+              Login
             </div>
+            <ul
+              tabIndex={0}
+              className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+            >
+              <li>
+                <Link
+                  href="/profile-settings"
+                  className="btn btn-ghost text-black flex items-center"
+                >
+                  會員中心
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/member/login"
+                  className="btn btn-ghost text-black flex items-center"
+                >
+                  管理訂單
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/member/login"
+                  className="btn btn-ghost text-black flex items-center"
+                >
+                  登出
+                </Link>
+              </li>
+            </ul>
           </div>
-          <span>Logout</span>
         </Link>
 
         <div className="dropdown dropdown-end">

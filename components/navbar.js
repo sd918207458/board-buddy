@@ -66,7 +66,33 @@ export default function Navbar() {
           className="btn btn-ghost text-white flex items-center"
         >
           <GiPerson className="w-6 h-6" />
-          <span>Login</span>
+
+          <div className="dropdown dropdown-hover dropdown-bottom dropdown-end">
+            <div tabIndex={0} role="button" className="btn m-1">
+              Login
+            </div>
+            <ul
+              tabIndex={0}
+              className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+            >
+              <li>
+                <Link
+                  href="/profile-settings"
+                  className="btn btn-ghost text-black flex items-center"
+                >
+                  會員中心
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/member/login"
+                  className="btn btn-ghost text-black flex items-center"
+                >
+                  管理訂單
+                </Link>
+              </li>
+            </ul>
+          </div>
         </Link>
         <div className="dropdown dropdown-end">
           <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">

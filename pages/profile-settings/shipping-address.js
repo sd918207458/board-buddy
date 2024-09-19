@@ -65,76 +65,79 @@ export default function ShippingAddress() {
   return (
     <>
       <Navbar />
-      <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] text-black">
-        <div className="container mx-auto p-6 bg-white rounded-lg shadow-xl">
-          <Breadcrumbs />
-          <h2 className="text-2xl font-bold text-center text-gray-800">
-            我的地址
-          </h2>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
+        <div className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+          <div className="px-6 py-4">
+            <Breadcrumbs />
+            <section className="max-w-4xl mx-auto mt-6">
+              <h2 className="text-lg font-semibold text-gray-700 capitalize dark:text-white mb-4">
+                我的地址
+              </h2>
+            </section>
 
-          {/* 只有在掛載完成後才渲染地址列表 */}
-          {isMounted && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6">
-              <div className="space-y-4">
-                {addresses.length > 0 ? (
-                  addresses.map((address) => (
-                    <AddressCard
-                      key={address.id}
-                      address={address}
-                      handleEdit={() => {
-                        setIsEditing(true);
-                        setFormData(address);
-                        openModal();
-                      }}
-                      handleDelete={() => handleDelete(address.id)}
-                      handleSetDefault={() => handleSetDefault(address.id)}
-                    />
-                  ))
-                ) : (
-                  <div className="text-center p-4 text-gray-800">
-                    <p>您目前沒有地址，請新增地址。</p>
-                  </div>
-                )}
-              </div>
-            </div>
+            {/* 只有在掛載完成後才渲染地址列表 */}
+            {isMounted && (
+              <section className="max-w-4xl mx-auto grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
+                <div className=" space-y-4">
+                  {addresses.length > 0 ? (
+                    addresses.map((address) => (
+                      <AddressCard
+                        key={address.id}
+                        address={address}
+                        handleEdit={() => {
+                          setIsEditing(true);
+                          setFormData(address);
+                          openModal();
+                        }}
+                        handleDelete={() => handleDelete(address.id)}
+                        handleSetDefault={() => handleSetDefault(address.id)}
+                      />
+                    ))
+                  ) : (
+                    <div className="card text-center p-4 text-gray-800">
+                      <p>您目前沒有地址，請新增地址。</p>
+                      <button
+                        className="btn btn-primary mt-4 w-full bg-[#003E52]"
+                        onClick={() => {
+                          setIsEditing(false);
+                          setFormData({
+                            username: "",
+                            phone: "",
+                            city: "",
+                            area: "",
+                            street: "",
+                            detailedAddress: "",
+                            isDefault: false,
+                            id: null,
+                          });
+                          openModal();
+                        }}
+                      >
+                        新增地址
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </section>
+            )}
+          </div>
+
+          {/* 只有在掛載完成後才渲染模態窗口 */}
+          {isMounted && isOpen && (
+            <dialog open className="modal" onClose={closeModal}>
+              <AddressForm
+                formData={formData}
+                handleChange={(e) =>
+                  setFormData({ ...formData, [e.target.name]: e.target.value })
+                }
+                handleSubmit={handleSubmit}
+                isEditing={isEditing}
+                isLoading={isLoading}
+                closeModal={closeModal}
+              />
+            </dialog>
           )}
-
-          <button
-            className="btn btn-primary w-full bg-[#003E52]"
-            onClick={() => {
-              setIsEditing(false);
-              setFormData({
-                username: "",
-                phone: "",
-                city: "",
-                area: "",
-                street: "",
-                detailedAddress: "",
-                isDefault: false,
-                id: null,
-              });
-              openModal();
-            }}
-          >
-            新增地址
-          </button>
         </div>
-
-        {/* 只有在掛載完成後才渲染模態窗口 */}
-        {isMounted && isOpen && (
-          <dialog open className="modal" onClose={closeModal}>
-            <AddressForm
-              formData={formData}
-              handleChange={(e) =>
-                setFormData({ ...formData, [e.target.name]: e.target.value })
-              }
-              handleSubmit={handleSubmit}
-              isEditing={isEditing}
-              isLoading={isLoading}
-              closeModal={closeModal}
-            />
-          </dialog>
-        )}
       </div>
       <Footer />
     </>
