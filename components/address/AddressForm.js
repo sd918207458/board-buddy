@@ -9,13 +9,22 @@ const AddressForm = ({
   isLoading,
   closeModal,
 }) => {
-  const [cities, setCities] = useState(Object.keys(taiwanDistricts));
+  // 從 taiwanDistricts 提取城市名稱
+  const cities = taiwanDistricts.map((city) => city.name);
+
   const [areas, setAreas] = useState([]);
 
   // 當城市變更時，更新區域
   useEffect(() => {
     if (formData.city) {
-      setAreas(taiwanDistricts[formData.city]);
+      const selectedCity = taiwanDistricts.find(
+        (city) => city.name === formData.city
+      );
+      if (selectedCity) {
+        setAreas(selectedCity.districts);
+      } else {
+        setAreas([]);
+      }
     } else {
       setAreas([]);
     }

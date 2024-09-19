@@ -39,6 +39,11 @@ const TableRow = ({ user }) => {
             訂單詳情
           </button>
         </Link>
+        <Link href={"./request"}>
+          <button className="btn btn-neutral bg-[#003E52] btn-xs transition-transform transform hover:scale-105">
+            退貨處理
+          </button>
+        </Link>
       </th>
     </tr>
   );
