@@ -68,7 +68,7 @@ export default function Navbar() {
               </Link>
             </li>
             <li>
-              <Link href="/member/my-orders/order-tracking.js" legacyBehavior>
+              <Link href="/my-orders/order-tracking" legacyBehavior>
                 <a className="btn btn-ghost text-black">管理訂單</a>
               </Link>
             </li>

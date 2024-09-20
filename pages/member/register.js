@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useRouter } from "next/router"; // 引入 useRouter 用於頁面跳轉
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
@@ -29,6 +30,7 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const router = useRouter(); // 使用 useRouter 進行頁面跳轉
 
   // 表單驗證邏輯
   const validateForm = () => {
@@ -47,19 +49,33 @@ export default function Register() {
     return "";
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const error = validateForm();
-    if (error) {
-      setErrorMessage(error);
-      return;
-    }
+    try {
+      const response = await fetch("http://localhost:3005/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          confirmPassword,
+        }),
+      });
 
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      alert("註冊成功！");
-    }, 1500);
+      // 檢查是否請求成功
+      if (!response.ok) {
+        const errorText = await response.text(); // 捕捉錯誤訊息作為文字而不是 JSON
+        throw new Error(`HTTP error: ${response.status}, ${errorText}`);
+      }
+
+      const data = await response.json(); // 解析 JSON 響應
+      alert("註冊成功");
+    } catch (error) {
+      console.error("錯誤:", error);
+      setErrorMessage(error.message);
+    }
   };
 
   return (

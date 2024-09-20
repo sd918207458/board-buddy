@@ -23,24 +23,49 @@ export default function Login() {
     return true;
   };
 
-  // 模擬登入處理
-  const handleLogin = (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
+  // // 模擬登入處理
+  // const handleLogin = (e) => {
+  //   e.preventDefault();
+  //   if (!validateForm()) return;
 
+  //   setErrorMessage("");
+  //   setIsLoading(true);
+
+  //   // 模擬一個假的登入請求
+  //   setTimeout(() => {
+  //     setIsLoading(false);
+  //     if (email !== "test@example.com" || password !== "123") {
+  //       setErrorMessage("電子信箱或密碼錯誤");
+  //     } else {
+  //       // 登入成功，這裡可以進行跳轉或其他處理
+  //       router.push("/profile-settings");
+  //     }
+  //   }, 1500);
+  // };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
     setErrorMessage("");
     setIsLoading(true);
 
-    // 模擬一個假的登入請求
-    setTimeout(() => {
-      setIsLoading(false);
-      if (email !== "test@example.com" || password !== "123") {
-        setErrorMessage("電子信箱或密碼錯誤");
-      } else {
-        // 登入成功，這裡可以進行跳轉或其他處理
-        router.push("/profile-settings");
-      }
-    }, 1500);
+    const response = await fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+    setIsLoading(false);
+
+    if (response.ok) {
+      // 存儲JWT token
+      localStorage.setItem("token", data.token);
+      router.push("/profile-settings");
+    } else {
+      setErrorMessage(data.error);
+    }
   };
 
   return (
