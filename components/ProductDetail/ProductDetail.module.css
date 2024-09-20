@@ -50,7 +50,7 @@
 .quantity-selector {
   display: inline-flex;
   align-items: center;
-  border: 1px solid #ddd;
+  /* border: 1px solid #ddd; */
   padding: 5px;
 }
 .quantity-selector input {
@@ -59,14 +59,27 @@
   border: none;
   outline: none;
 }
-.quantity-selector button {
+/* .quantity-selector button {
   background-color: #ddd;
   border: none;
   padding: 5px 10px;
   cursor: pointer;
+} */
+
+.button-container {
+  display: flex;
+  gap: 1rem; /* 按鈕之間的距離 */
+  align-items: center; /* 垂直居中對齊 */
 }
+
 .add-to-cart {
-  display: inline-block;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;  /* 按鈕內容垂直居中 */
+  padding: 0.5rem 1rem;  /* 控制按鈕的內邊距，確保按鈕大小一致 */
+  font-size: 1rem;  /* 確保字體大小一致 */
+  text-decoration: none;  /* 移除連結的下劃線 */
+  border-radius: 5px;  /* 統一按鈕的圓角 */
   padding: 10px 20px;
   background-color: #333;
   color: #fff;
@@ -75,7 +88,12 @@
   margin-right: 10px;
 }
 .wishlist {
-  display: inline-block;
+  display: inline-flex;  /* 使圖標和文字保持在同一行 */
+  align-items: center;  /* 確保垂直居中 */
+  padding: 0.5rem 1rem;  /* 控制按鈕的內邊距，確保按鈕大小一致 */
+  font-size: 1rem;  /* 確保字體大小一致 */
+  text-decoration: none;  /* 移除連結的下劃線 */
+  border-radius: 5px;  /* 統一按鈕的圓角 */
   padding: 10px 20px;
   background-color: transparent;
   color: #333;
@@ -83,6 +101,17 @@
   text-align: center;
   text-decoration: none;
 }
+
+
+.wishlist-icon {
+  margin-right: 0.5rem;  /* 圖標與文字的間距 */
+}
+
+
+
+
+
+
 
 /* orderDetailDes */
 

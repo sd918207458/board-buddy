@@ -1,8 +1,21 @@
 import React from 'react'
 import styles from './ProductDetail.module.css'
 import Image from 'next/image'
+import { useState } from 'react';
+import { CiHeart } from "react-icons/ci"; // 空心愛心
+import { FaHeart } from 'react-icons/fa'; // 實心愛心
 
 const ProductDetail = () => {
+
+ // 你的現有邏輯
+ const [liked, setLiked] = useState(false);
+
+ const toggleLike = () => {
+   setLiked(!liked); // 切換喜歡的狀態
+ };
+
+
+
   return (
     <>
     <div className={styles["product-container"]}>
@@ -31,19 +44,41 @@ const ProductDetail = () => {
       slightly damp skin for maximum hydration.
     </div>
     <div className={styles["product-quantity"]}>
-      Quantity:
+      數量:
       <div className={styles["quantity-selector"]}>
-        <button type="button">-</button>
-        <input type="text" defaultValue={2} />
-        <button type="button">+</button>
-      </div>
+  <button
+    type="button"
+    className="flex items-center justify-center rounded-l-md bg-gray-200 px-4 transition hover:bg-black hover:text-white"
+  >
+    -
+  </button>
+  <input
+    type="text"
+    defaultValue={2}
+    className="flex w-full items-center justify-center  px-4 text-xs uppercase transition text-center"
+  />
+  <button
+    type="button"
+    className="flex items-center justify-center rounded-r-md bg-gray-200 px-4 transition hover:bg-black hover:text-white"
+  >
+    +
+  </button>
+</div>
+
     </div>
-    <a href="#" className={styles["add-to-cart"]}>
-      Add To Cart
-    </a>
-    <a href="#" className={styles["wishlist"]}>
-      <i className="fa-regular fa-heart" /> Wishlist
-    </a>
+    <div className={styles["button-container"]}>
+  <a href="#" className={`${styles["add-to-cart"]} transition-all duration-200 ease-in-out focus:shadow hover:bg-gray-800`}>
+    加入購物車
+  </a>
+  <a href="#" onClick={toggleLike}  className={`${styles["wishlist"]} flex items-center`}>
+    {/* <CiHeart className={styles["wishlist-icon"]} />  */}
+    {liked ? (
+          <FaHeart color="red" size={24}  className={styles["wishlist-icon"]}  /> // 實心愛心（已收藏）
+        ) : (
+          <CiHeart size={24}  className={styles["wishlist-icon"]} /> // 空心愛心（未收藏）
+        )}加入收藏
+  </a>
+</div>
   </div>
 </div>
 
