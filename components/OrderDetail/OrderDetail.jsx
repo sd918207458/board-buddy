@@ -6,15 +6,15 @@ const OrderDetail = () => {
   return (
     <>
     <div className={styles["product-container"]}>
-  <div className={styles["product-image"]}>
+     <div className={styles["product-image"]}>
     <Image
       src="https://i.postimg.cc/XYdbSzx8/image.png"
       width={500}
       height={500}
       alt="I'M FABULOUS Body Oil"
     />
-  </div>
-  <div className={styles["product-details"]}>
+    </div>
+     <div className={styles["product-details"]}>
     <div className={styles["product-title"]}>I&apos;M Fabulous</div>
     <div className={styles["product-price"]}>$50</div>
     {/* <div className={styles["product-rating"]}><span>★★★★☆</span> 4.0/5</div> */}

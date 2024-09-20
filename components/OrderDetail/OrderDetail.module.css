@@ -5,8 +5,9 @@
   max-width: 900px;
   margin: 0 auto;
   padding: 20px;
-  border: 1px solid #ddd;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  /* border-top: none; */
+  /* border-bottom: none; */
+  /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); */
   background-color: transparent;
 }
 .product-image {
@@ -86,12 +87,13 @@
 /* orderDetailDes */
 
 .container {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
   background-color: transparent;
   padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+  /* border-top: none; */
+  /* border-bottom: none; */
+  /* box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3); */
 }
 
 .flex-nav {
