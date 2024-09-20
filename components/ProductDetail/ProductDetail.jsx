@@ -1,8 +1,8 @@
 import React from 'react'
-import styles from './OrderDetail.module.css'
+import styles from './ProductDetail.module.css'
 import Image from 'next/image'
 
-const OrderDetail = () => {
+const ProductDetail = () => {
   return (
     <>
     <div className={styles["product-container"]}>
@@ -19,8 +19,9 @@ const OrderDetail = () => {
     <div className={styles["product-price"]}>$50</div>
     {/* <div className={styles["product-rating"]}><span>★★★★☆</span> 4.0/5</div> */}
     <div className={styles["product-description"]}>
-      <span>作者</span>
-      <span>出版社</span>
+      <span>| 作者</span>
+      <span> | </span>
+      <span> 出版社</span>
       <br />
       <br />
       The French aromatherapy brand combines fatty hazelnut, sesame and grape
@@ -50,19 +51,23 @@ const OrderDetail = () => {
 
 <div className={styles.container}>
   <div className={styles["flex-nav"]}>
-    <div>遊戲介紹</div>
-    <div>遊戲規則</div>
-    <div>出版資訊</div>
+  <div className={styles.hoverable}>
+  <a href="#introduction">遊戲介紹</a></div>
+  <div className={styles.hoverable}>
+  <a href="#rules">遊戲規則</a></div>
+  <div className={styles.hoverable}>
+  <a href="#info">出版資訊</a></div>
   </div>
-  <h1 className={styles.title}>遊戲介紹</h1>
-  <div className={styles.section}>
-    <h2 className={styles.subtitle}>遊戲介紹</h2>
+  {/* <h1 className={styles.title}>遊戲介紹</h1> */}
+  <div id="introduction" className={styles.section}>
+    <h2   className={styles.subtitle}>遊戲介紹</h2>
     <p className={styles.paragraph}>
       《妙語說書人》是一款文字冒險遊戲，玩家扮演巧舌如簧的說書人，通過選擇詞語和故事情節來打動聽眾，影響他們的情感與選擇，探索人際互動和故事敘述的藝術。
     </p>
   </div>
-  <div className={styles.section}>
-    <h2 className={styles.subtitle}>遊戲規則</h2>
+
+  <div id="rules" className={styles.section}>
+    <h2  className={styles.subtitle}>遊戲規則</h2>
     <p className={styles.paragraph}>在《妙語說書人》中，玩家需要遵循以下遊戲規則：</p>
     <ul className={styles.list}>
       <li className={styles["list-item"]}>
@@ -83,7 +88,8 @@ const OrderDetail = () => {
     </ul>
     <p className={styles.paragraph}>玩家會透過語言去說故事，需靈活應變，達成最佳結果。</p>
   </div>
-  <div className={styles.section}>
+
+  <div id="info" className={styles.section}>
     <h2 className={styles.subtitle}>出版資訊</h2>
     <div className={styles.info}>
       <p className={styles.paragraph}>
@@ -103,6 +109,7 @@ const OrderDetail = () => {
       </p>
     </div>
   </div>
+
 </div>
 
 
@@ -110,4 +117,4 @@ const OrderDetail = () => {
   )
 }
 
-export default OrderDetail
+export default ProductDetail
