@@ -104,7 +104,7 @@ export default function OrderTracking() {
           )}
 
           {/* 分頁按鈕 */}
-          <div className="join items-center justify-center mt-4 mb-6">
+          <div className="join items-center justify-center mt-4 mb-6  w-full">
             <button className="join-item btn">«</button>
             <button className="join-item btn">Page 1</button>
             <button className="join-item btn">Page 2</button>
