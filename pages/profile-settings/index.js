@@ -15,8 +15,8 @@ const Card = ({ title, description, href, image }) => {
   return (
     <CSSTransition
       in={inProp}
-      timeout={300}
-      classNames="fade"
+      timeout={500}
+      classNames="scale"
       onEnter={() => setInProp(true)}
       onExited={() => setInProp(false)}
     >

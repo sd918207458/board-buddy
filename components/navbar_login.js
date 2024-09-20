@@ -70,7 +70,7 @@ export default function Navbar() {
               </Link>
             </li>
             <li>
-              <Link href="/member/logout" legacyBehavior>
+              <Link href="/member/login" legacyBehavior>
                 <a className="btn btn-ghost text-black flex items-center">
                   登出
                 </a>
