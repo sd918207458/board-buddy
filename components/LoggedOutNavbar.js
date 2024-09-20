@@ -1,12 +1,16 @@
 import React from "react";
-import { GiHouse, GiThreeFriends, GiShoppingBag, GiTalk } from "react-icons/gi";
+import {
+  GiHouse,
+  GiThreeFriends,
+  GiShoppingBag,
+  GiTalk,
+  GiPerson,
+} from "react-icons/gi";
 import Link from "next/link";
-import { CSSTransition, TransitionGroup } from "react-transition-group";
 
 export default function Navbar() {
   return (
-    <div className="navbar bg-[#003E52] text-white">
-      {/* 左側 LOGO 與導航按鈕 */}
+    <div className="navbar bg-[#003E52] text-white sticky top-0 z-50">
       <div className="flex-1">
         <Link href="/" legacyBehavior>
           <a className="btn btn-ghost normal-case text-xl text-white">
@@ -45,11 +49,11 @@ export default function Navbar() {
         </nav>
       </div>
 
-      {/* 右側登入與購物車按鈕 */}
       <div className="flex items-center space-x-4">
         <div className="dropdown dropdown-hover dropdown-bottom dropdown-end">
           <div tabIndex={0} role="button" className="btn m-1">
-            Login
+            <GiPerson className="w-6 h-6" />
+            <span className="ml-2">Login</span>
           </div>
           <ul
             tabIndex={0}
@@ -57,23 +61,12 @@ export default function Navbar() {
           >
             <li>
               <Link href="/profile-settings" legacyBehavior>
-                <a className="btn btn-ghost text-black flex items-center">
-                  會員中心
-                </a>
+                <a className="btn btn-ghost text-black">會員中心</a>
               </Link>
             </li>
             <li>
-              <Link href="/member/login" legacyBehavior>
-                <a className="btn btn-ghost text-black flex items-center">
-                  管理訂單
-                </a>
-              </Link>
-            </li>
-            <li>
-              <Link href="/member/login" legacyBehavior>
-                <a className="btn btn-ghost text-black flex items-center">
-                  登出
-                </a>
+              <Link href="/my-orders/order-tracking" legacyBehavior>
+                <a className="btn btn-ghost text-black">管理訂單</a>
               </Link>
             </li>
           </ul>

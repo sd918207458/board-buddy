@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-import Navbar from "@/components/navbar_login";
+import Navbar from "@/components/LoggedInNavbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Link from "next/link";
 import { CSSTransition } from "react-transition-group";
-import card_data from "../../components/UI.json/card_data.json"; // 確保路徑正確，並導入 JSON 數據
+import card_data from "../../components/UI.json/card_data.json";
 
-const cardData = card_data; // 將導入的數據正確賦值給 cardData
+const cardData = card_data;
 
 // 統一色系的卡片組件
 const Card = ({ title, description, href, image }) => {
-  const [inProp, setInProp] = useState(false); // 控制進入和離開動畫的狀態
+  const [inProp, setInProp] = useState(false);
 
   return (
     <CSSTransition

@@ -3,27 +3,32 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import UserTable from "@/components/table";
-import users from "./../../public/user_table";
-import users_1 from "./../../public/users_1";
+import users from "../../public/user_table";
+import users_1 from "../../public/users_1";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 
 export default function OrderTracking() {
   const [isMounted, setIsMounted] = useState(false); // 判斷是否在客戶端
   const [activeTab, setActiveTab] = useState("all"); // 管理當前選擇的 Tab
+  const [loading, setLoading] = useState(true); // 加入 loading 狀態
   const [hasError, setHasError] = useState(false); // 用來追踪錯誤
 
   useEffect(() => {
     try {
       setIsMounted(true);
+      setLoading(false); // 當完成掛載時結束 loading 狀態
     } catch (error) {
       console.error("Error mounting component: ", error);
       setHasError(true);
     }
   }, []);
 
-  // 渲染對應的表格
   const renderTable = () => {
     try {
+      if (loading) {
+        return <div className="text-center text-gray-500">資料加載中...</div>;
+      }
+
       switch (activeTab) {
         case "all":
           return <UserTable users={users} />;
@@ -38,7 +43,7 @@ export default function OrderTracking() {
       }
     } catch (error) {
       console.error("Error rendering table: ", error);
-      setHasError(true); // 捕獲渲染表格過程中的錯誤
+      setHasError(true);
       return null;
     }
   };
@@ -104,7 +109,7 @@ export default function OrderTracking() {
           )}
 
           {/* 分頁按鈕 */}
-          <div className="join items-center justify-center mt-4 mb-6">
+          <div className="join items-center justify-center mt-4 mb-6 w-full">
             <button className="join-item btn">«</button>
             <button className="join-item btn">Page 1</button>
             <button className="join-item btn">Page 2</button>

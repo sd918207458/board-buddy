@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -23,11 +23,18 @@ export default function ShippingAddress() {
   const { isOpen, openModal, closeModal } = useModal(); // 使用自定義 useModal hook
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(""); // 增加錯誤訊息狀態
 
   // 提交表單處理
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsLoading(true);
+
+    if (!formData.username || !formData.phone || !formData.city) {
+      setErrorMessage("請填寫所有必填欄位");
+      setIsLoading(false);
+      return;
+    }
 
     setTimeout(() => {
       if (isEditing) {
@@ -39,6 +46,7 @@ export default function ShippingAddress() {
       }
       setIsLoading(false);
       closeModal();
+      setErrorMessage(""); // 清除錯誤訊息
     }, 1000);
   };
 
@@ -55,6 +63,20 @@ export default function ShippingAddress() {
         isDefault: addr.id === id,
       }))
     );
+  };
+
+  // 表單重置處理
+  const resetForm = () => {
+    setFormData({
+      username: "",
+      phone: "",
+      city: "",
+      area: "",
+      street: "",
+      detailedAddress: "",
+      isDefault: false,
+      id: null,
+    });
   };
 
   return (
@@ -100,16 +122,7 @@ export default function ShippingAddress() {
                       className="btn btn-primary mt-4 w-full bg-[#003E52]"
                       onClick={() => {
                         setIsEditing(false);
-                        setFormData({
-                          username: "",
-                          phone: "",
-                          city: "",
-                          area: "",
-                          street: "",
-                          detailedAddress: "",
-                          isDefault: false,
-                          id: null,
-                        });
+                        resetForm();
                         openModal();
                       }}
                     >
@@ -139,6 +152,7 @@ export default function ShippingAddress() {
                       isEditing={isEditing}
                       isLoading={isLoading}
                       closeModal={closeModal}
+                      errorMessage={errorMessage} // 傳遞錯誤訊息
                     />
                   </div>
                 </div>

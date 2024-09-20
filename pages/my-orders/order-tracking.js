@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import UserTable from "@/components/table";
+import UserTable from "@/components/table"; // 表格組件
 import users from "./../../public/user_table";
 import users_1 from "./../../public/users_1";
 import { CSSTransition, TransitionGroup } from "react-transition-group"; // 引入 React Transition Group
@@ -112,7 +112,7 @@ export default function OrderTracking() {
           )}
 
           {/* 分頁按鈕 */}
-          <div className="join items-center justify-center mt-4 mb-6">
+          <div className="join items-center justify-center mt-4 mb-6 w-full">
             <button className="join-item btn">«</button>
             <button className="join-item btn">Page 1</button>
             <button className="join-item btn">Page 2</button>

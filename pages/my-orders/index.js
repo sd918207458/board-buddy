@@ -1,22 +1,22 @@
 import React, { useState } from "react";
-import Navbar from "@/components/navbar_login";
+import Navbar from "@/components/LoggedInNavbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Link from "next/link";
 import { CSSTransition } from "react-transition-group";
-import card_data from "../../components/UI.json/card_data.json"; // 確保路徑正確，並導入 JSON 數據
+import card_data from "../../components/UI.json/card_data.json";
 
-const cardData = card_data; // 將導入的數據正確賦值給 cardData
+const cardData = card_data;
 
 // 統一色系的卡片組件
 const Card = ({ title, description, href, image }) => {
-  const [inProp, setInProp] = useState(false); // 控制進入和離開動畫的狀態
+  const [inProp, setInProp] = useState(false);
 
   return (
     <CSSTransition
       in={inProp}
-      timeout={300}
-      classNames="fade"
+      timeout={500}
+      classNames="scale"
       onEnter={() => setInProp(true)}
       onExited={() => setInProp(false)}
     >
@@ -52,7 +52,7 @@ export default function MemberAccount() {
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
         <div className="w-full max-w-sm mx-auto overflow-hidden bg-[#003E52] rounded-lg shadow-lg dark:bg-gray-800 lg:max-w-4xl">
           <div className="relative flex flex-col items-center justify-center min-h-screen bg-white dark:bg-gray-900">
-            <div className="w-full max-w-sm mx-auto lg:max-w-4xl mb-4 absolute left-0 top-0">
+            <div className="w-full max-w-sm mx-auto lg:max-w-4xl mb-4 absolute left-0 top-0 p-3">
               <Breadcrumbs />
             </div>
 
