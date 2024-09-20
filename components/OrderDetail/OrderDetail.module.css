@@ -1,0 +1,165 @@
+
+
+.product-container {
+  display: flex;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background-color: transparent;
+}
+.product-image {
+  flex: 1;
+  padding-right: 20px;
+}
+.product-image img {
+  max-width: 100%;
+  border: 1px solid #ddd;
+}
+.product-details {
+  padding: 10px;
+  border-radius: 10px;
+  flex: 2;
+}
+.product-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.product-price {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 10px;
+}
+.product-rating {
+  margin-bottom: 10px;
+}
+.product-rating span {
+  font-size: 18px;
+  color: #f4c150;
+}
+.product-description {
+  margin-bottom: 20px;
+  color: #555;
+}
+.product-quantity {
+  margin-bottom: 20px;
+}
+.quantity-selector {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  padding: 5px;
+}
+.quantity-selector input {
+  width: 40px;
+  text-align: center;
+  border: none;
+  outline: none;
+}
+.quantity-selector button {
+  background-color: #ddd;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+.add-to-cart {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  margin-right: 10px;
+}
+.wishlist {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: transparent;
+  color: #333;
+  border: 1px solid #333;
+  text-align: center;
+  text-decoration: none;
+}
+
+/* orderDetailDes */
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: transparent;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.flex-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  border: 1px solid rgb(0, 0, 0);
+  padding: 10px;
+}
+
+.flex-nav div {
+  flex: 1; /* 平分父層 */
+  display: flex;
+  justify-content: center; /* 文字水平置中 */
+  align-items: center; /* 文字垂直置中 */
+  padding: 10px;
+  transition: background-color 0.3s;
+  border-left: 1px solid rgb(0, 0, 0); /* 左側邊框 */
+  border-right: 1px solid rgb(0, 0, 0); /* 右側邊框 */
+}
+
+/* 去掉第一個區塊的左邊框 */
+.flex-nav div:first-child {
+  border-left: none;
+}
+
+/* 去掉最後一個區塊的右邊框 */
+.flex-nav div:last-child {
+  border-right: none;
+}
+
+.title {
+  font-size: 24px;
+  border-bottom: 2px solid black;
+  padding-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 20px;
+  margin-top: 20px;
+  border-bottom: 1px solid black;
+  padding-bottom: 5px;
+}
+
+/* 原本的 p 標籤轉為 .paragraph */
+.paragraph {
+  line-height: 1.6;
+  margin-bottom: 10px;
+  margin-top: 5px;
+}
+
+/* 原本的 ul 標籤轉為 .list */
+.list {
+  margin-top: 10px;
+  margin-left: 20px;
+}
+
+/* 原本的 ul li 標籤轉為 .list-item */
+.list-item {
+  margin-bottom: 5px;
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+.info {
+  background-color: transparent;
+  padding: 15px;
+  border-radius: 8px;
+  }
