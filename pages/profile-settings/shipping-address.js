@@ -123,17 +123,20 @@ export default function ShippingAddress() {
                 </div>
               )}
 
-              <div className="col-span-2">
-                <button
-                  className="btn btn-primary mt-4 w-full bg-[#003E52]"
-                  onClick={() => {
-                    setIsEditing(false);
-                    resetForm();
-                    openModal();
-                  }}
-                >
-                  新增地址
-                </button>
+              {/* 新增付款方式卡片 */}
+              <div className="card bg-base-100 shadow-xl">
+                <div className="card-body flex justify-between">
+                  <h2 className="card-title">新增地址</h2>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => {
+                      setIsEditing(false);
+                      openModal();
+                    }}
+                  >
+                    新增
+                  </button>
+                </div>
               </div>
             </section>
           </div>
