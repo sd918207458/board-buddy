@@ -2,9 +2,6 @@ import React, { useState, useEffect } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import UserTable from "@/components/table";
-import users from "../../public/user_table";
-import users_1 from "../../public/users_1";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 
 export default function OrderTracking() {
@@ -12,11 +9,13 @@ export default function OrderTracking() {
   const [activeTab, setActiveTab] = useState("all"); // 管理當前選擇的 Tab
   const [loading, setLoading] = useState(true); // 加入 loading 狀態
   const [hasError, setHasError] = useState(false); // 用來追踪錯誤
+  const [currentPage, setCurrentPage] = useState(1); // 用於處理分頁的狀態
+  const totalPages = 10; // 模擬總頁數
 
   useEffect(() => {
     try {
       setIsMounted(true);
-      setLoading(false); // 當完成掛載時結束 loading 狀態
+      setTimeout(() => setLoading(false), 1500); // 模擬資料加載
     } catch (error) {
       console.error("Error mounting component: ", error);
       setHasError(true);
@@ -24,20 +23,171 @@ export default function OrderTracking() {
   }, []);
 
   const renderTable = () => {
-    try {
-      if (loading) {
-        return <div className="text-center text-gray-500">資料加載中...</div>;
-      }
+    if (loading) {
+      return (
+        <div className="flex justify-center items-center">
+          <span className="loading loading-spinner loading-lg text-primary"></span>
+        </div>
+      );
+    }
 
+    try {
       switch (activeTab) {
         case "all":
-          return <UserTable users={users} />;
+          return (
+            <section className="max-w-4xl mx-auto grid grid-cols-2 gap-6 mt-4 sm:grid-cols-2">
+              {/* 商品卡片 */}
+              <div className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105">
+                <figure>
+                  <img
+                    src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
+                    alt="Shoes"
+                    className="rounded-t-lg"
+                  />
+                </figure>
+                <div className="card-body">
+                  <h2 className="card-title">Shoes!</h2>
+                  <p>If a dog chews shoes whose shoes does he choose?</p>
+                  <div className="card-actions justify-end">
+                    <button className="btn btn-primary hover:bg-secondary hover:text-white">
+                      Buy Now
+                    </button>
+                  </div>
+                </div>
+              </div>
+              {/* 商品卡片 */}
+              <div className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105">
+                <figure>
+                  <img
+                    src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
+                    alt="Shoes"
+                    className="rounded-t-lg"
+                  />
+                </figure>
+                <div className="card-body">
+                  <h2 className="card-title">Shoes!</h2>
+                  <p>If a dog chews shoes whose shoes does he choose?</p>
+                  <div className="card-actions justify-end">
+                    <button className="btn btn-primary hover:bg-secondary hover:text-white">
+                      Buy Now
+                    </button>
+                  </div>
+                </div>
+              </div>
+              {/* 商品卡片 */}
+              <div className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105">
+                <figure>
+                  <img
+                    src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
+                    alt="Shoes"
+                    className="rounded-t-lg"
+                  />
+                </figure>
+                <div className="card-body">
+                  <h2 className="card-title">Shoes!</h2>
+                  <p>If a dog chews shoes whose shoes does he choose?</p>
+                  <div className="card-actions justify-end">
+                    <button className="btn btn-primary hover:bg-secondary hover:text-white">
+                      Buy Now
+                    </button>
+                  </div>
+                </div>
+              </div>
+              {/* 重複的商品卡片可以在這裡展開 */}
+            </section>
+          );
         case "pending":
-          return <UserTable users={users_1} />;
+          return (
+            <section className="max-w-4xl mx-auto grid grid-cols-2 gap-6 mt-4 sm:grid-cols-2">
+              {/* 店家卡片 */}
+              <div className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105">
+                <figure>
+                  <img
+                    src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
+                    alt="Shoes"
+                    className="rounded-t-lg"
+                  />
+                </figure>
+                <div className="card-body">
+                  <h2 className="card-title">
+                    Shoes! <div className="badge badge-secondary">NEW</div>
+                  </h2>
+                  <p>If a dog chews shoes whose shoes does he choose?</p>
+                  <div className="card-actions justify-end">
+                    <button className="btn btn-primary hover:bg-secondary hover:text-white">
+                      Learn More
+                    </button>
+                  </div>
+                </div>
+              </div>
+              {/* 店家卡片 */}
+              <div className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105">
+                <figure>
+                  <img
+                    src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
+                    alt="Shoes"
+                    className="rounded-t-lg"
+                  />
+                </figure>
+                <div className="card-body">
+                  <h2 className="card-title">
+                    Shoes! <div className="badge badge-secondary">NEW</div>
+                  </h2>
+                  <p>If a dog chews shoes whose shoes does he choose?</p>
+                  <div className="card-actions justify-end">
+                    <button className="btn btn-primary hover:bg-secondary hover:text-white">
+                      Learn More
+                    </button>
+                  </div>
+                </div>
+              </div>
+              {/* 店家卡片 */}
+              <div className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105">
+                <figure>
+                  <img
+                    src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
+                    alt="Shoes"
+                    className="rounded-t-lg"
+                  />
+                </figure>
+                <div className="card-body">
+                  <h2 className="card-title">
+                    Shoes! <div className="badge badge-secondary">NEW</div>
+                  </h2>
+                  <p>If a dog chews shoes whose shoes does he choose?</p>
+                  <div className="card-actions justify-end">
+                    <button className="btn btn-primary hover:bg-secondary hover:text-white">
+                      Learn More
+                    </button>
+                  </div>
+                </div>
+              </div>
+              {/* 重複的店家卡片可以在這裡展開 */}
+            </section>
+          );
         case "history":
-          return <UserTable users={users} />;
-        case "canceled":
-          return <UserTable users={users_1} />;
+          return (
+            <section className="max-w-4xl mx-auto grid ">
+              {/* 收藏文章卡片 */}
+              <div className="card card-side bg-base-100 shadow-xl">
+                <figure>
+                  <img
+                    src="https://img.daisyui.com/images/stock/photo-1635805737707-575885ab0820.webp"
+                    alt="Movie"
+                    className="rounded-t-lg"
+                  />
+                </figure>
+                <div className="card-body">
+                  <h2 className="card-title">New movie is released!</h2>
+                  <p>Click the button to watch on Jetflix app.</p>
+                  <div className="card-actions justify-end">
+                    <button className="btn btn-primary">Watch</button>
+                  </div>
+                </div>
+              </div>
+              {/* 重複的收藏文章卡片可以在這裡展開 */}
+            </section>
+          );
         default:
           return null;
       }
@@ -55,6 +205,12 @@ export default function OrderTracking() {
           <h2 className="text-2xl font-bold text-red-600">
             發生錯誤，請稍後再試。
           </h2>
+          <button
+            className="btn btn-primary mt-4"
+            onClick={() => window.location.reload()}
+          >
+            重新加載
+          </button>
         </div>
       </div>
     );
@@ -79,19 +235,25 @@ export default function OrderTracking() {
           {isMounted && (
             <div className="tabs tabs-boxed justify-center mb-6">
               <button
-                className={`tab ${activeTab === "all" ? "tab-active" : ""}`}
+                className={`tab ${
+                  activeTab === "all" ? "tab-active tab-primary" : ""
+                }`}
                 onClick={() => setActiveTab("all")}
               >
                 收藏商品
               </button>
               <button
-                className={`tab ${activeTab === "pending" ? "tab-active" : ""}`}
+                className={`tab ${
+                  activeTab === "pending" ? "tab-active tab-primary" : ""
+                }`}
                 onClick={() => setActiveTab("pending")}
               >
                 收藏店家
               </button>
               <button
-                className={`tab ${activeTab === "history" ? "tab-active" : ""}`}
+                className={`tab ${
+                  activeTab === "history" ? "tab-active tab-primary" : ""
+                }`}
                 onClick={() => setActiveTab("history")}
               >
                 收藏文章
@@ -101,8 +263,13 @@ export default function OrderTracking() {
 
           {/* 渲染表格 */}
           {isMounted && (
-            <TransitionGroup>
-              <CSSTransition key={activeTab} timeout={300} classNames="fade">
+            <TransitionGroup component={null}>
+              <CSSTransition
+                key={activeTab}
+                timeout={300}
+                classNames="fade"
+                unmountOnExit
+              >
                 <div className="p-6">{renderTable()}</div>
               </CSSTransition>
             </TransitionGroup>
@@ -110,12 +277,31 @@ export default function OrderTracking() {
 
           {/* 分頁按鈕 */}
           <div className="join items-center justify-center mt-4 mb-6 w-full">
-            <button className="join-item btn">«</button>
-            <button className="join-item btn">Page 1</button>
-            <button className="join-item btn">Page 2</button>
-            <button className="join-item btn btn-disabled">...</button>
-            <button className="join-item btn">Page 99</button>
-            <button className="join-item btn">»</button>
+            <button
+              className="join-item btn"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(currentPage - 1)}
+            >
+              «
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i + 1}
+                className={`join-item btn ${
+                  currentPage === i + 1 ? "btn-active" : ""
+                }`}
+                onClick={() => setCurrentPage(i + 1)}
+              >
+                Page {i + 1}
+              </button>
+            ))}
+            <button
+              className="join-item btn"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(currentPage + 1)}
+            >
+              »
+            </button>
           </div>
         </div>
       </div>
