@@ -1,7 +1,11 @@
 import React, { useState } from "react";
-import Navbar from "@/components/navbar";
+import { useRouter } from "next/router"; // 引入 useRouter 用於頁面跳轉
+import Navbar from "@/components/LoggedInNavbar";
 import Footer from "@/components/footer";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
+import { CSSTransition } from "react-transition-group";
 
+// 可重用的輸入欄位組件
 const InputField = ({ label, type, id, placeholder, value, onChange }) => (
   <div className="form-control mt-4">
     <label htmlFor={id} className="label">
@@ -26,35 +30,52 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const router = useRouter(); // 使用 useRouter 進行頁面跳轉
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setErrorMessage("");
-
-    // 表單驗證
+  // 表單驗證邏輯
+  const validateForm = () => {
     if (!email.includes("@")) {
-      setErrorMessage("請輸入有效的電子信箱");
-      return;
+      return "請輸入有效的電子信箱";
     }
     if (password.length < 6) {
-      setErrorMessage("密碼必須至少包含6個字元");
-      return;
+      return "密碼必須至少包含6個字元";
     }
     if (password !== confirmPassword) {
-      setErrorMessage("密碼和確認密碼不一致");
-      return;
+      return "密碼和確認密碼不一致";
     }
     if (!termsAccepted) {
-      setErrorMessage("您必須同意條款與隱私政策");
-      return;
+      return "您必須同意條款與隱私政策";
     }
+    return "";
+  };
 
-    // 模擬註冊過程
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      alert("註冊成功！");
-    }, 1500);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("http://localhost:3005/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          confirmPassword,
+        }),
+      });
+
+      // 檢查是否請求成功
+      if (!response.ok) {
+        const errorText = await response.text(); // 捕捉錯誤訊息作為文字而不是 JSON
+        throw new Error(`HTTP error: ${response.status}, ${errorText}`);
+      }
+
+      const data = await response.json(); // 解析 JSON 響應
+      alert("註冊成功");
+    } catch (error) {
+      console.error("錯誤:", error);
+      setErrorMessage(error.message);
+    }
   };
 
   return (
@@ -75,12 +96,17 @@ export default function Register() {
               註冊
             </h2>
 
-            {/* 錯誤提示 */}
-            {errorMessage && (
+            {/* 錯誤提示動畫 */}
+            <CSSTransition
+              in={!!errorMessage}
+              timeout={300}
+              classNames="fade"
+              unmountOnExit
+            >
               <div className="text-red-500 text-center mt-4">
                 {errorMessage}
               </div>
-            )}
+            </CSSTransition>
 
             <form onSubmit={handleSubmit}>
               {/* 電子信箱輸入欄 */}
@@ -112,7 +138,7 @@ export default function Register() {
                     className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? "隱藏" : "顯示"}
+                    {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
                   </button>
                 </div>
               </div>

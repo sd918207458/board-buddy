@@ -1,6 +1,9 @@
 import React, { useState } from "react";
-import Navbar from "@/components/navbar";
+import { useRouter } from "next/router";
+import Navbar from "@/components/LoggedInNavbar";
 import Footer from "@/components/footer";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
+import { CSSTransition } from "react-transition-group";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -9,23 +12,60 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const router = useRouter();
 
-  // 模擬登入處理
-  const handleLogin = (e) => {
+  // 表單驗證邏輯
+  const validateForm = () => {
+    if (!email || !password) {
+      setErrorMessage("請填寫所有欄位");
+      return false;
+    }
+    return true;
+  };
+
+  // // 模擬登入處理
+  // const handleLogin = (e) => {
+  //   e.preventDefault();
+  //   if (!validateForm()) return;
+
+  //   setErrorMessage("");
+  //   setIsLoading(true);
+
+  //   // 模擬一個假的登入請求
+  //   setTimeout(() => {
+  //     setIsLoading(false);
+  //     if (email !== "test@example.com" || password !== "123") {
+  //       setErrorMessage("電子信箱或密碼錯誤");
+  //     } else {
+  //       // 登入成功，這裡可以進行跳轉或其他處理
+  //       router.push("/profile-settings");
+  //     }
+  //   }, 1500);
+  // };
+
+  const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMessage("");
     setIsLoading(true);
 
-    // 模擬一個假的登入請求
-    setTimeout(() => {
-      setIsLoading(false);
-      if (email !== "test@example.com" || password !== "password123") {
-        setErrorMessage("電子信箱或密碼錯誤");
-      } else {
-        // 登入成功，這裡可以進行跳轉或其他處理
-        alert("登入成功！");
-      }
-    }, 1500);
+    const response = await fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+    setIsLoading(false);
+
+    if (response.ok) {
+      // 存儲JWT token
+      localStorage.setItem("token", data.token);
+      router.push("/profile-settings");
+    } else {
+      setErrorMessage(data.error);
+    }
   };
 
   return (
@@ -45,7 +85,7 @@ export default function Login() {
               <img
                 className="w-auto h-7 sm:h-8"
                 src="https://merakiui.com/images/logo.svg"
-                alt=""
+                alt="Logo"
               />
             </div>
 
@@ -55,9 +95,16 @@ export default function Login() {
 
             {/* 顯示錯誤訊息 */}
             {errorMessage && (
-              <div className="text-red-500 text-center mt-4">
-                {errorMessage}
-              </div>
+              <CSSTransition
+                in={!!errorMessage}
+                timeout={300}
+                classNames="fade"
+                unmountOnExit
+              >
+                <div className="text-red-500 text-center mt-4">
+                  {errorMessage}
+                </div>
+              </CSSTransition>
             )}
 
             <form onSubmit={handleLogin}>
@@ -108,7 +155,7 @@ export default function Login() {
                     className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 dark:text-gray-300"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? "隱藏" : "顯示"}
+                    {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
                   </button>
                 </div>
               </div>

@@ -1,35 +1,49 @@
-import React from "react";
-import Navbar from "@/components/navbar";
+import React, { useState } from "react";
+import Navbar from "@/components/LoggedInNavbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { CSSTransition } from "react-transition-group";
 import card_data from "../../components/UI.json/card_data.json";
 
 const cardData = card_data;
 
 // 統一色系的卡片組件
-const Card = ({ title, description, href }) => (
-  <motion.div
-    whileHover={{ scale: 1.05 }}
-    whileTap={{ scale: 0.95 }}
-    className="card bg-[#036672] text-white shadow-lg hover:shadow-2xl transition-shadow w-full md:w-80 lg:w-96 cursor-pointer"
-  >
-    <Link href={href} passHref>
-      <div className="card-body flex flex-row items-center">
-        <div className="avatar">
-          <div className="w-24 rounded-full ring ring-white ring-offset-base-100 ring-offset-2">
-            <img src="https://placekitten.com/200/200" alt="Avatar" />
-          </div>
-        </div>
-        <div className="ml-4">
-          <h2 className="card-title text-lg text-white">{title}</h2>
-          <p className="text-sm text-gray-200">{description}</p>
-        </div>
+const Card = ({ title, description, href, image }) => {
+  const [inProp, setInProp] = useState(false);
+
+  return (
+    <CSSTransition
+      in={inProp}
+      timeout={500}
+      classNames="scale"
+      onEnter={() => setInProp(true)}
+      onExited={() => setInProp(false)}
+    >
+      <div
+        className="card bg-[#036672] text-white shadow-lg hover:shadow-2xl transition-shadow w-full md:w-80 lg:w-96 cursor-pointer"
+        onMouseEnter={() => setInProp(true)}
+        onMouseLeave={() => setInProp(false)}
+      >
+        <Link href={href} legacyBehavior>
+          <a>
+            <div className="card-body flex flex-row items-center">
+              <div className="avatar">
+                <div className="w-24 rounded-full ring ring-white ring-offset-base-100 ring-offset-2">
+                  <img src={image} alt="Avatar" />
+                </div>
+              </div>
+              <div className="ml-4">
+                <h2 className="card-title text-lg text-white">{title}</h2>
+                <p className="text-sm text-gray-200">{description}</p>
+              </div>
+            </div>
+          </a>
+        </Link>
       </div>
-    </Link>
-  </motion.div>
-);
+    </CSSTransition>
+  );
+};
 
 export default function MemberAccount() {
   return (
@@ -38,7 +52,7 @@ export default function MemberAccount() {
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
         <div className="w-full max-w-sm mx-auto overflow-hidden bg-[#003E52] rounded-lg shadow-lg dark:bg-gray-800 lg:max-w-4xl">
           <div className="relative flex flex-col items-center justify-center min-h-screen bg-white dark:bg-gray-900">
-            <div className="w-full max-w-sm mx-auto lg:max-w-4xl mb-4 absolute left-0 top-0">
+            <div className="w-full max-w-sm mx-auto lg:max-w-4xl mb-4 absolute left-0 top-0 p-3">
               <Breadcrumbs />
             </div>
 

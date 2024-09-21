@@ -1,46 +1,56 @@
 import React from "react";
 import Link from "next/link";
+import { CSSTransition, TransitionGroup } from "react-transition-group";
 
 // 定義表格行組件
 const TableRow = ({ user }) => {
   return (
-    <tr className="hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 ease-in-out">
-      <th>
-        <label>
-          <input type="checkbox" className="checkbox" />
-        </label>
-      </th>
-      <td>
-        <div className="flex items-center gap-3">
-          <div className="avatar">
-            <div className="mask mask-squircle h-12 w-12">
-              <img src={user.avatar} alt={`Avatar of ${user.name}`} />
+    <CSSTransition key={user.id} timeout={300} classNames="fade">
+      <tr className="hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 ease-in-out">
+        <th>
+          <label>
+            <input type="checkbox" className="checkbox" />
+          </label>
+        </th>
+        <td>
+          <div className="flex items-center gap-3">
+            <div className="avatar">
+              <div className="mask mask-squircle h-12 w-12">
+                <img src={user.avatar} alt={`Avatar of ${user.name}`} />
+              </div>
+            </div>
+            <div>
+              <div className="font-bold text-gray-800 dark:text-gray-200">
+                {user.name}
+              </div>
+              <div className="text-sm text-gray-500 dark:text-gray-300">
+                {user.location}
+              </div>
             </div>
           </div>
-          <div>
-            <div className="font-bold text-gray-800 dark:text-gray-200">
-              {user.name}
-            </div>
-            <div className="text-sm text-gray-500 dark:text-gray-300">
-              {user.location}
-            </div>
-          </div>
-        </div>
-      </td>
-      <td>
-        <span className="text-gray-700 dark:text-gray-300">{user.company}</span>
-        <br />
-        <span className="badge badge-ghost badge-sm">{user.jobTitle}</span>
-      </td>
-      <td>{user.favoriteColor}</td>
-      <th>
-        <Link href={"./order-details"}>
-          <button className="btn btn-neutral bg-[#003E52] btn-xs transition-transform transform hover:scale-105">
-            訂單詳情
-          </button>
-        </Link>
-      </th>
-    </tr>
+        </td>
+        <td>
+          <span className="text-gray-700 dark:text-gray-300">
+            {user.company}
+          </span>
+          <br />
+          <span className="badge badge-ghost badge-sm">{user.jobTitle}</span>
+        </td>
+        <td>{user.favoriteColor}</td>
+        <th>
+          <Link href="/my-orders/order-details" legacyBehavior>
+            <a className="btn btn-neutral bg-[#003E52] btn-xs transition-transform hover:scale-105">
+              訂單詳情
+            </a>
+          </Link>
+          <Link href="/my-orders/request" legacyBehavior>
+            <a className="btn btn-neutral bg-[#003E52] btn-xs transition-transform hover:scale-105">
+              退貨處理
+            </a>
+          </Link>
+        </th>
+      </tr>
+    </CSSTransition>
   );
 };
 
@@ -63,12 +73,12 @@ const UserTable = ({ users }) => {
             <th></th>
           </tr>
         </thead>
-        <tbody>
+        <TransitionGroup component="tbody">
           {/* 動態生成表格行 */}
-          {users.map((user, index) => (
-            <TableRow key={index} user={user} />
+          {users.map((user) => (
+            <TableRow key={user.id} user={user} />
           ))}
-        </tbody>
+        </TransitionGroup>
       </table>
     </div>
   );

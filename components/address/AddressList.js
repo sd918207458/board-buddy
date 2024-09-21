@@ -6,14 +6,18 @@ const AddressList = ({
   handleEdit,
   handleDelete,
   handleSetDefault,
-}) => (
-  <div>
-    {addresses.length === 0 ? (
+}) => {
+  if (addresses.length === 0) {
+    return (
       <div className="text-center text-gray-500">
         尚未添加任何地址，請新增一個地址。
       </div>
-    ) : (
-      addresses.map((address) => (
+    );
+  }
+
+  return (
+    <div>
+      {addresses.map((address) => (
         <AddressCard
           key={address.id}
           address={address}
@@ -21,9 +25,9 @@ const AddressList = ({
           handleDelete={handleDelete}
           handleSetDefault={handleSetDefault}
         />
-      ))
-    )}
-  </div>
-);
+      ))}
+    </div>
+  );
+};
 
 export default AddressList;

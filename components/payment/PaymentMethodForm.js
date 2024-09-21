@@ -1,3 +1,5 @@
+import React from "react";
+
 const PaymentMethodForm = ({
   currentMethod,
   isEditing,
@@ -6,9 +8,34 @@ const PaymentMethodForm = ({
   handleChange,
   closeModal,
 }) => {
+  // 簡單的表單驗證（驗證卡號和到期日）
+  const validateForm = () => {
+    const cardNumberRegex = /^\d{4} \d{4} \d{4} \d{4}$/;
+    const expiryDateRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
+
+    if (!cardNumberRegex.test(currentMethod.cardNumber)) {
+      alert("請輸入有效的信用卡卡號 (0000 0000 0000 0000)");
+      return false;
+    }
+
+    if (!expiryDateRegex.test(currentMethod.expiryDate)) {
+      alert("請輸入有效的到期日 (MM/YY)");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      handleSubmit();
+    }
+  };
+
   return (
     <dialog id="my_modal_4" className="modal">
-      <div className="modal-box">
+      <form className="modal-box" onSubmit={handleFormSubmit}>
         <h3 className="font-bold text-lg">
           {isEditing ? "編輯錢包" : "新增錢包"}
         </h3>
@@ -26,6 +53,7 @@ const PaymentMethodForm = ({
               onChange={handleChange}
               placeholder="0000 0000 0000 0000"
               className="input input-bordered w-full"
+              required
             />
           </div>
 
@@ -41,6 +69,7 @@ const PaymentMethodForm = ({
               onChange={handleChange}
               placeholder="MM/YY"
               className="input input-bordered w-full"
+              required
             />
           </div>
         </div>
@@ -62,17 +91,17 @@ const PaymentMethodForm = ({
         {/* Modal Actions */}
         <div className="modal-action">
           <button
+            type="submit"
             className={`btn btn-success ${isLoading ? "loading" : ""}`}
-            onClick={handleSubmit}
             disabled={isLoading}
           >
             {isEditing ? "保存修改" : "新增錢包"}
           </button>
-          <button className="btn" onClick={closeModal}>
+          <button type="button" className="btn" onClick={closeModal}>
             取消
           </button>
         </div>
-      </div>
+      </form>
     </dialog>
   );
 };
