@@ -113,14 +113,31 @@ export default function OrderTracking() {
 
           {/* 分頁按鈕 */}
           <div className="join items-center justify-center mt-4 mb-6 w-full">
-            <button className="join-item btn" disabled={currentPage === 1}>
+            <button
+              className="join-item btn"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(currentPage - 1)}
+            >
               «
             </button>
-            <button className="join-item btn btn-active">Page 1</button>
-            <button className="join-item btn">Page 2</button>
-            <button className="join-item btn btn-disabled">...</button>
-            <button className="join-item btn">Page 99</button>
-            <button className="join-item btn">»</button>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i + 1}
+                className={`join-item btn ${
+                  currentPage === i + 1 ? "btn-active" : ""
+                }`}
+                onClick={() => setCurrentPage(i + 1)}
+              >
+                Page {i + 1}
+              </button>
+            ))}
+            <button
+              className="join-item btn"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(currentPage + 1)}
+            >
+              »
+            </button>
           </div>
         </div>
       </div>
