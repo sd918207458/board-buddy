@@ -30,10 +30,7 @@ const AddressForm = ({
   ];
 
   return (
-    <form
-      className="w-full bg-white modal-box w-11/12 max-w-5xl p-4"
-      onSubmit={handleSubmit}
-    >
+    <form onSubmit={handleSubmit}>
       <h3 className="font-bold text-lg mb-4 text-gray-800">
         {isEditing ? "編輯地址" : "新增地址"}
       </h3>
@@ -43,7 +40,7 @@ const AddressForm = ({
         {inputFields.map(({ id, label, placeholder }) => (
           <div className="form-control" key={id}>
             <label className="label" htmlFor={id}>
-              <span className="label-text">{label}</span>
+              <span className="label-text ">{label}</span>
             </label>
             <input
               id={id}
@@ -52,7 +49,7 @@ const AddressForm = ({
               value={formData[id]}
               onChange={handleChange}
               placeholder={`請輸入${placeholder}`}
-              className="input input-bordered w-full"
+              className="input input-bordered w-full text-black"
               required
             />
           </div>
@@ -61,13 +58,13 @@ const AddressForm = ({
         {/* 城市選擇 */}
         <div className="form-control">
           <label className="label">
-            <span className="label-text">城市</span>
+            <span className="label-text ">城市</span>
           </label>
           <select
             name="city"
             value={formData.city}
             onChange={handleChange}
-            className="select select-bordered w-full"
+            className="select select-bordered w-full text-black"
             required
           >
             <option value="">請選擇城市</option>
@@ -82,13 +79,13 @@ const AddressForm = ({
         {/* 區域選擇 */}
         <div className="form-control">
           <label className="label">
-            <span className="label-text">區域</span>
+            <span className="label-text ">區域</span>
           </label>
           <select
             name="area"
             value={formData.area}
             onChange={handleChange}
-            className="select select-bordered w-full"
+            className="select select-bordered w-full text-black"
             required
             disabled={!formData.city}
           >
@@ -133,8 +130,8 @@ const AddressForm = ({
         <button
           type="button"
           className="btn btn-primary"
-          onClick={closeModal}
           style={{ backgroundColor: "#003E52" }}
+          onClick={closeModal} // 添加這行代碼來調用 closeModal 函數
         >
           取消
         </button>
