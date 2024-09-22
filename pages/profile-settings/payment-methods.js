@@ -1,7 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { CSSTransition, TransitionGroup } from "react-transition-group";
+
+// 驗證信用卡號是否有效
+const validateCardNumber = (cardNumber) => {
+  const cardNumberPattern = /^\d{16}$/; // 16位數字格式
+  return cardNumberPattern.test(cardNumber);
+};
+
+// 驗證到期日是否有效 (MM/YY 格式)
+const validateExpiryDate = (expiryDate) => {
+  const expiryDatePattern = /^(0[1-9]|1[0-2])\/\d{2}$/; // MM/YY 格式
+  return expiryDatePattern.test(expiryDate);
+};
 
 export default function PaymentMethods() {
   const [paymentMethods, setPaymentMethods] = useState([
@@ -14,6 +27,7 @@ export default function PaymentMethods() {
     },
   ]);
 
+  const [isMounted, setIsMounted] = useState(false);
   const [currentMethod, setCurrentMethod] = useState({
     id: null,
     cardholderName: "",
@@ -22,10 +36,14 @@ export default function PaymentMethods() {
     cvv: "",
     isDefault: false,
   });
-
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // 處理表單輸入變更
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setCurrentMethod((prev) => ({
@@ -34,38 +52,45 @@ export default function PaymentMethods() {
     }));
   };
 
-  // 保存付款方式（新增或編輯）
   const handleSubmit = () => {
-    if (isEditing) {
-      // 編輯現有的付款方式
-      setPaymentMethods((prev) =>
-        prev.map((method) =>
-          method.id === currentMethod.id ? currentMethod : method
-        )
-      );
-    } else {
-      // 新增付款方式
-      setPaymentMethods((prev) => [
-        ...prev,
-        { ...currentMethod, id: Date.now() },
-      ]);
+    if (!validateCardNumber(currentMethod.cardNumber)) {
+      alert("信用卡號格式錯誤，請輸入16位數字");
+      return;
+    }
+    if (!validateExpiryDate(currentMethod.expiryDate)) {
+      alert("到期日格式錯誤，請使用 MM/YY 格式");
+      return;
     }
 
-    // 確保只有一張卡被設為預設卡
-    if (currentMethod.isDefault) {
-      setPaymentMethods((prev) =>
-        prev.map((method) =>
-          method.id === currentMethod.id
-            ? { ...method, isDefault: true }
-            : { ...method, isDefault: false }
-        )
-      );
-    }
+    setIsLoading(true);
+    setTimeout(() => {
+      if (isEditing) {
+        setPaymentMethods((prev) =>
+          prev.map((method) =>
+            method.id === currentMethod.id ? currentMethod : method
+          )
+        );
+      } else {
+        setPaymentMethods((prev) => [
+          ...prev,
+          { ...currentMethod, id: Date.now() },
+        ]);
+      }
 
-    closeModal();
+      if (currentMethod.isDefault) {
+        setPaymentMethods((prev) =>
+          prev.map((method) =>
+            method.id === currentMethod.id
+              ? { ...method, isDefault: true }
+              : { ...method, isDefault: false }
+          )
+        );
+      }
+      setIsLoading(false);
+      closeModal();
+    }, 1000);
   };
 
-  // 設置為預設付款方式
   const handleSetDefault = (id) => {
     setPaymentMethods((prev) =>
       prev.map((method) =>
@@ -76,20 +101,22 @@ export default function PaymentMethods() {
     );
   };
 
-  // 編輯付款方式
   const handleEdit = (method) => {
     setCurrentMethod(method);
     setIsEditing(true);
-    document.getElementById("my_modal_4").showModal();
+    openModal();
   };
 
-  // 刪除付款方式
   const handleDelete = (id) => {
     setPaymentMethods((prev) => prev.filter((method) => method.id !== id));
   };
 
-  // 重置表單並關閉模態框
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
   const closeModal = () => {
+    setIsModalOpen(false);
     setCurrentMethod({
       id: null,
       cardholderName: "",
@@ -99,13 +126,12 @@ export default function PaymentMethods() {
       isDefault: false,
     });
     setIsEditing(false);
-    document.getElementById("my_modal_4").close();
   };
 
   return (
     <>
       <Navbar />
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
         <div className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
           <div className="px-6 py-4">
             <Breadcrumbs />
@@ -115,44 +141,52 @@ export default function PaymentMethods() {
               </h2>
             </section>
 
-            <section className="max-w-4xl mx-auto">
-              <h3 className="text-l font-semibold text-gray-700 capitalize dark:text-white mb-6">
-                常用錢包
-              </h3>
-
-              {/* 現有付款方式卡片 */}
-              {paymentMethods.map((method) => (
-                <div key={method.id} className="card bg-base-100 shadow-xl mb-4">
-                  <div className="card-body">
-                    <h2 className="card-title">付款方式</h2>
-                    <p>卡號: {method.cardNumber}</p>
-                    <p>到期日: {method.expiryDate}</p>
-                    {method.isDefault && (
-                      <span className="badge badge-primary">預設</span>
-                    )}
-                    <div className="flex justify-between">
-                      <button
-                        className="btn btn-primary"
-                        onClick={() => handleEdit(method)}
-                      >
-                        編輯
-                      </button>
-                      <button
-                        className="btn btn-error"
-                        onClick={() => handleDelete(method.id)}
-                      >
-                        刪除
-                      </button>
-                      <button
-                        className="btn btn-outline"
-                        onClick={() => handleSetDefault(method.id)}
-                      >
-                        設為預設
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <h3 className="text-l font-semibold text-gray-700 capitalize dark:text-white mb-6">
+              常用錢包
+            </h3>
+            <section className="max-w-4xl mx-auto grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
+              {isMounted && (
+                <TransitionGroup component={null}>
+                  {paymentMethods.map((method) => (
+                    <CSSTransition
+                      key={method.id}
+                      timeout={300}
+                      classNames="fade"
+                    >
+                      <div className="card bg-base-100 shadow-xl mb-4">
+                        <div className="card-body ">
+                          <h2 className="card-title">付款方式</h2>
+                          <p>卡號: {method.cardNumber}</p>
+                          <p>到期日: {method.expiryDate}</p>
+                          {method.isDefault && (
+                            <span className="badge badge-primary">預設</span>
+                          )}
+                          <div className="flex justify-between">
+                            <button
+                              className="btn btn-primary"
+                              onClick={() => handleEdit(method)}
+                            >
+                              編輯
+                            </button>
+                            <button
+                              className="btn btn-error"
+                              onClick={() => handleDelete(method.id)}
+                            >
+                              刪除
+                            </button>
+                            <button
+                              className="btn btn-outline"
+                              onClick={() => handleSetDefault(method.id)}
+                            >
+                              設為預設
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </CSSTransition>
+                  ))}
+                </TransitionGroup>
+              )}
 
               {/* 新增付款方式卡片 */}
               <div className="card bg-base-100 shadow-xl">
@@ -162,7 +196,7 @@ export default function PaymentMethods() {
                     className="btn btn-primary"
                     onClick={() => {
                       setIsEditing(false);
-                      document.getElementById("my_modal_4").showModal();
+                      openModal();
                     }}
                   >
                     新增
@@ -173,105 +207,80 @@ export default function PaymentMethods() {
           </div>
 
           {/* Modal for Editing/Adding Payment Method */}
-          <dialog id="my_modal_4" className="modal">
-            <div className="modal-box">
-              <h3 className="font-bold text-lg">
-                {isEditing ? "編輯錢包" : "新增錢包"}
-              </h3>
+          {isModalOpen && (
+            <dialog open className="modal">
+              <div className="modal-box">
+                <h3 className="font-bold text-lg">
+                  {isEditing ? "編輯錢包" : "新增錢包"}
+                </h3>
 
-              <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
-                {/* Cardholder's Name */}
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">付款人姓名</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="cardholderName"
-                    value={currentMethod.cardholderName}
-                    onChange={handleChange}
-                    placeholder="請輸入姓名"
-                    className="input input-bordered w-full"
-                  />
+                <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
+                  {/* Credit Card Number */}
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">信用卡卡號</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="cardNumber"
+                      value={currentMethod.cardNumber}
+                      onChange={handleChange}
+                      placeholder="0000 0000 0000 0000"
+                      className="input input-bordered w-full"
+                    />
+                  </div>
+
+                  {/* Expiry Date */}
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">到期日</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="expiryDate"
+                      value={currentMethod.expiryDate}
+                      onChange={handleChange}
+                      placeholder="MM/YY"
+                      className="input input-bordered w-full"
+                    />
+                  </div>
                 </div>
 
-                {/* Credit Card Number */}
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">信用卡卡號</span>
+                {/* Set Default Payment Method */}
+                <div className="form-control mt-4">
+                  <label className="cursor-pointer label">
+                    <input
+                      type="checkbox"
+                      name="isDefault"
+                      checked={currentMethod.isDefault}
+                      onChange={handleChange}
+                      className="checkbox"
+                    />
+                    <span className="label-text ml-2">
+                      設為我的預設付款方式
+                    </span>
                   </label>
-                  <input
-                    type="text"
-                    name="cardNumber"
-                    value={currentMethod.cardNumber}
-                    onChange={handleChange}
-                    placeholder="0000 0000 0000 0000"
-                    className="input input-bordered w-full"
-                  />
                 </div>
 
-                {/* Expiry Date */}
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">到期日</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="expiryDate"
-                    value={currentMethod.expiryDate}
-                    onChange={handleChange}
-                    placeholder="MM/YY"
-                    className="input input-bordered w-full"
-                  />
-                </div>
-
-                {/* CVV */}
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">驗證碼</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="cvv"
-                    value={currentMethod.cvv}
-                    onChange={handleChange}
-                    placeholder="CVV"
-                    className="input input-bordered w-full"
-                  />
+                {/* Modal Actions */}
+                <div className="modal-action">
+                  <button
+                    className={`btn btn-success ${isLoading ? "loading" : ""}`}
+                    onClick={handleSubmit}
+                    disabled={isLoading}
+                  >
+                    {isEditing ? "保存修改" : "新增錢包"}
+                  </button>
+                  <button className="btn" onClick={closeModal}>
+                    取消
+                  </button>
                 </div>
               </div>
-
-              {/* Set Default Payment Method */}
-              <div className="form-control mt-4">
-                <label className="cursor-pointer label">
-                  <input
-                    type="checkbox"
-                    name="isDefault"
-                    checked={currentMethod.isDefault}
-                    onChange={handleChange}
-                    className="checkbox"
-                  />
-                  <span className="label-text ml-2">
-                    設為我的預設付款方式
-                  </span>
-                </label>
-              </div>
-
-              {/* Modal Actions */}
-              <div className="modal-action">
-                <button className="btn btn-success" onClick={handleSubmit}>
-                  {isEditing ? "保存修改" : "新增錢包"}
-                </button>
-                <button className="btn" onClick={closeModal}>
-                  取消
-                </button>
-              </div>
-            </div>
-          </dialog>
+            </dialog>
+          )}
         </div>
       </div>
       <Footer />
     </>
   );
 }
-

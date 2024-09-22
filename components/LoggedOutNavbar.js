@@ -1,5 +1,11 @@
 import React from "react";
-import { GiHouse, GiThreeFriends, GiShoppingBag, GiTalk } from "react-icons/gi";
+import {
+  GiHouse,
+  GiThreeFriends,
+  GiShoppingBag,
+  GiTalk,
+  GiPerson,
+} from "react-icons/gi";
 import Link from "next/link";
 
 export default function Navbar() {
@@ -46,7 +52,8 @@ export default function Navbar() {
       <div className="flex items-center space-x-4">
         <div className="dropdown dropdown-hover dropdown-bottom dropdown-end">
           <div tabIndex={0} role="button" className="btn m-1">
-            Login
+            <GiPerson className="w-6 h-6" />
+            <span className="ml-2">Login</span>
           </div>
           <ul
             tabIndex={0}
@@ -54,23 +61,12 @@ export default function Navbar() {
           >
             <li>
               <Link href="/profile-settings" legacyBehavior>
-                <a className="btn btn-ghost text-black flex items-center">
-                  會員中心
-                </a>
+                <a className="btn btn-ghost text-black">會員中心</a>
               </Link>
             </li>
             <li>
-              <Link href="/member/login" legacyBehavior>
-                <a className="btn btn-ghost text-black flex items-center">
-                  管理訂單
-                </a>
-              </Link>
-            </li>
-            <li>
-              <Link href="/member/login" legacyBehavior>
-                <a className="btn btn-ghost text-black flex items-center">
-                  登出
-                </a>
+              <Link href="/my-orders/order-tracking" legacyBehavior>
+                <a className="btn btn-ghost text-black">管理訂單</a>
               </Link>
             </li>
           </ul>
