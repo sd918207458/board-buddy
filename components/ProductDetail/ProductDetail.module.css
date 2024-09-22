@@ -1,5 +1,5 @@
 .blueBackground {
-  background-color: #0a4580;
+  background-color: #06305a;
 }
 
 .product-container {
@@ -83,7 +83,7 @@
   text-decoration: none; /* 移除連結的下劃線 */
   border-radius: 5px; /* 統一按鈕的圓角 */
   padding: 10px 20px;
-  background-color: #03192e;
+  background-color: #010b14;
   color: #fff;
   text-align: center;
   text-decoration: none;
