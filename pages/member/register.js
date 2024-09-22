@@ -24,6 +24,7 @@ const InputField = ({ label, type, id, placeholder, value, onChange }) => (
 
 export default function Register() {
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -34,6 +35,9 @@ export default function Register() {
 
   // 表單驗證邏輯
   const validateForm = () => {
+    if (!username) {
+      return "請輸入使用者名稱";
+    }
     if (!email.includes("@")) {
       return "請輸入有效的電子信箱";
     }
@@ -51,13 +55,22 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setErrorMessage("");
+
+    const validationError = validateForm();
+    if (validationError) {
+      setErrorMessage(validationError);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch("http://localhost:3005/api/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          username,
           email,
           password,
           confirmPassword,
@@ -72,9 +85,12 @@ export default function Register() {
 
       const data = await response.json(); // 解析 JSON 響應
       alert("註冊成功");
+      router.push("/member/login"); // 成功後跳轉到登入頁面
     } catch (error) {
       console.error("錯誤:", error);
       setErrorMessage(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -109,6 +125,16 @@ export default function Register() {
             </CSSTransition>
 
             <form onSubmit={handleSubmit}>
+              {/* 使用者名稱輸入欄 */}
+              <InputField
+                label="使用者名稱"
+                type="text"
+                id="username"
+                placeholder="使用者名稱"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+
               {/* 電子信箱輸入欄 */}
               <InputField
                 label="電子信箱"
