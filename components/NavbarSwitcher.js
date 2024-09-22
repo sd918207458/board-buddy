@@ -1,23 +1,26 @@
-import React, { useState, useEffect } from "react";
-import LoggedInNavbar from "./LoggedInNavbar"; // 已登入時的 Navbar
-import LoggedOutNavbar from "./LoggedOutNavbar"; // 未登入時的 Navbar
+// components/NavbarSwitcher.js
+import React, { useEffect, useState } from "react";
+import LoggedInNavbar from "@/components/LoggedInNavbar";
+import LoggedOutNavbar from "@/components/LoggedOutNavbar";
+import { useRouter } from "next/router";
 
-export default function NavbarSwitcher() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // 假設 false 為未登入狀態
+const NavbarSwitcher = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    // 這裡可以使用 fetch API 從後端驗證用戶是否已登入
-    const checkLoginStatus = async () => {
-      try {
-        const response = await fetch("/api/check-auth"); // 假設有一個 API 檢查認證狀態
-        const data = await response.json();
-        setIsLoggedIn(data.isAuthenticated);
-      } catch (error) {
-        console.error("Error checking login status", error);
-      }
-    };
-    checkLoginStatus();
-  }, []);
+    // 假設你將JWT token存儲在localStorage中
+    const token = localStorage.getItem("token");
+
+    // 檢查token是否存在來判斷是否已登入
+    if (token) {
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, [router]);
 
   return isLoggedIn ? <LoggedInNavbar /> : <LoggedOutNavbar />;
-}
+};
+
+export default NavbarSwitcher;
