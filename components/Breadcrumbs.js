@@ -1,12 +1,21 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
+import { useEffect, useState } from "react";
 
 const Breadcrumbs = ({ customCrumbs }) => {
   const router = useRouter();
 
+  const [pathnames, setPathnames] = useState([]);
+  // 使用 useEffect 來確保只在客戶端處理路徑
+  useEffect(() => {
+    if (router.asPath) {
+      setPathnames(router.asPath.split("/").filter((x) => x));
+    }
+  }, [router.asPath]);
+
   // 將路徑分割成陣列
-  const pathnames = router.asPath.split("/").filter((x) => x);
+  // const pathnames = router.asPath.split("/").filter((x) => x);
 
   // 如果有自定義 breadcrumbs 項，使用自定義的，否則使用當前路徑
   const breadcrumbs = customCrumbs || pathnames;
