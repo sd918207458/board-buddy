@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="../styles/sidecart.css">
+</head>
+<body>
+<div class="container">
+  <!-- 購物車內容 -->
+  <section class="cart-content">
+    <h2>購物車內容</h2>
+    <table class="cart-table">
+      <thead>
+        <tr>
+          <th>商品明細</th>
+          <th>單價</th>
+          <th>數量</th>
+          <th>小計</th>
+        </tr>
+      </thead>
+      <tbody>
+       <tr>
+  <td class="product-info">
+    <img src="https://i.postimg.cc/XYdbSzx8/image.png" alt="商品" class="product-image" />
+    <span>大鍋炒 Wok on Fire</span>
+  </td>
+  <td class="text-center align-middle">NT$490</td>
+  <td class="text-center align-middle">
+    <button class="quantity-button">-</button>
+    <span>1</span>
+    <button class="quantity-button">+</button>
+  </td>
+  <td class="text-center align-middle">NT$490</td>
+  <td class="text-center align-middle">
+    <button class="remove-item">×</button>
+  </td>
+</tr>
+
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 側邊的結帳金額區塊 -->
+  <aside class="checkout-summary">
+    <h3>結帳金額</h3>
+    <div class="summary-item">
+      <span>商品小計</span>
+      <span>NT$490</span>
+    </div>
+    <div class="summary-item">
+      <span>運費</span>
+      <span>+NT$130</span>
+    </div>
+    <div class="summary-item total">
+      <span>應付總額</span>
+      <span>NT$620</span>
+    </div>
+    <button class="checkout-button">結帳</button>
+  </aside>
+</div>
+
+</body>
+</html>
