@@ -48,23 +48,29 @@ export default function Login() {
     setErrorMessage("");
     setIsLoading(true);
 
-    const response = await fetch("/api/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const response = await fetch("http://localhost:3005/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await response.json();
-    setIsLoading(false);
+      const data = await response.json();
 
-    if (response.ok) {
-      // 存儲JWT token
-      localStorage.setItem("token", data.token);
-      router.push("/profile-settings");
-    } else {
-      setErrorMessage(data.error);
+      if (response.ok) {
+        // 存儲JWT token
+        localStorage.setItem("token", data.token);
+
+        // 成功後跳轉到個人資料設置頁面
+        router.push("/profile-settings");
+      } else {
+        setErrorMessage(data.error); // 顯示錯誤信息
+      }
+    } catch (error) {
+      console.error("錯誤:", error);
+      setErrorMessage("登入失敗，請稍後再試");
+    } finally {
+      setIsLoading(false);
     }
   };
 
