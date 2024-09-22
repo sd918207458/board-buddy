@@ -11,7 +11,7 @@ const ProductListPage = () => {
       <Navbar />
       <div className="flex">
         {/* Sidebar on the left */}
-        <aside className="w-64">
+        <aside className="w-70">
           <Breadcrumbs />
           <Sidebar />
         </aside>
