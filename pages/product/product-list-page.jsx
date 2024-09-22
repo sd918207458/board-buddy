@@ -3,7 +3,8 @@ import Sidebar from "@/components/sidebar/sidebar.js";
 import ProductCard from "@/components/productcard/productcard";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
-import Pagination from "@/components/pagination/pagination";
+import Pagination from "@/components/pagination/Pagination";
+import Breadcrumbs from "@/components/Breadcrumbs";
 const ProductListPage = () => {
   return (
     <>
@@ -11,6 +12,7 @@ const ProductListPage = () => {
       <div className="flex">
         {/* Sidebar on the left */}
         <aside className="w-64">
+          <Breadcrumbs />
           <Sidebar />
         </aside>
 
