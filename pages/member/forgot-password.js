@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+
 import Navbar from "@/components/LoggedInNavbar";
 import Footer from "@/components/footer";
 import { CSSTransition } from "react-transition-group";
@@ -59,10 +60,12 @@ export default function ForgotPassword() {
       setIsLoading(false);
       setShowVerificationCode(true);
     }, 1500);
+
   };
 
   // 點擊「送出驗證碼」按鈕時觸發
   const handleSubmitVerificationCode = () => {
+
     if (!validateVerificationCode()) {
       setErrorMessage("請輸入有效的6位數驗證碼");
       return;
@@ -88,6 +91,8 @@ export default function ForgotPassword() {
     }, 1500);
   };
 
+
+
   return (
     <>
       <Navbar />
@@ -105,6 +110,7 @@ export default function ForgotPassword() {
             <h2 className="text-center text-2xl font-bold text-gray-700 dark:text-gray-200 mt-4">
               忘記密碼
             </h2>
+
 
             {/* 錯誤提示 */}
             {errorMessage && (

@@ -1,3 +1,4 @@
+
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 
 const PaymentMethodCard = ({
@@ -8,12 +9,14 @@ const PaymentMethodCard = ({
 }) => (
   <CSSTransition key={method.id} timeout={500} classNames="fade-slide">
     <div className="card bg-base-100 shadow-xl mb-4">
+
       <div className="card-body">
         <h2 className="card-title">付款方式</h2>
         <p>卡號: {method.cardNumber}</p>
         <p>到期日: {method.expiryDate}</p>
         {method.isDefault && <span className="badge badge-primary">預設</span>}
         <div className="flex justify-between">
+
           <button
             className="btn btn-primary"
             onClick={() => handleEdit(method)}
@@ -30,10 +33,12 @@ const PaymentMethodCard = ({
             className="btn btn-outline"
             onClick={() => handleSetDefault(method.id)}
           >
+
             設為預設
           </button>
         </div>
       </div>
+
     </div>
   </CSSTransition>
 );

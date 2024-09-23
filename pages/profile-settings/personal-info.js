@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Navbar from "@/components/navbar";
@@ -153,10 +154,12 @@ export default function PersonalInfo() {
     return <div>加載中...</div>; // 加載中的提示
   }
 
+
   return (
     <>
       <Navbar />
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52]">
+
         <div className="card w-full max-w-lg mx-auto bg-white shadow-lg lg:max-w-4xl rounded-lg">
           <section className="p-6">
             <Breadcrumbs />
@@ -262,11 +265,13 @@ export default function PersonalInfo() {
                         {type.name}
                       </option>
                     ))}
+
                   </select>
                 </div>
 
                 {/* 常玩時段 */}
                 <div className="form-control">
+
                   <label className="label" htmlFor="playTime">
                     常玩時段
                   </label>
@@ -286,9 +291,11 @@ export default function PersonalInfo() {
                         {time.name}
                       </option>
                     ))}
+
                   </select>
                 </div>
               </div>
+
 
               {/* 提交按鈕 */}
               <div className="form-control mt-6">
@@ -310,6 +317,7 @@ export default function PersonalInfo() {
               {submitMessage && (
                 <p className="text-green-500 mt-4">{submitMessage}</p>
               )}
+
             </form>
           </section>
         </div>

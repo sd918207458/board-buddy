@@ -27,6 +27,7 @@ const ProductListPage = () => {
 
       <Footer />
     </>
+
   );
 };
 export default ProductListPage;

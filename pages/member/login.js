@@ -1,6 +1,8 @@
+
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import Navbar from "@/components/LoggedInNavbar";
+
 import Footer from "@/components/footer";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { CSSTransition } from "react-transition-group";
@@ -71,7 +73,9 @@ export default function Login() {
   return (
     <>
       <Navbar />
+
       <div className="flex items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
+
         <div className="flex w-full max-w-sm mx-auto overflow-hidden bg-white rounded-lg shadow-lg dark:bg-gray-800 lg:max-w-4xl">
           <div
             className="hidden bg-cover lg:block lg:w-1/2"
@@ -190,20 +194,27 @@ export default function Login() {
 
             <div className="flex items-center justify-between mt-4">
               <span className="w-1/5 border-b dark:border-gray-600 lg:w-1/4" />
+
               <span className="text-xs text-gray-500 uppercase dark:text-gray-400">
                 還沒有帳戶嗎?
                 <a
                   href="register"
+
                   className="ml-1 text-xs text-gray-500 uppercase dark:text-gray-400 hover:underline"
+
                 >
                   註冊
                 </a>
               </span>
+
               <span className="w-1/5 border-b dark:border-gray-600 lg:w-1/4" />
+
+
             </div>
           </div>
         </div>
       </div>
+
       <Footer />
     </>
   );

@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
+
 import AddressCard from "@/components/address/AddressCard";
 import AddressForm from "@/components/address/AddressForm";
 
 import { CSSTransition, TransitionGroup } from "react-transition-group";
+
 
 export default function ShippingAddress() {
   const [addresses, setAddresses] = useState([]);
@@ -22,17 +24,21 @@ export default function ShippingAddress() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
   const [errorMessage, setErrorMessage] = useState("");
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsLoading(true);
+
 
     if (!formData.username || !formData.phone || !formData.city) {
       setErrorMessage("請填寫所有必填欄位");
       setIsLoading(false);
       return;
     }
+
 
     setTimeout(() => {
       if (isEditing) {
@@ -42,15 +48,21 @@ export default function ShippingAddress() {
       } else {
         setAddresses((prev) => [...prev, { ...formData, id: Date.now() }]);
       }
+
       setIsLoading(false);
       resetForm();
+
       closeModal();
     }, 1000);
   };
 
+
+
   const handleDelete = (id) => {
     setAddresses((prev) => prev.filter((addr) => addr.id !== id));
   };
+
+
 
   const handleSetDefault = (id) => {
     setAddresses((prev) =>
@@ -61,7 +73,9 @@ export default function ShippingAddress() {
     );
   };
 
+
   const resetForm = () => {
+
     setFormData({
       username: "",
       phone: "",
@@ -73,6 +87,7 @@ export default function ShippingAddress() {
       id: null,
     });
     setIsEditing(false);
+
   };
 
   const openModal = () => {
@@ -81,11 +96,13 @@ export default function ShippingAddress() {
 
   const closeModal = () => {
     document.getElementById("my_modal_1").close();
+
   };
 
   return (
     <>
       <Navbar />
+
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
         <div className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
           <div className="px-6 py-4">
@@ -165,6 +182,7 @@ export default function ShippingAddress() {
               </CSSTransition>
             }
           </TransitionGroup>
+
         </div>
       </div>
       <Footer />

@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useRouter } from "next/router"; // 引入 useRouter 用於頁面跳轉
 import Navbar from "@/components/LoggedInNavbar";
@@ -78,12 +79,15 @@ export default function Register() {
     }
   };
 
+
   return (
     <>
       <Navbar />
       <div className="flex items-center justify-center min-h-screen bg-[#003E52]">
+
         <div className="card max-w-sm lg:max-w-4xl bg-base-100 shadow-xl">
           <div className="card-body w-full px-6 py-8">
+
             <div className="flex justify-center">
               <img
                 className="w-auto h-8"
@@ -95,7 +99,6 @@ export default function Register() {
             <h2 className="text-center text-2xl font-bold text-gray-700 dark:text-gray-200 mt-4">
               註冊
             </h2>
-
             {/* 錯誤提示動畫 */}
             <CSSTransition
               in={!!errorMessage}
@@ -181,6 +184,7 @@ export default function Register() {
                 </button>
               </div>
             </form>
+
 
             {/* 已有帳戶提示 */}
             <div className="flex items-center justify-center mt-4">

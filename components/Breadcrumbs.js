@@ -1,6 +1,9 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
+
 import { CSSTransition, TransitionGroup } from "react-transition-group";
+
+
 
 const Breadcrumbs = ({ customCrumbs }) => {
   const router = useRouter();
@@ -17,9 +20,11 @@ const Breadcrumbs = ({ customCrumbs }) => {
     "my-favorites": "會員中心",
     "my-orders": "會員中心",
     "personal-info": "個人資料",
+
     FAQ: "常見問題",
     "payment-methods": "付款方式",
     wishlist: "我的收藏",
+
     "order-tracking": "訂單追蹤",
     "order-details": "訂單明細",
   };
@@ -29,8 +34,10 @@ const Breadcrumbs = ({ customCrumbs }) => {
       <ul className="flex items-center gap-2">
         {/* 第一個項目 "Home" */}
         <li>
+
           <Link href="/" legacyBehavior>
             <a className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800">
+
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -45,11 +52,14 @@ const Breadcrumbs = ({ customCrumbs }) => {
                 ></path>
               </svg>
               首頁
+
             </a>
+
           </Link>
         </li>
 
         {/* 使用分隔符號 */}
+
         <TransitionGroup component={null}>
           {breadcrumbs.map((name, index) => {
             const routeTo = `/${breadcrumbs.slice(0, index + 1).join("/")}`;
@@ -92,6 +102,7 @@ const Breadcrumbs = ({ customCrumbs }) => {
             );
           })}
         </TransitionGroup>
+
       </ul>
     </div>
   );

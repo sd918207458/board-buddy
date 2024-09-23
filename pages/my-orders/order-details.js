@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
@@ -12,10 +13,12 @@ export default function OrderDetails() {
     setIsMounted(true); // 客戶端掛載後將 isMounted 設為 true
   }, []);
 
+
   return (
     <>
       <Navbar />
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
+
         <TransitionGroup>
           {/* 確保動畫僅在客戶端渲染後運行 */}
           <CSSTransition
@@ -176,6 +179,7 @@ export default function OrderDetails() {
             </div>
           </CSSTransition>
         </TransitionGroup>
+
       </div>
       <Footer />
     </>

@@ -1,10 +1,13 @@
 import React from "react";
 import Link from "next/link";
+
 import { CSSTransition, TransitionGroup } from "react-transition-group";
+
 
 // 定義表格行組件
 const TableRow = ({ user }) => {
   return (
+
     <CSSTransition key={user.id} timeout={300} classNames="fade">
       <tr className="hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 ease-in-out">
         <th>
@@ -51,6 +54,7 @@ const TableRow = ({ user }) => {
         </th>
       </tr>
     </CSSTransition>
+
   );
 };
 
@@ -73,12 +77,14 @@ const UserTable = ({ users }) => {
             <th></th>
           </tr>
         </thead>
+
         <TransitionGroup component="tbody">
           {/* 動態生成表格行 */}
           {users.map((user) => (
             <TableRow key={user.id} user={user} />
           ))}
         </TransitionGroup>
+
       </table>
     </div>
   );

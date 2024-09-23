@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
@@ -16,6 +17,7 @@ const validateExpiryDate = (expiryDate) => {
   return expiryDatePattern.test(expiryDate);
 };
 
+
 export default function PaymentMethods() {
   const [paymentMethods, setPaymentMethods] = useState([
     {
@@ -27,7 +29,9 @@ export default function PaymentMethods() {
     },
   ]);
 
+
   const [isMounted, setIsMounted] = useState(false);
+
   const [currentMethod, setCurrentMethod] = useState({
     id: null,
     cardholderName: "",
@@ -36,6 +40,7 @@ export default function PaymentMethods() {
     cvv: "",
     isDefault: false,
   });
+
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -44,6 +49,7 @@ export default function PaymentMethods() {
     setIsMounted(true);
   }, []);
 
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setCurrentMethod((prev) => ({
@@ -51,6 +57,7 @@ export default function PaymentMethods() {
       [name]: type === "checkbox" ? checked : value,
     }));
   };
+
 
   const handleSubmit = () => {
     if (!validateCardNumber(currentMethod.cardNumber)) {
@@ -63,6 +70,7 @@ export default function PaymentMethods() {
     }
 
     setIsLoading(true);
+
     setTimeout(() => {
       if (isEditing) {
         setPaymentMethods((prev) =>
@@ -86,9 +94,11 @@ export default function PaymentMethods() {
           )
         );
       }
+
       setIsLoading(false);
       closeModal();
     }, 1000);
+
   };
 
   const handleSetDefault = (id) => {
@@ -112,11 +122,13 @@ export default function PaymentMethods() {
   };
 
   const openModal = () => {
+
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
+
     setCurrentMethod({
       id: null,
       cardholderName: "",
@@ -140,6 +152,7 @@ export default function PaymentMethods() {
                 我的錢包
               </h2>
             </section>
+
 
             <h3 className="text-l font-semibold text-gray-700 capitalize dark:text-white mb-6">
               常用錢包
@@ -188,6 +201,7 @@ export default function PaymentMethods() {
                 </TransitionGroup>
               )}
 
+
               {/* 新增付款方式卡片 */}
               <div className="card bg-base-100 shadow-xl">
                 <div className="card-body flex justify-between">
@@ -207,6 +221,7 @@ export default function PaymentMethods() {
           </div>
 
           {/* Modal for Editing/Adding Payment Method */}
+
           {isModalOpen && (
             <dialog open className="modal">
               <div className="modal-box">
@@ -278,6 +293,7 @@ export default function PaymentMethods() {
               </div>
             </dialog>
           )}
+
         </div>
       </div>
       <Footer />

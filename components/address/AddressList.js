@@ -6,6 +6,7 @@ const AddressList = ({
   handleEdit,
   handleDelete,
   handleSetDefault,
+
 }) => {
   if (addresses.length === 0) {
     return (
@@ -18,6 +19,7 @@ const AddressList = ({
   return (
     <div>
       {addresses.map((address) => (
+
         <AddressCard
           key={address.id}
           address={address}
@@ -25,9 +27,11 @@ const AddressList = ({
           handleDelete={handleDelete}
           handleSetDefault={handleSetDefault}
         />
+
       ))}
     </div>
   );
 };
+
 
 export default AddressList;
