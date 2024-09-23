@@ -78,8 +78,13 @@ export default function Navbar() {
       <div className="flex items-center space-x-4">
         {isLoggedIn ? (
           <div className="dropdown dropdown-hover dropdown-bottom dropdown-end">
-            <div tabIndex={0} role="button" className="btn m-1">
-              會員中心
+            <div
+              tabIndex={0}
+              role="avatar"
+              className=" w-12 rounded-full avatar flex flex-col items-center"
+            >
+              <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+              <span>討論區</span>
             </div>
             <ul
               tabIndex={0}
