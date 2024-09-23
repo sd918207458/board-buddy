@@ -18,7 +18,7 @@ export default function Login() {
     e.preventDefault();
     setErrorMessage("");
     setIsLoading(true);
-  
+
     try {
       const response = await fetch("http://localhost:3005/api/auth/login", {
         method: "POST",
@@ -26,11 +26,14 @@ export default function Login() {
         body: JSON.stringify({ username, password }),
         credentials: "include", // 確保 cookies 被發送
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
-        // 如果登入成功，跳轉至首頁
+        // 將 JWT token 存入 localStorage
+        localStorage.setItem("token", data.accessToken);
+
+        // 跳轉到首頁
         router.push("/");
       } else {
         // 如果登入失敗，顯示錯誤訊息
@@ -43,7 +46,7 @@ export default function Login() {
       setIsLoading(false);
     }
   };
-  
+
   return (
     <>
       <Navbar />
