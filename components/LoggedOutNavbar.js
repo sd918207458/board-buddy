@@ -1,12 +1,30 @@
-import React from "react";
-import { GiHouse, GiThreeFriends, GiShoppingBag, GiTalk } from "react-icons/gi";
+import React, { useState, useEffect } from "react";
+import {
+  GiHouse,
+  GiThreeFriends,
+  GiShoppingBag,
+  GiTalk,
+  GiPerson,
+} from "react-icons/gi";
 import Link from "next/link";
-import { CSSTransition, TransitionGroup } from "react-transition-group";
+import { useRouter } from "next/router";
 
 export default function Navbar() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    // 檢查是否已登入，透過localStorage中的 token 判斷
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
+  }, []);
+
+  const handleLogin = () => {
+    router.push("/member/login"); // 登入頁面跳轉
+  };
+
   return (
-    <div className="navbar bg-[#003E52] text-white">
-      {/* 左側 LOGO 與導航按鈕 */}
+    <div className="navbar bg-[#003E52] text-white sticky top-0 z-50">
       <div className="flex-1">
         <Link href="/" legacyBehavior>
           <a className="btn btn-ghost normal-case text-xl text-white">
@@ -45,39 +63,40 @@ export default function Navbar() {
         </nav>
       </div>
 
-      {/* 右側登入與購物車按鈕 */}
       <div className="flex items-center space-x-4">
-        <div className="dropdown dropdown-hover dropdown-bottom dropdown-end">
-          <div tabIndex={0} role="button" className="btn m-1">
-            Login
+        {!isLoggedIn ? (
+          <>
+            <button
+              className="btn btn-outline text-white"
+              onClick={handleLogin}
+            >
+              登入
+            </button>
+          </>
+        ) : (
+          // 這裡可以放已登入的導航項目或其他元素
+          <div className="dropdown dropdown-hover dropdown-bottom dropdown-end">
+            <div tabIndex={0} role="button" className="btn m-1">
+              <GiPerson className="w-6 h-6" />
+              <span className="ml-2">會員中心</span>
+            </div>
+            <ul
+              tabIndex={0}
+              className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+            >
+              <li>
+                <Link href="/profile-settings" legacyBehavior>
+                  <a className="btn btn-ghost text-black">會員中心</a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/my-orders/order-tracking" legacyBehavior>
+                  <a className="btn btn-ghost text-black">管理訂單</a>
+                </Link>
+              </li>
+            </ul>
           </div>
-          <ul
-            tabIndex={0}
-            className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
-          >
-            <li>
-              <Link href="/profile-settings" legacyBehavior>
-                <a className="btn btn-ghost text-black flex items-center">
-                  會員中心
-                </a>
-              </Link>
-            </li>
-            <li>
-              <Link href="/member/login" legacyBehavior>
-                <a className="btn btn-ghost text-black flex items-center">
-                  管理訂單
-                </a>
-              </Link>
-            </li>
-            <li>
-              <Link href="/member/login" legacyBehavior>
-                <a className="btn btn-ghost text-black flex items-center">
-                  登出
-                </a>
-              </Link>
-            </li>
-          </ul>
-        </div>
+        )}
 
         <div className="dropdown dropdown-end">
           <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
@@ -108,7 +127,7 @@ export default function Navbar() {
               <span className="text-info">Subtotal: $999</span>
               <div className="card-actions">
                 <button className="btn btn-primary bg-[#003E52] btn-block">
-                  View cart
+                  查看購物車
                 </button>
               </div>
             </div>

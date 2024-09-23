@@ -1,8 +1,40 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { GiHouse, GiThreeFriends, GiShoppingBag, GiTalk } from "react-icons/gi";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 export default function Navbar() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    // 檢查是否已登入，透過localStorage中的 token 判斷
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
+  }, []);
+
+  // 登出邏輯，清除token，並保留在原本的頁面
+  const handleLogout = async () => {
+    try {
+      // 發送 API 請求登出
+      await fetch("/api/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // 確保請求附帶cookie
+      });
+
+      // 清除 localStorage 中的 token
+      localStorage.removeItem("token");
+
+      // 清除狀態，不跳轉頁面
+      setIsLoggedIn(false);
+    } catch (error) {
+      console.error("登出失敗", error);
+    }
+  };
+
   return (
     <div className="navbar bg-[#003E52] text-white sticky top-0 z-50">
       <div className="flex-1">
@@ -44,37 +76,46 @@ export default function Navbar() {
       </div>
 
       <div className="flex items-center space-x-4">
-        <div className="dropdown dropdown-hover dropdown-bottom dropdown-end">
-          <div tabIndex={0} role="button" className="btn m-1">
-            Login
-          </div>
-          <ul
-            tabIndex={0}
-            className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
-          >
-            <li>
-              <Link href="/profile-settings" legacyBehavior>
-                <a className="btn btn-ghost text-black flex items-center">
-                  會員中心
-                </a>
-              </Link>
-            </li>
-            <li>
-              <Link href="/member/login" legacyBehavior>
-                <a className="btn btn-ghost text-black flex items-center">
-                  管理訂單
-                </a>
-              </Link>
-            </li>
-            <li>
-              <Link href="/member/login" legacyBehavior>
-                <a className="btn btn-ghost text-black flex items-center">
+        {isLoggedIn ? (
+          <div className="dropdown dropdown-hover dropdown-bottom dropdown-end">
+            <div tabIndex={0} role="button" className="btn m-1">
+              會員中心
+            </div>
+            <ul
+              tabIndex={0}
+              className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+            >
+              <li>
+                <Link href="/profile-settings" legacyBehavior>
+                  <a className="btn btn-ghost text-black flex items-center">
+                    會員中心
+                  </a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/member/orders" legacyBehavior>
+                  <a className="btn btn-ghost text-black flex items-center">
+                    管理訂單
+                  </a>
+                </Link>
+              </li>
+              <li>
+                <a
+                  className="btn btn-ghost text-black flex items-center"
+                  onClick={handleLogout}
+                >
                   登出
                 </a>
-              </Link>
-            </li>
-          </ul>
-        </div>
+              </li>
+            </ul>
+          </div>
+        ) : (
+          <div className="dropdown dropdown-hover dropdown-bottom dropdown-end">
+            <Link href="/member/login" legacyBehavior>
+              <a className="btn m-1">登入</a>
+            </Link>
+          </div>
+        )}
 
         <div className="dropdown dropdown-end">
           <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
@@ -105,7 +146,7 @@ export default function Navbar() {
               <span className="text-info">Subtotal: $999</span>
               <div className="card-actions">
                 <button className="btn btn-primary bg-[#003E52] btn-block">
-                  View cart
+                  查看購物車
                 </button>
               </div>
             </div>

@@ -4,6 +4,7 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import AvatarUpload from "@/components/personal-info/upload_avatar";
+import InputField from "@/components/personal-info/InputField";
 
 const DatePicker1 = dynamic(() => import("@/components/datepicker"), {
   ssr: false,
@@ -30,6 +31,7 @@ export default function PersonalInfo() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [loading, setLoading] = useState(true); // 新增加載狀態
 
   // Fetch game types and play times on mount
   useEffect(() => {
@@ -44,8 +46,10 @@ export default function PersonalInfo() {
         const playTimesData = await playTimesRes.json();
         setGameTypes(gameTypesData || []);
         setPlayTimes(playTimesData || []);
+        setLoading(false); // 加載完成
       } catch (error) {
         console.error("Failed to load data", error);
+        setLoading(false);
       }
     };
 
@@ -86,6 +90,12 @@ export default function PersonalInfo() {
     ) {
       return "所有欄位都是必填的";
     }
+    if (!/\S+@\S+\.\S+/.test(emailAddress)) {
+      return "請輸入有效的電子郵件地址";
+    }
+    if (!/^\d{10}$/.test(phone)) {
+      return "請輸入有效的手機號碼";
+    }
     return "";
   };
 
@@ -93,7 +103,7 @@ export default function PersonalInfo() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Form validation
+    // 表單驗證
     const validationError = validateForm();
     if (validationError) {
       setErrorMessage(validationError);
@@ -102,7 +112,6 @@ export default function PersonalInfo() {
     }
 
     try {
-      // Add avatar URL to formData before submission
       const completeFormData = { ...formData, avatarUrl };
 
       const response = await fetch("/api/save-personal-info", {
@@ -129,7 +138,7 @@ export default function PersonalInfo() {
           gameType: "",
           playTime: "",
         });
-        setAvatarUrl(""); // Clear avatar after successful submission
+        setAvatarUrl(""); // 清除上傳的頭像
       } else {
         setErrorMessage(result.message || "提交失敗，請重試！");
       }
@@ -140,8 +149,8 @@ export default function PersonalInfo() {
     }
   };
 
-  if (!isMounted) {
-    return null;
+  if (!isMounted || loading) {
+    return <div>加載中...</div>; // 加載中的提示
   }
 
   return (
@@ -160,120 +169,58 @@ export default function PersonalInfo() {
               <AvatarUpload onUpload={handleAvatarUpload} />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {/* Username */}
-                <div className="form-control">
-                  <label className="label" htmlFor="username">
-                    使用者名稱
-                  </label>
-                  <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    value={formData.username}
-                    onChange={handleChange}
-                    className="input input-bordered w-full"
-                    required
-                  />
-                </div>
+                <InputField
+                  label="使用者名稱"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                />
+                <InputField
+                  label="電話號碼"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  required
+                />
+                <InputField
+                  label="電子郵件"
+                  name="emailAddress"
+                  value={formData.emailAddress}
+                  onChange={handleChange}
+                  type="email"
+                  required
+                />
+                <InputField
+                  label="密碼"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  type="password"
+                  required
+                />
+                <InputField
+                  label="名字"
+                  name="first_name"
+                  value={formData.first_name}
+                  onChange={handleChange}
+                />
+                <InputField
+                  label="姓氏"
+                  name="last_name"
+                  value={formData.last_name}
+                  onChange={handleChange}
+                />
+                <InputField
+                  label="生日"
+                  name="birthday"
+                  value={formData.birthday}
+                  onChange={handleChange}
+                  type="date"
+                  required
+                />
 
-                {/* Phone */}
-                <div className="form-control">
-                  <label className="label" htmlFor="phone">
-                    電話號碼
-                  </label>
-                  <input
-                    type="text"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className="input input-bordered w-full"
-                    required
-                  />
-                </div>
-
-                {/* Email */}
-                <div className="form-control">
-                  <label className="label" htmlFor="emailAddress">
-                    電子郵件
-                  </label>
-                  <input
-                    type="email"
-                    id="emailAddress"
-                    name="emailAddress"
-                    value={formData.emailAddress}
-                    onChange={handleChange}
-                    className="input input-bordered w-full"
-                    required
-                  />
-                </div>
-
-                {/* Password */}
-                <div className="form-control">
-                  <label className="label" htmlFor="password">
-                    密碼
-                  </label>
-                  <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="input input-bordered w-full"
-                    required
-                  />
-                </div>
-
-                {/* First Name */}
-                <div className="form-control">
-                  <label className="label" htmlFor="first_name">
-                    名字
-                  </label>
-                  <input
-                    type="text"
-                    id="first_name"
-                    name="first_name"
-                    value={formData.first_name}
-                    onChange={handleChange}
-                    className="input input-bordered w-full"
-                  />
-                </div>
-
-                {/* Last Name */}
-                <div className="form-control">
-                  <label className="label" htmlFor="last_name">
-                    姓氏
-                  </label>
-                  <input
-                    type="text"
-                    id="last_name"
-                    name="last_name"
-                    value={formData.last_name}
-                    onChange={handleChange}
-                    className="input input-bordered w-full"
-                  />
-                </div>
-
-                {/* Birthday */}
-                <div className="form-control">
-                  <label className="label" htmlFor="birthday">
-                    生日
-                  </label>
-                  <DatePicker1
-                    id="birthday"
-                    name="birthday"
-                    value={formData.birthday}
-                    onChange={(date) =>
-                      handleChange({
-                        target: { name: "birthday", value: date },
-                      })
-                    }
-                    className="input input-bordered w-full"
-                    required
-                  />
-                </div>
-
-                {/* Gender */}
+                {/* 性別 */}
                 <div className="form-control">
                   <label className="label" htmlFor="gender">
                     性別
@@ -294,7 +241,7 @@ export default function PersonalInfo() {
                   </select>
                 </div>
 
-                {/* Game Type */}
+                {/* 遊戲類型 */}
                 <div className="form-control">
                   <label className="label" htmlFor="gameType">
                     最喜歡的遊戲類型
@@ -318,7 +265,7 @@ export default function PersonalInfo() {
                   </select>
                 </div>
 
-                {/* Play Time */}
+                {/* 常玩時段 */}
                 <div className="form-control">
                   <label className="label" htmlFor="playTime">
                     常玩時段
@@ -343,7 +290,7 @@ export default function PersonalInfo() {
                 </div>
               </div>
 
-              {/* Submit Button */}
+              {/* 提交按鈕 */}
               <div className="form-control mt-6">
                 <button
                   type="submit"
@@ -356,7 +303,7 @@ export default function PersonalInfo() {
                 </button>
               </div>
 
-              {/* Error/Success Messages */}
+              {/* 錯誤/成功訊息 */}
               {errorMessage && (
                 <p className="text-red-500 mt-4">{errorMessage}</p>
               )}

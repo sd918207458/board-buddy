@@ -2,7 +2,19 @@ import React, { useState, useEffect } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import { CSSTransition, TransitionGroup } from "react-transition-group"; // 替換為 React Transition Group
+import { CSSTransition, TransitionGroup } from "react-transition-group";
+
+// 驗證信用卡號是否有效
+const validateCardNumber = (cardNumber) => {
+  const cardNumberPattern = /^\d{16}$/; // 16位數字格式
+  return cardNumberPattern.test(cardNumber);
+};
+
+// 驗證到期日是否有效 (MM/YY 格式)
+const validateExpiryDate = (expiryDate) => {
+  const expiryDatePattern = /^(0[1-9]|1[0-2])\/\d{2}$/; // MM/YY 格式
+  return expiryDatePattern.test(expiryDate);
+};
 
 export default function PaymentMethods() {
   const [paymentMethods, setPaymentMethods] = useState([
@@ -15,7 +27,7 @@ export default function PaymentMethods() {
     },
   ]);
 
-  const [isMounted, setIsMounted] = useState(false); // 用於追踪是否在客戶端
+  const [isMounted, setIsMounted] = useState(false);
   const [currentMethod, setCurrentMethod] = useState({
     id: null,
     cardholderName: "",
@@ -25,11 +37,11 @@ export default function PaymentMethods() {
     isDefault: false,
   });
   const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // 增加加載狀態
-  const [isModalOpen, setIsModalOpen] = useState(false); // 管理 modal 的開關狀態
+  const [isLoading, setIsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true); // 在客戶端掛載時設置
+    setIsMounted(true);
   }, []);
 
   const handleChange = (e) => {
@@ -41,7 +53,16 @@ export default function PaymentMethods() {
   };
 
   const handleSubmit = () => {
-    setIsLoading(true); // 設置加載狀態
+    if (!validateCardNumber(currentMethod.cardNumber)) {
+      alert("信用卡號格式錯誤，請輸入16位數字");
+      return;
+    }
+    if (!validateExpiryDate(currentMethod.expiryDate)) {
+      alert("到期日格式錯誤，請使用 MM/YY 格式");
+      return;
+    }
+
+    setIsLoading(true);
     setTimeout(() => {
       if (isEditing) {
         setPaymentMethods((prev) =>
@@ -65,9 +86,9 @@ export default function PaymentMethods() {
           )
         );
       }
-      setIsLoading(false); // 解除加載狀態
+      setIsLoading(false);
       closeModal();
-    }, 1000); // 模擬加載延遲
+    }, 1000);
   };
 
   const handleSetDefault = (id) => {
@@ -124,7 +145,6 @@ export default function PaymentMethods() {
               常用錢包
             </h3>
             <section className="max-w-4xl mx-auto grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
-              {/* 使用 CSSTransition 和 TransitionGroup */}
               {isMounted && (
                 <TransitionGroup component={null}>
                   {paymentMethods.map((method) => (
@@ -247,7 +267,7 @@ export default function PaymentMethods() {
                   <button
                     className={`btn btn-success ${isLoading ? "loading" : ""}`}
                     onClick={handleSubmit}
-                    disabled={isLoading} // 加載中時禁用按鈕
+                    disabled={isLoading}
                   >
                     {isEditing ? "保存修改" : "新增錢包"}
                   </button>

@@ -96,8 +96,19 @@ export default function Request() {
     }
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // 模擬提交處理
       setSubmitMessage("提交成功！我們已收到您的退換貨申請。");
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        orderNumber: "",
+        orderDate: "",
+        productName: "",
+        productModel: "",
+        productQuantity: "",
+        returnReason: "",
+      });
     } catch (error) {
       setErrorMessage("提交失敗，請稍後重試。");
     } finally {

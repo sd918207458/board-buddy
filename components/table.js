@@ -39,12 +39,12 @@ const TableRow = ({ user }) => {
         <td>{user.favoriteColor}</td>
         <th>
           <Link href="/my-orders/order-details" legacyBehavior>
-            <a className="btn btn-neutral bg-[#003E52] btn-xs transition-transform hover:scale-105 m-1">
+            <a className="btn btn-neutral bg-[#003E52] btn-xs transition-transform hover:scale-105">
               訂單詳情
             </a>
           </Link>
           <Link href="/my-orders/request" legacyBehavior>
-            <a className="btn btn-neutral bg-[#003E52] btn-xs transition-transform hover:scale-105 m-1">
+            <a className="btn btn-neutral bg-[#003E52] btn-xs transition-transform hover:scale-105">
               退貨處理
             </a>
           </Link>
