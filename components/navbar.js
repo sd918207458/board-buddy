@@ -1,12 +1,73 @@
 import React from "react";
+import {
+  GiHouse,
+  GiThreeFriends,
+  GiShoppingBag,
+  GiTalk,
+  GiCat,
+  GiPerson,
+} from "react-icons/gi";
+import Link from "next/link";
 
 export default function Navbar() {
   return (
-    <div className="navbar bg-base-100">
+    <div className="navbar bg-[#003E52] text-white">
+      {/* 左側 LOGO 與導航按鈕 */}
       <div className="flex-1">
-        <a className="btn btn-ghost text-xl">daisyUI</a>
+        <Link href="/" className="btn btn-ghost normal-case text-xl text-white">
+          <img
+            src="https://your-logo-url-here.com"
+            className="w-10 h-10 mr-2"
+          />
+        </Link>
+        <nav className="flex space-x-6">
+          <Link
+            href="/"
+            className="btn btn-ghost text-white flex flex-col items-center"
+          >
+            <GiHouse className="w-6 h-6" />
+            <span>首頁</span>
+          </Link>
+          <Link
+            href="/group"
+            className="btn btn-ghost text-white flex flex-col items-center"
+          >
+            <GiThreeFriends className="w-6 h-6" />
+            <span>揪團</span>
+          </Link>
+          <Link
+            href="/shop"
+            className="btn btn-ghost text-white flex flex-col items-center"
+          >
+            <GiShoppingBag className="w-6 h-6" />
+            <span>商城</span>
+          </Link>
+          <Link
+            href="/forum"
+            className="btn btn-ghost text-white flex flex-col items-center"
+          >
+            <GiTalk className="w-6 h-6" />
+            <span>討論區</span>
+          </Link>
+          <Link
+            href="/quiz"
+            className="btn btn-ghost text-white flex flex-col items-center"
+          >
+            <GiCat className="w-6 h-6" />
+            <span>測驗</span>
+          </Link>
+        </nav>
       </div>
-      <div className="flex-none">
+
+      {/* 右側登入與購物車按鈕 */}
+      <div className="flex items-center space-x-4">
+        <Link
+          href="/member/login"
+          className="btn btn-ghost text-white flex items-center"
+        >
+          <GiPerson className="w-6 h-6" />
+          <span>Login</span>
+        </Link>
         <div className="dropdown dropdown-end">
           <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
             <div className="indicator">
@@ -35,41 +96,12 @@ export default function Navbar() {
               <span className="text-lg font-bold">8 Items</span>
               <span className="text-info">Subtotal: $999</span>
               <div className="card-actions">
-                <button className="btn btn-primary btn-block">View cart</button>
+                <button className="btn btn-primary bg-[#003E52] btn-block">
+                  View cart
+                </button>
               </div>
             </div>
           </div>
-        </div>
-        <div className="dropdown dropdown-end">
-          <div
-            tabIndex={0}
-            role="button"
-            className="btn btn-ghost btn-circle avatar"
-          >
-            <div className="w-10 rounded-full">
-              <img
-                alt="Tailwind CSS Navbar component"
-                src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-              />
-            </div>
-          </div>
-          <ul
-            tabIndex={0}
-            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
-          >
-            <li>
-              <a className="justify-between">
-                Profile
-                <span className="badge">New</span>
-              </a>
-            </li>
-            <li>
-              <a>Settings</a>
-            </li>
-            <li>
-              <a>Logout</a>
-            </li>
-          </ul>
         </div>
       </div>
     </div>

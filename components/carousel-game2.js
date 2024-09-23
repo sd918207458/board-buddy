@@ -114,25 +114,26 @@ const Carousel = () => {
 
     return (
         <div>
-            <div className="mx-11 my-5 flex items-center">
-    <span className="text-[1.5rem] text-[#a16207] mr-2">★</span>
-    <h1 className="text-[#a16207] text-[36px]">為您精選</h1>
-</div>
-
-            <div className="relative">
-                <div className="flex justify-center space-x-4">
-                    {cardsData.slice(currentIndex * 3, currentIndex * 3 + 3).map((card, index) => (
-                        <Card key={index} {...card} />
-                    ))}
-                </div>
-                <button className="absolute top-1/2 left-0 transform -translate-y-1/2 bg-gray-900 text-white p-2 rounded" onClick={handlePrev}>
-                    &#10094;
-                </button>
-                <button className="absolute top-1/2 right-0 transform -translate-y-1/2 bg-gray-900 text-white p-2 rounded" onClick={handleNext}>
-                    &#10095;
-                </button>
-            </div>
+        <div className="mx-11 my-5 flex items-center">
+            <span className="text-[1.5rem] mr-2 text-[#EFB880]">★</span>
+            <h1 className="text-[36px] text-[#EFB880]">為您精選</h1>
         </div>
+    
+        <div className="relative">
+            <div className="flex justify-center space-x-4">
+                {cardsData.slice(currentIndex * 3, currentIndex * 3 + 3).map((card, index) => (
+                    <Card key={index} {...card} />
+                ))}
+            </div>
+            <button className="absolute top-1/2 left-16 transform -translate-y-1/2 bg-gray-900 text-white p-2 rounded" onClick={handlePrev}>
+                &#10094;
+            </button>
+            <button className="absolute top-1/2 right-16 transform -translate-y-1/2 bg-gray-900 text-white p-2 rounded" onClick={handleNext}>
+                &#10095;
+            </button>
+        </div>
+    </div>
+    
     );
 };
 
