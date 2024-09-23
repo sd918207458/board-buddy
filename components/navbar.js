@@ -1,8 +1,17 @@
 import React from "react";
 import { GiHouse, GiThreeFriends, GiShoppingBag, GiTalk } from "react-icons/gi";
 import Link from "next/link";
+import { useState } from "react";
+import Carttoggle from "./Carttoggle/Carttoggle";
 
 export default function Navbar() {
+    const [isCartVisible, setIsCartVisible] = useState(false);
+  
+    const toggleCart = () => {
+      setIsCartVisible(!isCartVisible);
+    };
+
+
   return (
     <div className="navbar bg-[#003E52] text-white sticky top-0 z-50">
       <div className="flex-1">
@@ -75,9 +84,11 @@ export default function Navbar() {
             </li>
           </ul>
         </div>
-
+{/* 購物車 */}
         <div className="dropdown dropdown-end">
-          <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
+          <div tabIndex={0} role="button" className="btn btn-ghost btn-circle"
+            onClick={toggleCart} // 加上事件處理器
+            >
             <div className="indicator">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -100,7 +111,11 @@ export default function Navbar() {
             tabIndex={0}
             className="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-52 shadow"
           >
-            <div className="card-body">
+  {/* Conditionally render Cart component when the button is clicked */}
+  {isCartVisible && <Carttoggle/>}
+
+
+            {/* <div className="card-body">
               <span className="text-lg font-bold">8 Items</span>
               <span className="text-info">Subtotal: $999</span>
               <div className="card-actions">
@@ -109,6 +124,7 @@ export default function Navbar() {
                 </button>
               </div>
             </div>
+             */}
           </div>
         </div>
       </div>

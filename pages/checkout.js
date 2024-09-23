@@ -11,7 +11,7 @@ export default function CheckoutPage() {
   return (
     <div>
       <Navbar />
-      <Breadcrumbs />
+      {/* <Breadcrumbs /> */}
       <Sidecart />
       <Steps />
       <Checkout />
