@@ -6,7 +6,7 @@ import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { CSSTransition } from "react-transition-group";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -14,37 +14,27 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
 
-  // 表單驗證邏輯
-  const validateForm = () => {
-    if (!email || !password) {
-      setErrorMessage("請填寫所有欄位");
-      return false;
-    }
-    return true;
-  };
-
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMessage("");
     setIsLoading(true);
-
+  
     try {
-      const response = await fetch("http://localhost:3005/api/login", {
+      const response = await fetch("http://localhost:3005/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
+        credentials: "include", // 確保 cookies 被發送
       });
-
+  
       const data = await response.json();
-
+  
       if (response.ok) {
-        // 存儲JWT token
-        localStorage.setItem("token", data.token);
-
-        // 成功後跳轉到個人資料設置頁面
-        router.push("/profile-settings");
+        // 如果登入成功，跳轉至首頁
+        router.push("/");
       } else {
-        setErrorMessage(data.error); // 顯示錯誤信息
+        // 如果登入失敗，顯示錯誤訊息
+        setErrorMessage(data.message || "登入失敗");
       }
     } catch (error) {
       console.error("錯誤:", error);
@@ -53,7 +43,7 @@ export default function Login() {
       setIsLoading(false);
     }
   };
-
+  
   return (
     <>
       <Navbar />
@@ -97,16 +87,16 @@ export default function Login() {
               <div className="mt-4">
                 <label
                   className="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-200"
-                  htmlFor="LoggingEmailAddress"
+                  htmlFor="LoggingUsername"
                 >
-                  電子信箱
+                  使用者名稱
                 </label>
                 <input
-                  id="LoggingEmailAddress"
+                  id="LoggingUsername"
                   className="block w-full px-4 py-2 text-gray-700 bg-white border rounded-lg dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring focus:ring-blue-300"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   required
                 />
               </div>
@@ -164,7 +154,7 @@ export default function Login() {
               <div className="mt-6">
                 <button
                   type="submit"
-                  className={`btn btn-neutral btn-block bg-[#003E52] w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform btn-neutral  rounded-lg focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-50 ${
+                  className={`w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-[#003E52] rounded-lg focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-50 ${
                     isLoading ? "loading" : ""
                   }`}
                   disabled={isLoading}

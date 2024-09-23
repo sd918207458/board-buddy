@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useRouter } from "next/router"; // 引入 useRouter 用於頁面跳轉
+import { useRouter } from "next/router";
 import Navbar from "@/components/NavbarSwitcher";
 import Footer from "@/components/footer";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
@@ -31,7 +31,7 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const router = useRouter(); // 使用 useRouter 進行頁面跳轉
+  const router = useRouter();
 
   // 表單驗證邏輯
   const validateForm = () => {
@@ -66,7 +66,7 @@ export default function Register() {
     }
 
     try {
-      const response = await fetch("http://localhost:3005/api/register", {
+      const response = await fetch("http://localhost:3005/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -77,18 +77,17 @@ export default function Register() {
         }),
       });
 
-      // 檢查是否請求成功
-      if (!response.ok) {
-        const errorText = await response.text(); // 捕捉錯誤訊息作為文字而不是 JSON
-        throw new Error(`HTTP error: ${response.status}, ${errorText}`);
-      }
+      const data = await response.json(); // 捕捉錯誤響應
 
-      const data = await response.json(); // 解析 JSON 響應
-      alert("註冊成功");
-      router.push("/member/login"); // 成功後跳轉到登入頁面
+      if (response.status === 201) {
+        alert("註冊成功");
+        router.push("/member/login");
+      } else {
+        setErrorMessage(data.message || "註冊失敗");
+      }
     } catch (error) {
       console.error("錯誤:", error);
-      setErrorMessage(error.message);
+      setErrorMessage("伺服器錯誤，請稍後再試");
     } finally {
       setIsLoading(false);
     }
