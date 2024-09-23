@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Navbar from "@/components/navbar";
+import Navbar from "@/components/NavbarSwitcher";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
@@ -49,7 +49,7 @@ export default function OrderTracking() {
                   <h2 className="card-title">Shoes!</h2>
                   <p>If a dog chews shoes whose shoes does he choose?</p>
                   <div className="card-actions justify-end">
-                    <button className="btn btn-primary hover:bg-secondary hover:text-white">
+                    <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
                       Buy Now
                     </button>
                   </div>
@@ -68,7 +68,7 @@ export default function OrderTracking() {
                   <h2 className="card-title">Shoes!</h2>
                   <p>If a dog chews shoes whose shoes does he choose?</p>
                   <div className="card-actions justify-end">
-                    <button className="btn btn-primary hover:bg-secondary hover:text-white">
+                    <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
                       Buy Now
                     </button>
                   </div>
@@ -87,7 +87,7 @@ export default function OrderTracking() {
                   <h2 className="card-title">Shoes!</h2>
                   <p>If a dog chews shoes whose shoes does he choose?</p>
                   <div className="card-actions justify-end">
-                    <button className="btn btn-primary hover:bg-secondary hover:text-white">
+                    <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
                       Buy Now
                     </button>
                   </div>
@@ -114,7 +114,7 @@ export default function OrderTracking() {
                   </h2>
                   <p>If a dog chews shoes whose shoes does he choose?</p>
                   <div className="card-actions justify-end">
-                    <button className="btn btn-primary hover:bg-secondary hover:text-white">
+                    <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
                       Learn More
                     </button>
                   </div>
@@ -135,7 +135,7 @@ export default function OrderTracking() {
                   </h2>
                   <p>If a dog chews shoes whose shoes does he choose?</p>
                   <div className="card-actions justify-end">
-                    <button className="btn btn-primary hover:bg-secondary hover:text-white">
+                    <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
                       Learn More
                     </button>
                   </div>
@@ -156,7 +156,7 @@ export default function OrderTracking() {
                   </h2>
                   <p>If a dog chews shoes whose shoes does he choose?</p>
                   <div className="card-actions justify-end">
-                    <button className="btn btn-primary hover:bg-secondary hover:text-white">
+                    <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
                       Learn More
                     </button>
                   </div>

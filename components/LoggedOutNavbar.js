@@ -9,7 +9,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-export default function Navbar() {
+export default function LoggedOutNavbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
 
@@ -60,16 +60,19 @@ export default function Navbar() {
               <span>討論區</span>
             </a>
           </Link>
+          <Link href="/profile-settings/FAQ" legacyBehavior>
+            <a className="btn btn-ghost text-white flex flex-col items-center">
+              <GiTalk className="w-6 h-6" />
+              <span>常見問題</span>
+            </a>
+          </Link>
         </nav>
       </div>
 
       <div className="flex items-center space-x-4">
         {!isLoggedIn ? (
           <>
-            <button
-              className="btn btn-outline text-white"
-              onClick={handleLogin}
-            >
+            <button className="btn m-1" onClick={handleLogin}>
               登入
             </button>
           </>
@@ -78,7 +81,7 @@ export default function Navbar() {
           <div className="dropdown dropdown-hover dropdown-bottom dropdown-end">
             <div tabIndex={0} role="button" className="btn m-1">
               <GiPerson className="w-6 h-6" />
-              <span className="ml-2">會員中心</span>
+              <span className="ml-2">User</span>
             </div>
             <ul
               tabIndex={0}

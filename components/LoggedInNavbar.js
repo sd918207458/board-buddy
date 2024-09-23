@@ -72,6 +72,12 @@ export default function Navbar() {
               <span>討論區</span>
             </a>
           </Link>
+          <Link href="/profile-settings/FAQ" legacyBehavior>
+            <a className="btn btn-ghost text-white flex flex-col items-center">
+              <GiTalk className="w-6 h-6" />
+              <span>常見問題</span>
+            </a>
+          </Link>
         </nav>
       </div>
 
@@ -84,7 +90,7 @@ export default function Navbar() {
               className=" w-12 rounded-full avatar flex flex-col items-center"
             >
               <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
-              <span>討論區</span>
+              <span>User</span>
             </div>
             <ul
               tabIndex={0}
@@ -98,12 +104,41 @@ export default function Navbar() {
                 </Link>
               </li>
               <li>
-                <Link href="/member/orders" legacyBehavior>
+                <Link href="/personal-info" legacyBehavior>
+                  <a className="btn btn-ghost text-black flex items-center">
+                    個人資料
+                  </a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/my-orders/order-tracking" legacyBehavior>
                   <a className="btn btn-ghost text-black flex items-center">
                     管理訂單
                   </a>
                 </Link>
               </li>
+              <li>
+                <Link href="/payment-methods" legacyBehavior>
+                  <a className="btn btn-ghost text-black flex items-center">
+                    我的錢包
+                  </a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/shipping-address" legacyBehavior>
+                  <a className="btn btn-ghost text-black flex items-center">
+                    運送地址
+                  </a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/my-favorites/wishlist" legacyBehavior>
+                  <a className="btn btn-ghost text-black flex items-center">
+                    我的收藏
+                  </a>
+                </Link>
+              </li>
+
               <li>
                 <a
                   className="btn btn-ghost text-black flex items-center"

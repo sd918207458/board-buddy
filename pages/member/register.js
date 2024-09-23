@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router"; // 引入 useRouter 用於頁面跳轉
-import Navbar from "@/components/LoggedInNavbar";
+import Navbar from "@/components/NavbarSwitcher";
 import Footer from "@/components/footer";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { CSSTransition } from "react-transition-group";

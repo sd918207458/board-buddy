@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Navbar from "@/components/LoggedInNavbar";
+import Navbar from "@/components/NavbarSwitcher";
 import Footer from "@/components/footer";
 import { CSSTransition } from "react-transition-group";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";

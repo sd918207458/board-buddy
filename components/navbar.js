@@ -2,7 +2,7 @@ import React from "react";
 import { GiHouse, GiThreeFriends, GiShoppingBag, GiTalk } from "react-icons/gi";
 import Link from "next/link";
 
-export default function Navbar() {
+export default function LoggedInNavbar() {
   return (
     <div className="navbar bg-[#003E52] text-white sticky top-0 z-50">
       <div className="flex-1">

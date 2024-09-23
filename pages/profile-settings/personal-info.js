@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import Navbar from "@/components/navbar";
+import Navbar from "@/components/NavbarSwitcher";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import AvatarUpload from "@/components/personal-info/upload_avatar";
+import ImageUpload from "@/components/personal-info/upload_avatar";
 import InputField from "@/components/personal-info/InputField";
 
 const DatePicker1 = dynamic(() => import("@/components/datepicker"), {
@@ -35,15 +35,39 @@ export default function PersonalInfo() {
 
   // Fetch game types and play times on mount
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchInitialData = async () => {
       try {
-        const [gameTypesRes, playTimesRes] = await Promise.all([
+        const [gameTypesRes, playTimesRes, userInfoRes] = await Promise.all([
           fetch("/api/game-types"),
           fetch("/api/play-times"),
+          fetch("/api/users", {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`, // 帶上用戶token
+            },
+          }),
         ]);
 
         const gameTypesData = await gameTypesRes.json();
         const playTimesData = await playTimesRes.json();
+        const userInfoData = await userInfoRes.json();
+
+        if (userInfoData.success) {
+          setFormData({
+            username: userInfoData.user.username,
+            phone: userInfoData.user.phone,
+            emailAddress: userInfoData.user.email,
+            password: "", // 密碼不應顯示
+            first_name: userInfoData.user.first_name,
+            last_name: userInfoData.user.last_name,
+            birthday: userInfoData.user.birthday,
+            gender: userInfoData.user.gender,
+            gameType: userInfoData.user.gameType,
+            playTime: userInfoData.user.playTime,
+          });
+          setAvatarUrl(userInfoData.user.avatarUrl);
+        }
+
         setGameTypes(gameTypesData || []);
         setPlayTimes(playTimesData || []);
         setLoading(false); // 加載完成
@@ -53,16 +77,18 @@ export default function PersonalInfo() {
       }
     };
 
-    fetchData();
+    fetchInitialData();
     setIsMounted(true);
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value, // 使用 name 屬性動態更新對應的值
+    }));
   };
 
-  // Handle avatar upload result
   const handleAvatarUpload = (url) => {
     setAvatarUrl(url); // Store uploaded avatar URL
   };
@@ -82,7 +108,6 @@ export default function PersonalInfo() {
       !username ||
       !phone ||
       !emailAddress ||
-      !password ||
       !birthday ||
       !gender ||
       !gameType ||
@@ -103,7 +128,6 @@ export default function PersonalInfo() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // 表單驗證
     const validationError = validateForm();
     if (validationError) {
       setErrorMessage(validationError);
@@ -114,10 +138,11 @@ export default function PersonalInfo() {
     try {
       const completeFormData = { ...formData, avatarUrl };
 
-      const response = await fetch("/api/save-personal-info", {
+      const response = await fetch("/api/update-user-info", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify(completeFormData),
       });
@@ -126,19 +151,6 @@ export default function PersonalInfo() {
 
       if (result.success) {
         setSubmitMessage("提交成功！資料已儲存。");
-        setFormData({
-          username: "",
-          phone: "",
-          emailAddress: "",
-          password: "",
-          first_name: "",
-          last_name: "",
-          birthday: "",
-          gender: "",
-          gameType: "",
-          playTime: "",
-        });
-        setAvatarUrl(""); // 清除上傳的頭像
       } else {
         setErrorMessage(result.message || "提交失敗，請重試！");
       }
@@ -150,7 +162,7 @@ export default function PersonalInfo() {
   };
 
   if (!isMounted || loading) {
-    return <div>加載中...</div>; // 加載中的提示
+    return <div>加載中...</div>; // Loading screen
   }
 
   return (
@@ -164,10 +176,9 @@ export default function PersonalInfo() {
               個人資料設定
             </h2>
 
+            {/* Avatar Upload */}
+            <ImageUpload onUpload={handleAvatarUpload} />
             <form onSubmit={handleSubmit}>
-              {/* Avatar Upload */}
-              <AvatarUpload onUpload={handleAvatarUpload} />
-
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <InputField
                   label="使用者名稱"
@@ -176,6 +187,7 @@ export default function PersonalInfo() {
                   onChange={handleChange}
                   required
                 />
+
                 <InputField
                   label="電話號碼"
                   name="phone"
