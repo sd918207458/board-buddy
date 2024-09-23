@@ -25,8 +25,6 @@ export default function CheckoutPage() {
           <Checkout />
           <h1>地址資訊</h1>
           <AddressFormProduct />
-          <h1>付款方式</h1>
-          
         </div>
       </div>
       <Footer />
