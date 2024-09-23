@@ -6,7 +6,7 @@ const AddressFormProduct = () => {
       <div>
         <section className="max-w-4xl p-6 mx-auto bg-white rounded-md shadow-md dark:bg-gray-800">
           <h2 className="text-lg font-semibold text-gray-700 capitalize dark:text-white">
-            選擇地址
+            運送方式
           </h2>
           <div>
             <div className="flex gap-6 mt-4">
@@ -17,11 +17,28 @@ const AddressFormProduct = () => {
                   className="radio"
                   defaultChecked
                 />
-                <span className="ml-2">預設地址</span>
+                <span className="ml-2">宅配</span>
               </label>
 
               <label className="inline-flex items-center">
                 <input type="radio" name="radio-1" className="radio" />
+                <span className="ml-2">超商取貨</span>
+              </label>
+            </div>
+
+            <div className="flex gap-6 mt-4">
+              <label className="inline-flex items-center">
+                <input
+                  type="radio"
+                  name="radio-2"
+                  className="radio"
+                  defaultChecked
+                />
+                <span className="ml-2">預設地址</span>
+              </label>
+
+              <label className="inline-flex items-center">
+                <input type="radio" name="radio-2" className="radio" />
                 <span className="ml-2">使用自訂地址</span>
               </label>
             </div>

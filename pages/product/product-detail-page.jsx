@@ -10,7 +10,6 @@ const ProductDetailPage = () => {
       <Navbar />
       <Breadcrumbs />
       <ProductDetail />
-      <Cart />
       <Footer />
     </div>
   );

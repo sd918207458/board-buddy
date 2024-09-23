@@ -85,16 +85,20 @@ const Carttoggle = () => {
           </div>
         </section>
       </div>
+      {/* 破版版本 END */}
 
+      {/* 購物車 */}
       <div className="fixed top-0 right-0 w-80 h-full bg-gray-900 overflow-y-auto shadow-lg ">
         <section className="h-auto bg-transparent py-4 sm:py-6 lg:py-8">
           <div className="mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-center">
-              <h1 className="text-lg font-semibold text-white">Cart Summary</h1>
+              <h1 className="text-lg font-semibold text-white">我的購物車</h1>
             </div>
+            {/* 商品 */}
             <div className="mx-auto mt-4 max-w-sm">
               <div className="bg-transparent shadow">
                 <div className="px-4 py-4 sm:px-6 sm:py-6">
+                  {/* 商品名稱，價錢，數量 */}
                   <div className="flow-root">
                     <ul className="-my-4">
                       <li className="flex flex-col space-y-3 py-2 text-left sm:flex-row sm:space-x-4 sm:space-y-0">
@@ -140,12 +144,14 @@ const Carttoggle = () => {
                       </p>
                     </div>
                   </div>
+
+                  {/* 結帳按鈕 */}
                   <div className="mt-4 text-center">
                     <button
                       type="button"
                       className="group inline-flex w-full items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition-all duration-200 ease-in-out focus:shadow hover:bg-gray-800"
                     >
-                      Checkout
+                      結帳
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="group-hover:ml-4 ml-2 h-4 w-4 transition-all"

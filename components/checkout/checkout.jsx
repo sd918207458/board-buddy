@@ -13,7 +13,7 @@ const Checkout = () => {
 
   return (
     <>
-      <section className={styles.cartContent}>
+      <section className={`${styles.cartContent} max-w-4xl`}>
         <h2>購物車內容</h2>
         <table className={styles.cartTable}>
           <thead>
