@@ -104,7 +104,7 @@ export default function Navbar() {
                 </Link>
               </li>
               <li>
-                <Link href="/personal-info" legacyBehavior>
+                <Link href="/profile-settings/personal-info" legacyBehavior>
                   <a className="btn btn-ghost text-black flex items-center">
                     個人資料
                   </a>
@@ -118,14 +118,14 @@ export default function Navbar() {
                 </Link>
               </li>
               <li>
-                <Link href="/payment-methods" legacyBehavior>
+                <Link href="/profile-settings/payment-methods" legacyBehavior>
                   <a className="btn btn-ghost text-black flex items-center">
                     我的錢包
                   </a>
                 </Link>
               </li>
               <li>
-                <Link href="/shipping-address" legacyBehavior>
+                <Link href="/profile-settings/shipping-address" legacyBehavior>
                   <a className="btn btn-ghost text-black flex items-center">
                     運送地址
                   </a>

@@ -1,76 +1,67 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
-export default function ImageUpload() {
-  // 記錄選擇的圖片檔案，特殊物件初始值用null
-  const [selectedImg, setSelectedImg] = useState(null);
-  // 預覽圖片網址(呼叫URL.createObjectURL後產生的暫時網址)
-  const [previewURL, setPreviewURL] = useState("");
+export default function UploadAvatar() {
+  const [file, setFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [uploadStatus, setUploadStatus] = useState("");
 
-  // 呈現伺服器的訊息用的狀態
-  const [message, setMessage] = useState("");
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0]; // 定義 selectedFile
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    // console.log(file)
-
-    // 需要判斷使用者是否在點開選擇圖片時，按取消按鈕，會返回undefined值
-    if (file) {
-      setSelectedImg(file);
-    } else {
-      setSelectedImg(null);
+    // 檢查檔案並設定預覽
+    if (selectedFile) {
+      setFile(selectedFile); // 將檔案設置到 state 中
+      const preview = URL.createObjectURL(selectedFile); // 為檔案生成 URL 預覽
+      setPreviewUrl(preview); // 設定圖片預覽的 URL
     }
   };
 
-  const handleFileUpload = async () => {
-    const fd = new FormData();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    // 對照伺服器要接收的檔案欄位名稱，加入要上傳的欄位值
-    fd.append("avatar", selectedImg);
-
-    // 傳送到伺服器對應的api路由中，這裡會自動解析為FormData格式
-    const res = await fetch("http://localhost:3005/upload-avatar", {
-      method: "POST",
-      body: fd,
-    });
-
-    // 獲得伺服器回傳的訊息
-    const data = await res.json();
-
-    setMessage(JSON.stringify(data));
-  };
-
-  // 當選擇圖片更動時，建立預覽圖
-  useEffect(() => {
-    // 沒有選擇圖片(或取消時，回復預覽網址)
-    if (!selectedImg) {
-      setPreviewURL("");
+    if (!file) {
+      setUploadStatus("請選擇一張圖片上傳");
       return;
     }
 
-    const objectURL = URL.createObjectURL(selectedImg);
-    setPreviewURL(objectURL);
+    const formData = new FormData();
+    formData.append("avatar", file);
 
-    // 當元件unmount時呼叫反函式清除暫存
-    return () => {
-      URL.revokeObjectURL(objectURL);
-    };
-  }, [selectedImg]);
+    try {
+      const response = await fetch(
+        "http://localhost:3005/api/users/upload-avatar",
+        {
+          method: "POST",
+          body: formData,
+          credentials: "include", // 確保有認證cookie傳遞
+        }
+      );
+
+      const result = await response.json();
+      if (result.status === "success") {
+        setUploadStatus("上傳成功！");
+      } else {
+        setUploadStatus("上傳失敗，請重試。");
+      }
+    } catch (error) {
+      setUploadStatus("上傳失敗，請檢查網絡連線。");
+    }
+  };
 
   return (
-    <>
-      <h1>圖片預覽與上傳</h1>
-      <hr />
-      <div>
-        <input type="file" onChange={handleImageChange} />
-      </div>
-      <div>
-        <button onClick={handleFileUpload}>上傳到伺服器</button>
-      </div>
-      <div>伺服器回應: {message}</div>
-      <div>
-        預覽:
-        <img src={previewURL} alt="" />
-      </div>
-    </>
+    <div>
+      <h1>上傳頭像</h1>
+      <form onSubmit={handleSubmit}>
+        <input type="file" accept="image/*" onChange={handleFileChange} />
+        <div className="avatar">
+          <div className="w-24 rounded-full">
+            {previewUrl && <img src={previewUrl} alt="圖片預覽" width="100" />}
+            {/* 圖片預覽 */}
+          </div>
+        </div>
+        <button type="submit">上傳</button>
+      </form>
+      {uploadStatus && <p>{uploadStatus}</p>}
+    </div>
   );
 }

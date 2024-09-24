@@ -3,8 +3,8 @@ import dynamic from "next/dynamic";
 import Navbar from "@/components/NavbarSwitcher";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import ImageUpload from "@/components/personal-info/upload_avatar";
 import InputField from "@/components/personal-info/InputField";
+import AvatarUpload from "@/components/personal-info/upload_avatar"; // 導入 AvatarUpload
 
 const DatePicker1 = dynamic(() => import("@/components/datepicker"), {
   ssr: false,
@@ -32,6 +32,8 @@ export default function PersonalInfo() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [loading, setLoading] = useState(true); // 新增加載狀態
+
+  
 
   // Fetch game types and play times on mount
   useEffect(() => {
@@ -89,8 +91,27 @@ export default function PersonalInfo() {
     }));
   };
 
-  const handleAvatarUpload = (url) => {
-    setAvatarUrl(url); // Store uploaded avatar URL
+  const handleAvatarUpload = async (file) => {
+    // Upload the avatar file separately
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    try {
+      const response = await fetch("lhttp://localhost:3005/api/users/upload-avatar", {
+        method: "POST",
+        body: formData,
+        credentials: "include", // 若後端需要認證cookie
+      });
+
+      const result = await response.json();
+      if (result.status === "success") {
+        setAvatarUrl(result.data.avatar); // Store uploaded avatar URL
+      } else {
+        setErrorMessage("上傳頭像失敗，請重試。");
+      }
+    } catch (error) {
+      setErrorMessage("上傳失敗，請檢查網絡連線。");
+    }
   };
 
   const validateForm = () => {
@@ -98,7 +119,6 @@ export default function PersonalInfo() {
       username,
       phone,
       emailAddress,
-      password,
       birthday,
       gender,
       gameType,
@@ -136,9 +156,9 @@ export default function PersonalInfo() {
     }
 
     try {
-      const completeFormData = { ...formData, avatarUrl };
+      const completeFormData = { ...formData, avatar: avatarUrl }; // include avatar URL
 
-      const response = await fetch("/api/update-user-info", {
+      const response = await fetch("/api/users/update", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -149,7 +169,7 @@ export default function PersonalInfo() {
 
       const result = await response.json();
 
-      if (result.success) {
+      if (result.status === "success") {
         setSubmitMessage("提交成功！資料已儲存。");
       } else {
         setErrorMessage(result.message || "提交失敗，請重試！");
@@ -175,9 +195,8 @@ export default function PersonalInfo() {
             <h2 className="text-2xl font-semibold text-[#003E52] text-center">
               個人資料設定
             </h2>
-
             {/* Avatar Upload */}
-            <ImageUpload onUpload={handleAvatarUpload} />
+            <AvatarUpload onUpload={handleAvatarUpload} /> {/* 重新上傳頭像 */}
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <InputField

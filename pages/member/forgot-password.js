@@ -45,8 +45,8 @@ export default function ForgotPassword() {
     return "";
   };
 
-  // 點擊「取得驗證碼」按鈕時觸發
-  const handleGetVerificationCode = () => {
+  // 請求驗證碼 API
+  const handleGetVerificationCode = async () => {
     if (!validateEmail(email)) {
       setErrorMessage("請輸入有效的電子信箱");
       return;
@@ -54,14 +54,32 @@ export default function ForgotPassword() {
     setErrorMessage("");
     setIsLoading(true);
 
-    // 模擬驗證碼請求
-    setTimeout(() => {
+    try {
+      const response = await fetch(
+        "http://localhost:3005/api/reset-password/otp",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        }
+      );
+
+      const result = await response.json();
+      if (result.status === "success") {
+        setShowVerificationCode(true);
+      } else {
+        setErrorMessage(result.message || "無法發送驗證碼，請重試。");
+      }
+    } catch (error) {
+      setErrorMessage("伺服器錯誤，請稍後再試。");
+    } finally {
       setIsLoading(false);
-      setShowVerificationCode(true);
-    }, 1500);
+    }
   };
 
-  // 點擊「送出驗證碼」按鈕時觸發
+  // 提交驗證碼後，顯示新密碼欄位
   const handleSubmitVerificationCode = () => {
     if (!validateVerificationCode()) {
       setErrorMessage("請輸入有效的6位數驗證碼");
@@ -72,7 +90,7 @@ export default function ForgotPassword() {
   };
 
   // 提交重設密碼表單
-  const handleSubmitNewPassword = () => {
+  const handleSubmitNewPassword = async () => {
     const passwordError = validatePasswords();
     if (passwordError) {
       setErrorMessage(passwordError);
@@ -81,11 +99,33 @@ export default function ForgotPassword() {
 
     setIsLoading(true);
 
-    // 模擬密碼重置請求
-    setTimeout(() => {
+    try {
+      const response = await fetch(
+        "http://localhost:3005/api/reset/password/reset",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            token: verificationCode,
+            password: newPassword,
+          }),
+        }
+      );
+
+      const result = await response.json();
+      if (result.status === "success") {
+        alert("密碼重置成功！");
+      } else {
+        setErrorMessage(result.message || "重置密碼失敗，請重試！");
+      }
+    } catch (error) {
+      setErrorMessage("伺服器錯誤，請稍後再試。");
+    } finally {
       setIsLoading(false);
-      alert("密碼重置成功！");
-    }, 1500);
+    }
   };
 
   return (
