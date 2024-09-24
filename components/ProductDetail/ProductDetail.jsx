@@ -18,27 +18,23 @@ const ProductDetail = () => {
       <div className={styles["product-container"]}>
         <div className={styles["product-image"]}>
           <Image
-            src="https://i.postimg.cc/XYdbSzx8/image.png"
-            width={500}
-            height={500}
-            alt="I'M FABULOUS Body Oil"
+            src="https://i.postimg.cc/MGFg5m5k/4.png"
+            width={800}
+            height={800}
+            alt="暗影迷途"
           />
         </div>
         <div className={styles["product-details"]}>
-          <div className={styles["product-title"]}>I&apos;M Fabulous</div>
-          <div className={styles["product-price"]}>$50</div>
+          <div className={styles["product-title"]}>暗影迷途</div>
+          <div className={styles["product-price"]}>$850</div>
           {/* <div className={styles["product-rating"]}><span>★★★★☆</span> 4.0/5</div> */}
           <div className={styles["product-description"]}>
-            <span>| 作者</span>
+            <span>| 王梓涵</span>
             <span> | </span>
-            <span> 出版社</span>
+            <span> 謎夜遊戲出版</span>
             <br />
             <br />
-            The French aromatherapy brand combines fatty hazelnut, sesame and
-            grape seed oils, along with helichrise oil for its regenerating
-            properties. Rosemary and sage impart a firming effect, while
-            petitgrain and lavender give the moisturizer its balanced scent. As
-            with all oils, pat it onto slightly damp skin for maximum hydration.
+            《暗影迷途》是一款合作推理遊戲，玩家們是陷入一座神秘古堡中的探險隊，必須在重重迷霧與陰謀中找出逃脫的線索。每位玩家擁有不同的技能與背景，透過分享資訊和解讀謎題，一步步揭開古堡背後的秘密。但時間有限，暗影中的威脅逐漸逼近，玩家必須快速做出決策。
           </div>
           <div className={styles["product-quantity"]}>
             數量:
@@ -85,7 +81,7 @@ const ProductDetail = () => {
             <a
               href="#"
               onClick={toggleLike}
-              className={`${styles["wishlist"]} transition-all duration-200 ease-in-out focus:shadow hover:bg-gray-800 flex items-center`}
+              className={`${styles["wishlist"]} transition-all duration-200 ease-in-out focus:shadow hover:bg-red-800 flex items-center`}
             >
               {/* <CiHeart className={styles["wishlist-icon"]} />  */}
               {liked ? (
@@ -121,39 +117,14 @@ const ProductDetail = () => {
         <div id="introduction" className={styles.section}>
           <h2 className={styles.subtitle}>遊戲介紹</h2>
           <p className={styles.paragraph}>
-            《妙語說書人》是一款文字冒險遊戲，玩家扮演巧舌如簧的說書人，通過選擇詞語和故事情節來打動聽眾，影響他們的情感與選擇，探索人際互動和故事敘述的藝術。
+            《暗影迷途》是一款合作推理遊戲，玩家們是陷入一座神秘古堡中的探險隊，必須在重重迷霧與陰謀中找出逃脫的線索。每位玩家擁有不同的技能與背景，透過分享資訊和解讀謎題，一步步揭開古堡背後的秘密。但時間有限，暗影中的威脅逐漸逼近，玩家必須快速做出決策。
           </p>
         </div>
 
         <div id="rules" className={styles.section}>
           <h2 className={styles.subtitle}>遊戲規則</h2>
           <p className={styles.paragraph}>
-            在《妙語說書人》中，玩家需要遵循以下遊戲規則：
-          </p>
-          <ul className={styles.list}>
-            <li className={styles["list-item"]}>
-              1.
-              遊戲開始時，玩家會根據故事情境卡提出想法，決定要影響的角色情緒和方向。
-            </li>
-            <li className={styles["list-item"]}>
-              2.
-              根據情境中的選項進行互動，玩家需要選擇能引發角色共鳴的詞語，影響事件中的選擇。
-            </li>
-            <li className={styles["list-item"]}>
-              3.
-              故事會根據玩家的選擇影響整個劇情的情緒、反應和未來的選擇，需根據情境進行決策。
-            </li>
-            <li className={styles["list-item"]}>
-              4.
-              目的是通過影響其他角色的反應，創造出最佳的劇情，成功打動聽眾獲得更多分數。
-            </li>
-            <li className={styles["list-item"]}>
-              5.
-              為使情節生動有趣，玩家的選擇需帶來不可預測的結果，反映說書人的影響力。
-            </li>
-          </ul>
-          <p className={styles.paragraph}>
-            玩家會透過語言去說故事，需靈活應變，達成最佳結果。
+            玩家需要合作探索古堡，翻開隱藏的卡片解鎖房間，並運用各自的能力來破解謎題。每回合暗影會逐漸吞噬地圖的一部分，逼迫玩家加速解謎。只要有一位玩家找到古堡出口，所有人即勝利；若所有玩家被困，遊戲失敗。
           </p>
         </div>
 

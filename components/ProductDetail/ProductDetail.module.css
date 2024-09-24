@@ -32,8 +32,9 @@
 }
 .product-price {
   font-size: 20px;
-  color: #ffffff;
+  color: #000000;
   margin-bottom: 10px;
+  font-weight: bold;
 }
 /* .product-rating {
   margin-bottom: 10px;
@@ -44,7 +45,7 @@
 } */
 .product-description {
   margin-bottom: 20px;
-  color: #ffffff;
+  color: #000000;
 }
 .product-quantity {
   margin-bottom: 20px;
@@ -83,8 +84,8 @@
   text-decoration: none; /* 移除連結的下劃線 */
   border-radius: 5px; /* 統一按鈕的圓角 */
   padding: 10px 20px;
-  background-color: #010b14;
-  color: #fff;
+  background-color: #003E52;
+  color: #ffffff;
   text-align: center;
   text-decoration: none;
   margin-right: 10px;
@@ -124,7 +125,7 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 20px;
-  border: 1px solid rgb(255, 255, 255);
+  border: 1px solid rgb(0, 0, 0);
   padding: 10px;
 }
 
@@ -135,8 +136,8 @@
   align-items: center; /* 文字垂直置中 */
   padding: 10px;
   transition: background-color 0.3s;
-  border-left: 1px solid rgb(255, 255, 255); /* 左側邊框 */
-  border-right: 1px solid rgb(255, 255, 255); /* 右側邊框 */
+  border-left: 1px solid rgb(0, 0, 0); /* 左側邊框 */
+  border-right: 1px solid rgb(0, 0, 0); /* 右側邊框 */
 }
 
 /* 去掉第一個區塊的左邊框 */
@@ -151,14 +152,14 @@
 
 .title {
   font-size: 24px;
-  border-bottom: 2px solid rgb(255, 255, 255);
+  border-bottom: 2px solid rgb(0, 0, 0);
   padding-bottom: 10px;
 }
 
 .subtitle {
   font-size: 20px;
   margin-top: 20px;
-  border-bottom: 1px solid rgb(255, 255, 255);
+  border-bottom: 1px solid rgb(0, 0, 0);
   padding-bottom: 5px;
 }
 
@@ -196,6 +197,7 @@
   transition: background-color 0.3s, color 0.3s; /* 添加平滑過渡效果 */
 }
 
+/* text */
 .add-to-cart:hover {
   color: #ffffff;
 }

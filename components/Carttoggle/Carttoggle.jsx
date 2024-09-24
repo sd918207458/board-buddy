@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 const Carttoggle = () => {
   return (
@@ -15,13 +16,7 @@ const Carttoggle = () => {
                   <div className="flow-root">
                     <ul className="-my-4">
                       <li className="flex flex-col space-y-3 py-2 text-left sm:flex-row sm:space-x-4 sm:space-y-0">
-                        <div className="shrink-0">
-                          <img
-                            className="h-12 w-12 max-w-full rounded-lg object-cover"
-                            src="https://i.postimg.cc/XYdbSzx8/image.png"
-                            alt="Product"
-                          />
-                        </div>
+                        <div className="shrink-0"></div>
                         <div className="flex flex-1 flex-col justify-between">
                           <div className="pr-2">
                             <p className="text-sm font-semibold text-white">
@@ -29,22 +24,6 @@ const Carttoggle = () => {
                             </p>
                             <p className="text-xs text-gray-400">36EU - 4US</p>
                           </div>
-                          {/* <div className="mt-2 flex items-center justify-between">
-                            <p className="text-base font-semibold text-white">
-                              $259.00
-                            </p>
-                            <div className="flex h-6 items-stretch text-gray-600">
-                              <button className="flex items-center justify-center rounded-l-md bg-gray-200 px-2 transition hover:bg-black hover:text-white">
-                                -
-                              </button>
-                              <div className="flex w-full items-center justify-center bg-gray-100 px-2 text-xs uppercase transition">
-                                1
-                              </div>
-                              <button className="flex items-center justify-center rounded-r-md bg-gray-200 px-2 transition hover:bg-black hover:text-white">
-                                +
-                              </button>
-                            </div>
-                          </div> */}
                         </div>
                       </li>
                     </ul>
@@ -103,33 +82,35 @@ const Carttoggle = () => {
                     <ul className="-my-4">
                       <li className="flex flex-col space-y-3 py-2 text-left sm:flex-row sm:space-x-4 sm:space-y-0">
                         <div className="shrink-0">
-                          <img
+                          <Image
                             className="h-12 w-12 max-w-full rounded-lg object-cover"
-                            src="https://i.postimg.cc/XYdbSzx8/image.png"
-                            alt="Product"
+                            src="https://i.postimg.cc/MGFg5m5k/4.png"
+                            width={500}
+                            height={500}
+                            alt="暗影迷途"
                           />
                         </div>
                         <div className="flex flex-1 flex-col justify-between">
                           <div className="pr-2">
                             <p className="text-sm font-semibold text-white">
-                              Nike Air Max 2019
+                              暗影迷途
                             </p>
-                            <p className="text-xs text-gray-400">36EU - 4US</p>
+                            {/* <p className="text-xs text-gray-400">36EU - 4US</p> */}
                           </div>
                           <div className="mt-2 flex items-center justify-between">
                             <p className="text-base font-semibold text-white">
                               $259.00
                             </p>
                             <div className="flex h-6 items-stretch text-gray-600">
-                              <button className="flex items-center justify-center rounded-l-md bg-gray-200 px-2 transition hover:bg-black hover:text-white">
+                              {/* <button className="flex items-center justify-center rounded-l-md bg-gray-200 px-2 transition hover:bg-black hover:text-white">
                                 -
-                              </button>
-                              <div className="flex w-full items-center justify-center bg-gray-100 px-2 text-xs uppercase transition">
+                              </button> */}
+                              <div className="flex w-full items-center justify-center text-gray-100 px-2 text-xs uppercase transition">
                                 1
                               </div>
-                              <button className="flex items-center justify-center rounded-r-md bg-gray-200 px-2 transition hover:bg-black hover:text-white">
+                              {/* <button className="flex items-center justify-center rounded-r-md bg-gray-200 px-2 transition hover:bg-black hover:text-white">
                                 +
-                              </button>
+                              </button> */}
                             </div>
                           </div>
                         </div>
