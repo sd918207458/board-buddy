@@ -5,18 +5,38 @@ import { useRouter } from "next/router";
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userData, setUserData] = useState({ avatar: "", username: "" }); // 用來儲存使用者資料
   const router = useRouter();
 
   useEffect(() => {
     // 檢查是否已登入，透過localStorage中的 token 判斷
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
+
+    if (token) {
+      // 發送請求到後端以獲取當前使用者資料
+      fetch("http://localhost:3005/api/auth/check", {
+        method: "GET",
+        credentials: "include",
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status === "success" && data.data.user) {
+            setUserData({
+              avatar: data.data.user.avatar,
+              username: data.data.user.username,
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("獲取使用者資料失敗", error);
+        });
+    }
   }, []);
 
   // 登出邏輯，清除token，並保留在原本的頁面
   const handleLogout = async () => {
     try {
-      // 發送 API 請求登出
       await fetch("/api/logout", {
         method: "POST",
         headers: {
@@ -25,10 +45,7 @@ export default function Navbar() {
         credentials: "include", // 確保請求附帶cookie
       });
 
-      // 清除 localStorage 中的 token
       localStorage.removeItem("token");
-
-      // 清除狀態，不跳轉頁面
       setIsLoggedIn(false);
     } catch (error) {
       console.error("登出失敗", error);
@@ -89,8 +106,15 @@ export default function Navbar() {
               role="avatar"
               className=" w-12 rounded-full avatar flex flex-col items-center"
             >
-              <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
-              <span>User</span>
+              {/* 顯示使用者 avatar 和 username */}
+              <img
+                src={
+                  userData.avatar ||
+                  "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                }
+                alt="User Avatar"
+              />
+              <span>{userData.username || "User"}</span>
             </div>
             <ul
               tabIndex={0}
