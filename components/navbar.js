@@ -3,14 +3,14 @@ import { GiHouse, GiThreeFriends, GiShoppingBag, GiTalk } from "react-icons/gi";
 import Link from "next/link";
 import { useState } from "react";
 import Carttoggle from "./Carttoggle/Carttoggle";
+import CarttoggleTest from "./Carttoggle/CarttoggleTest";
 
 export default function Navbar() {
-    const [isCartVisible, setIsCartVisible] = useState(false);
-  
-    const toggleCart = () => {
-      setIsCartVisible(!isCartVisible);
-    };
+  const [isCartVisible, setIsCartVisible] = useState(false);
 
+  const toggleCart = () => {
+    setIsCartVisible(!isCartVisible);
+  };
 
   return (
     <div className="navbar bg-[#003E52] text-white sticky top-0 z-50">
@@ -84,11 +84,14 @@ export default function Navbar() {
             </li>
           </ul>
         </div>
-{/* 購物車 */}
+        {/* 購物車 icon*/}
         <div className="dropdown dropdown-end">
-          <div tabIndex={0} role="button" className="btn btn-ghost btn-circle"
+          <div
+            tabIndex={0}
+            role="button"
+            className="btn btn-ghost btn-circle"
             onClick={toggleCart} // 加上事件處理器
-            >
+          >
             <div className="indicator">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -111,20 +114,28 @@ export default function Navbar() {
             tabIndex={0}
             className="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-52 shadow"
           >
-  {/* Conditionally render Cart component when the button is clicked */}
-  {isCartVisible && <Carttoggle/>}
+            {/* Conditionally render Cart component when the button is clicked */}
+            {/* {isCartVisible && <Carttoggle />} */}
+            {/* {isCartVisible && (
+              <div
+                tabIndex={0}
+                className="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-80 shadow" // 固定寬度為 w-80 或 w-96
+              >
+                <div className="card-body w-full h-auto overflow-y-auto">
+                  <CarttoggleTest />
+                </div>
+              </div>
+            )} */}
 
-
-            {/* <div className="card-body">
-              <span className="text-lg font-bold">8 Items</span>
-              <span className="text-info">Subtotal: $999</span>
+            <div className="card-body">
+              <span className="text-lg text-black font-bold">8 Items</span>
+              <span className="text-info">小計: $999</span>
               <div className="card-actions">
-                <button className="btn btn-primary bg-[#003E52] btn-block">
+                <button className="btn btn-primary bg-[#003E52] btn-block hover:bg-red-600">
                   View cart
                 </button>
               </div>
             </div>
-             */}
           </div>
         </div>
       </div>
