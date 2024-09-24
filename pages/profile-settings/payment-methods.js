@@ -4,25 +4,16 @@ import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 
-// 驗證信用卡號是否有效
-const validateCardNumber = (cardNumber) => {
-  const cardNumberPattern = /^\d{16}$/; // 16位數字格式
-  return cardNumberPattern.test(cardNumber);
-};
-
-// 驗證到期日是否有效 (MM/YY 格式)
-const validateExpiryDate = (expiryDate) => {
-  const expiryDatePattern = /^(0[1-9]|1[0-2])\/\d{2}$/; // MM/YY 格式
-  return expiryDatePattern.test(expiryDate);
-};
-
 export default function PaymentMethods() {
   const [paymentMethods, setPaymentMethods] = useState([
     {
       id: 1,
-      cardholderName: "王大明",
-      cardNumber: "0000 0000 0000 0000",
-      expiryDate: "12/24",
+      type: "cash", // 付款方式類型
+      method: "現金付款",
+      cardholderName: "",
+      cardNumber: "",
+      expiryDate: "",
+      cvv: "",
       isDefault: true,
     },
   ]);
@@ -30,6 +21,8 @@ export default function PaymentMethods() {
   const [isMounted, setIsMounted] = useState(false);
   const [currentMethod, setCurrentMethod] = useState({
     id: null,
+    type: "cash", // 預設為現金付款
+    method: "現金付款",
     cardholderName: "",
     cardNumber: "",
     expiryDate: "",
@@ -53,15 +46,6 @@ export default function PaymentMethods() {
   };
 
   const handleSubmit = () => {
-    if (!validateCardNumber(currentMethod.cardNumber)) {
-      alert("信用卡號格式錯誤，請輸入16位數字");
-      return;
-    }
-    if (!validateExpiryDate(currentMethod.expiryDate)) {
-      alert("到期日格式錯誤，請使用 MM/YY 格式");
-      return;
-    }
-
     setIsLoading(true);
     setTimeout(() => {
       if (isEditing) {
@@ -119,6 +103,8 @@ export default function PaymentMethods() {
     setIsModalOpen(false);
     setCurrentMethod({
       id: null,
+      type: "cash", // 預設為現金付款
+      method: "現金付款",
       cardholderName: "",
       cardNumber: "",
       expiryDate: "",
@@ -156,8 +142,13 @@ export default function PaymentMethods() {
                       <div className="card bg-base-100 shadow-xl mb-4">
                         <div className="card-body ">
                           <h2 className="card-title">付款方式</h2>
-                          <p>卡號: {method.cardNumber}</p>
-                          <p>到期日: {method.expiryDate}</p>
+                          <p>付款方式: {method.method}</p>
+                          {method.cardNumber && (
+                            <p>卡號: {method.cardNumber}</p>
+                          )}
+                          {method.expiryDate && (
+                            <p>到期日: {method.expiryDate}</p>
+                          )}
                           {method.isDefault && (
                             <span className="badge badge-primary">預設</span>
                           )}
@@ -214,37 +205,72 @@ export default function PaymentMethods() {
                   {isEditing ? "編輯錢包" : "新增錢包"}
                 </h3>
 
-                <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
-                  {/* Credit Card Number */}
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text">信用卡卡號</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="cardNumber"
-                      value={currentMethod.cardNumber}
-                      onChange={handleChange}
-                      placeholder="0000 0000 0000 0000"
-                      className="input input-bordered w-full"
-                    />
-                  </div>
-
-                  {/* Expiry Date */}
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text">到期日</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="expiryDate"
-                      value={currentMethod.expiryDate}
-                      onChange={handleChange}
-                      placeholder="MM/YY"
-                      className="input input-bordered w-full"
-                    />
-                  </div>
+                {/* 付款方式選擇 */}
+                <div className="form-control mt-4">
+                  <label className="label">
+                    <span className="label-text">選擇付款方式</span>
+                  </label>
+                  <select
+                    name="type"
+                    value={currentMethod.type}
+                    onChange={handleChange}
+                    className="select select-bordered"
+                  >
+                    <option value="creditCard">信用卡付款</option>
+                    <option value="cash">現金付款</option>
+                    <option value="onlinePayment">線上付款</option>
+                  </select>
                 </div>
+
+                {/* 根據選擇顯示不同的輸入欄位 */}
+                {currentMethod.type === "creditCard" && (
+                  <>
+                    <div className="form-control mt-4">
+                      <label className="label">
+                        <span className="label-text">信用卡卡號</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="cardNumber"
+                        value={currentMethod.cardNumber}
+                        onChange={handleChange}
+                        placeholder="0000 0000 0000 0000"
+                        className="input input-bordered"
+                      />
+                    </div>
+
+                    <div className="form-control mt-4">
+                      <label className="label">
+                        <span className="label-text">到期日</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="expiryDate"
+                        value={currentMethod.expiryDate}
+                        onChange={handleChange}
+                        placeholder="MM/YY"
+                        className="input input-bordered"
+                      />
+                    </div>
+                  </>
+                )}
+
+                {currentMethod.type === "onlinePayment" && (
+                  <div className="form-control mt-4">
+                    <label className="label">
+                      <span className="label-text">選擇線上付款方式</span>
+                    </label>
+                    <select
+                      name="method"
+                      value={currentMethod.method}
+                      onChange={handleChange}
+                      className="select select-bordered"
+                    >
+                      <option value="Line Pay">Line Pay</option>
+                      <option value="ECPay">ECPay</option>
+                    </select>
+                  </div>
+                )}
 
                 {/* Set Default Payment Method */}
                 <div className="form-control mt-4">

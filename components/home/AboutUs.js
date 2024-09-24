@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 const AboutUs = () => {
   return (
@@ -21,7 +22,9 @@ const AboutUs = () => {
               <p className="text-gray-700 mb-6">
                 想參加桌遊揪團活動嗎？我們提供線上與線下的桌遊活動，讓你輕鬆找到志同道合的玩家。無論是家庭聚會還是策略對決，我們的揪團系統將幫助你快速加入最適合的活動！
               </p>
-              <button className="btn btn-primary">立即揪團</button>
+              <Link href="/profile-settings" legacyBehavior>
+                <button className="btn btn-primary">立即揪團</button>
+              </Link>
             </div>
           </div>
           <div>
@@ -48,7 +51,9 @@ const AboutUs = () => {
               <p className="text-gray-700 mb-6">
                 我們為你精選了最受歡迎的桌遊產品。從經典的策略遊戲到輕鬆的派對桌遊，你都可以在我們的平台上輕鬆購買，並享受快速配送服務。
               </p>
-              <button className="btn btn-primary">開始購物</button>
+              <Link href="/profile-settings" legacyBehavior>
+                <button className="btn btn-primary">開始購物</button>
+              </Link>
             </div>
           </div>
         </div>

@@ -1,10 +1,13 @@
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 const PopularProducts = () => {
   return (
     <section className="mt-10">
-      <h2 className="text-3xl font-bold text-center mb-8">熱門桌遊商品</h2>
+      <h2 className="text-3xl font-bold text-center mb-8 text-white">
+        熱門桌遊商品
+      </h2>
       <div className="carousel w-full">
         {/* 第1個商品 */}
         <div id="product1" className="carousel-item relative w-full">
@@ -25,7 +28,9 @@ const PopularProducts = () => {
           </div>
           <div className="absolute bottom-5 left-5 text-white">
             <h2 className="text-2xl font-bold">策略桌遊 - 最佳選擇</h2>
-            <button className="btn btn-secondary mt-3">立即購買</button>
+            <Link href="/profile-settings/personal-info" legacyBehavior>
+              <button className="btn btn-secondary mt-3">立即購買</button>
+            </Link>
           </div>
         </div>
 

@@ -4,7 +4,9 @@ import Image from "next/image";
 const PopularStores = () => {
   return (
     <section className="mt-10">
-      <h2 className="text-3xl font-bold text-center mb-8">熱門店家</h2>
+      <h2 className="text-3xl font-bold text-center mb-8 text-white">
+        熱門店家
+      </h2>
       <div className="carousel w-full">
         {/* 店家1 */}
         <div id="store1" className="carousel-item relative w-full">

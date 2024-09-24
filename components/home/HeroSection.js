@@ -19,7 +19,7 @@ const HeroSection = () => {
           <p className="mb-5">
             探索最新的桌遊，參加揪團活動，並與朋友一起享受遊戲的樂趣！
           </p>
-          <button className="btn btn-primary">立即探索</button>
+          {/* <button className="btn btn-primary">立即探索</button> */}
         </div>
       </div>
     </div>

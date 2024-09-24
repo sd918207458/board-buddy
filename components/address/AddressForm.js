@@ -21,14 +21,6 @@ const AddressForm = ({
     setAreas(selectedCity ? selectedCity.districts : []);
   }, [formData.city]);
 
-  // 表單輸入字段數據
-  const inputFields = [
-    { id: "username", label: "收貨人姓名", placeholder: "姓名" },
-    { id: "phone", label: "收貨人手機", placeholder: "手機號碼" },
-    { id: "street", label: "街道", placeholder: "街道" },
-    { id: "detailedAddress", label: "詳細地址", placeholder: "詳細地址" },
-  ];
-
   return (
     <form onSubmit={handleSubmit}>
       <h3 className="font-bold text-lg mb-4 text-gray-800">
@@ -36,85 +28,155 @@ const AddressForm = ({
       </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* 表單輸入欄位 */}
-        {inputFields.map(({ id, label, placeholder }) => (
-          <div className="form-control" key={id}>
-            <label className="label" htmlFor={id}>
-              <span className="label-text ">{label}</span>
-            </label>
-            <input
-              id={id}
-              type="text"
-              name={id}
-              value={formData[id]}
-              onChange={handleChange}
-              placeholder={`請輸入${placeholder}`}
-              className="input input-bordered w-full text-black"
-              required
-            />
-          </div>
-        ))}
-
-        {/* 城市選擇 */}
+        {/* 收貨方式選擇 */}
         <div className="form-control">
           <label className="label">
-            <span className="label-text ">城市</span>
+            <span className="label-text ">收貨方式</span>
           </label>
           <select
-            name="city"
-            value={formData.city}
+            name="deliveryMethod"
+            value={formData.deliveryMethod}
             onChange={handleChange}
             className="select select-bordered w-full text-black"
             required
           >
-            <option value="">請選擇城市</option>
-            {cities.map((city) => (
-              <option key={city} value={city}>
-                {city}
-              </option>
-            ))}
+            <option value="homeDelivery">宅配到府</option>
+            <option value="convenienceStore">超商取貨</option>
           </select>
         </div>
 
-        {/* 區域選擇 */}
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text ">區域</span>
-          </label>
-          <select
-            name="area"
-            value={formData.area}
-            onChange={handleChange}
-            className="select select-bordered w-full text-black"
-            required
-            disabled={!formData.city}
-          >
-            <option value="">請選擇區域</option>
-            {areas.map((area) => (
-              <option key={area.zip} value={area.name}>
-                {area.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        {/* 如果選擇「宅配到府」，顯示地址欄位 */}
+        {formData.deliveryMethod === "homeDelivery" && (
+          <>
+            <div className="form-control">
+              <label className="label" htmlFor="city">
+                <span className="label-text ">城市</span>
+              </label>
+              <select
+                name="city"
+                value={formData.city}
+                onChange={handleChange}
+                className="select select-bordered w-full text-black"
+                required
+              >
+                <option value="">請選擇城市</option>
+                {cities.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        {/* 預設地址選擇 */}
-        <div className="form-control">
-          <label className="cursor-pointer flex items-center">
-            <input
-              type="checkbox"
-              name="isDefault"
-              checked={formData.isDefault}
-              onChange={(e) =>
-                handleChange({
-                  target: { name: "isDefault", value: e.target.checked },
-                })
-              }
-              className="checkbox"
-            />
-            <span className="label-text ml-2">將此設為我的預設地址</span>
-          </label>
-        </div>
+            <div className="form-control">
+              <label className="label" htmlFor="area">
+                <span className="label-text ">區域</span>
+              </label>
+              <select
+                name="area"
+                value={formData.area}
+                onChange={handleChange}
+                className="select select-bordered w-full text-black"
+                required
+                disabled={!formData.city}
+              >
+                <option value="">請選擇區域</option>
+                {areas.map((area) => (
+                  <option key={area.zip} value={area.name}>
+                    {area.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-control">
+              <label className="label" htmlFor="street">
+                <span className="label-text ">街道</span>
+              </label>
+              <input
+                id="street"
+                type="text"
+                name="street"
+                value={formData.street}
+                onChange={handleChange}
+                placeholder="請輸入街道"
+                className="input input-bordered w-full text-black"
+                required
+              />
+            </div>
+
+            <div className="form-control">
+              <label className="label" htmlFor="detailedAddress">
+                <span className="label-text ">詳細地址</span>
+              </label>
+              <input
+                id="detailedAddress"
+                type="text"
+                name="detailedAddress"
+                value={formData.detailedAddress}
+                onChange={handleChange}
+                placeholder="請輸入詳細地址"
+                className="input input-bordered w-full text-black"
+                required
+              />
+            </div>
+          </>
+        )}
+
+        {/* 如果選擇「超商取貨」，顯示選擇超商與店鋪資訊 */}
+        {formData.deliveryMethod === "convenienceStore" && (
+          <>
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text ">選擇超商</span>
+              </label>
+              <select
+                name="storeType"
+                value={formData.storeType}
+                onChange={handleChange}
+                className="select select-bordered w-full text-black"
+                required
+              >
+                <option value="">請選擇超商</option>
+                <option value="7-11">7-11</option>
+                <option value="FamilyMart">全家</option>
+              </select>
+            </div>
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text ">店鋪代碼/名稱</span>
+              </label>
+              <input
+                type="text"
+                name="storeName"
+                value={formData.storeName}
+                onChange={handleChange}
+                placeholder="請輸入超商店鋪名稱或代碼"
+                className="input input-bordered w-full text-black"
+                required
+              />
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* 預設地址選擇 */}
+      <div className="form-control">
+        <label className="cursor-pointer flex items-center">
+          <input
+            type="checkbox"
+            name="isDefault"
+            checked={formData.isDefault}
+            onChange={(e) =>
+              handleChange({
+                target: { name: "isDefault", value: e.target.checked },
+              })
+            }
+            className="checkbox"
+          />
+          <span className="label-text m-4">將此設為我的預設地址</span>
+        </label>
       </div>
 
       {/* 操作按鈕 */}
@@ -129,9 +191,9 @@ const AddressForm = ({
         </button>
         <button
           type="button"
-          className="btn btn-primary"
+          className="btn text-white"
           style={{ backgroundColor: "#003E52" }}
-          onClick={closeModal} // 添加這行代碼來調用 closeModal 函數
+          onClick={closeModal}
         >
           取消
         </button>
