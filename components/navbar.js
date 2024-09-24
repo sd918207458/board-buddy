@@ -2,8 +2,7 @@ import React from "react";
 import { GiHouse, GiThreeFriends, GiShoppingBag, GiTalk } from "react-icons/gi";
 import Link from "next/link";
 import { useState } from "react";
-import Carttoggle from "./Carttoggle/Carttoggle";
-import CarttoggleTest from "./Carttoggle/CarttoggleTest";
+import Image from "next/image";
 
 export default function Navbar() {
   const [isCartVisible, setIsCartVisible] = useState(false);
@@ -128,10 +127,30 @@ export default function Navbar() {
             )} */}
 
             <div className="card-body">
-              <span className="text-lg text-black font-bold">8 Items</span>
-              <span className="text-info">小計: $999</span>
-              <div className="card-actions">
-                <button className="btn btn-primary bg-[#003E52] btn-block hover:bg-red-600">
+              <div className="flex items-center space-x-4">
+                {/* 圖片 */}
+                <Image
+                  src="https://i.postimg.cc/MGFg5m5k/4.png"
+                  width={50}
+                  height={50}
+                  alt="暗影迷途"
+                  className="rounded-lg"
+                />
+                {/* 商品名稱和數量 */}
+                <div>
+                  <span className="block text-lg text-black font-bold">
+                    暗影迷途
+                  </span>
+                  <span className="block text-lg text-black">數量: 1</span>
+                </div>
+              </div>
+
+              {/* 小計 */}
+              <span className="block mt-4 text-violet-600">小計: $999</span>
+
+              {/* 按鈕 */}
+              <div className="card-actions mt-4">
+                <button className="btn btn-primary bg-[#003E52] btn-block hover:bg-violet-600">
                   View cart
                 </button>
               </div>
