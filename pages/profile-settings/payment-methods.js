@@ -3,6 +3,7 @@ import Navbar from "@/components/NavbarSwitcher";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
+import Coupon from "@/components/payment/Coupon"; // 引入優惠券組件
 
 export default function PaymentMethods() {
   const [paymentMethods, setPaymentMethods] = useState([
@@ -18,6 +19,7 @@ export default function PaymentMethods() {
     },
   ]);
 
+  const [discount, setDiscount] = useState(0); // 儲存優惠券折扣
   const [isMounted, setIsMounted] = useState(false);
   const [currentMethod, setCurrentMethod] = useState({
     id: null,
@@ -36,6 +38,19 @@ export default function PaymentMethods() {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // 處理應用優惠券的邏輯
+  const applyCoupon = (couponCode) => {
+    return new Promise((resolve, reject) => {
+      // 模擬與後端進行優惠券驗證
+      if (couponCode === "DISCOUNT10") {
+        setDiscount(10);
+        resolve(10);
+      } else {
+        reject("Invalid coupon");
+      }
+    });
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -194,6 +209,18 @@ export default function PaymentMethods() {
                   </button>
                 </div>
               </div>
+            </section>
+            <section className="max-w-4xl mx-auto mt-6">
+              <h2 className="text-lg font-semibold text-gray-700 capitalize dark:text-white mb-4">
+                我的優惠券
+              </h2>
+
+              {/* 優惠券組件 */}
+              <Coupon applyCoupon={applyCoupon} />
+
+              {discount > 0 && (
+                <p className="text-green-500 mt-4">優惠券折扣: NT${discount}</p>
+              )}
             </section>
           </div>
 

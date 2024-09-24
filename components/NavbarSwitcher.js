@@ -5,25 +5,41 @@ import { useRouter } from "next/router";
 
 const NavbarSwitcher = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // 新增一個狀態來控制載入
+  const [isLoading, setIsLoading] = useState(true); // 控制載入狀態
   const router = useRouter();
 
   useEffect(() => {
-    // 檢查JWT token是否存在於localStorage中
     const token = localStorage.getItem("token");
-
     if (token) {
-      setIsLoggedIn(true);
+      // 檢查 token 的有效性，發送 API 請求到後端
+      fetch("http://localhost:3005/api/auth/check", {
+        method: "GET",
+        credentials: "include",
+      })
+        .then((response) => {
+          if (!response.ok) {
+            // 如果 token 無效，清理 localStorage 並登出
+            localStorage.removeItem("token");
+            setIsLoggedIn(false);
+          } else {
+            setIsLoggedIn(true);
+          }
+        })
+        .catch((error) => {
+          console.error("檢查 token 發生錯誤", error);
+          setIsLoggedIn(false);
+        })
+        .finally(() => {
+          // 確保在請求完成後，無論成功或失敗，都將 `isLoading` 設置為 false
+          setIsLoading(false);
+        });
     } else {
-      setIsLoggedIn(false);
+      // 沒有 token，直接結束 loading 狀態
+      setIsLoading(false);
     }
-
-    // 載入完成，設置為false
-    setIsLoading(false);
   }, [router]);
 
   if (isLoading) {
-    // 當載入狀態時可以顯示一個簡單的loading
     return <div>Loading...</div>;
   }
 
