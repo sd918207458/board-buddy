@@ -4,7 +4,7 @@ import Navbar from "@/components/NavbarSwitcher";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import InputField from "@/components/personal-info/InputField";
-import AvatarUpload from "@/components/personal-info/upload_avatar"; // 導入 AvatarUpload
+import AvatarUpload from "@/components/personal-info/upload_avatar";
 
 const DatePicker1 = dynamic(() => import("@/components/datepicker"), {
   ssr: false,
@@ -26,92 +26,63 @@ export default function PersonalInfo() {
 
   const [gameTypes, setGameTypes] = useState([]);
   const [playTimes, setPlayTimes] = useState([]);
-  const [avatarUrl, setAvatarUrl] = useState(""); // Track avatar upload URL
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [submitMessage, setSubmitMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
-  const [loading, setLoading] = useState(true); // 新增加載狀態
+  const [loading, setLoading] = useState(true);
 
-  
-
-  // Fetch game types and play times on mount
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
         const [gameTypesRes, playTimesRes, userInfoRes] = await Promise.all([
           fetch("/api/game-types"),
           fetch("/api/play-times"),
-          fetch("/api/users", {
+          fetch("http://localhost:3005/api/users", {
             method: "GET",
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`, // 帶上用戶token
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
           }),
         ]);
 
-        const gameTypesData = await gameTypesRes.json();
-        const playTimesData = await playTimesRes.json();
-        const userInfoData = await userInfoRes.json();
+        const [gameTypesData, playTimesData, userInfoData] = await Promise.all([
+          gameTypesRes.json(),
+          playTimesRes.json(),
+          userInfoRes.json(),
+        ]);
 
-        if (userInfoData.success) {
+        if (userInfoData.status === "success") {
+          const { user } = userInfoData.data;
           setFormData({
-            username: userInfoData.user.username,
-            phone: userInfoData.user.phone,
-            emailAddress: userInfoData.user.email,
-            password: "", // 密碼不應顯示
-            first_name: userInfoData.user.first_name,
-            last_name: userInfoData.user.last_name,
-            birthday: userInfoData.user.birthday,
-            gender: userInfoData.user.gender,
-            gameType: userInfoData.user.gameType,
-            playTime: userInfoData.user.playTime,
+            username: user.username,
+            phone: user.phone,
+            emailAddress: user.email,
+            password: "",
+            first_name: user.first_name,
+            last_name: user.last_name,
+            birthday: user.birthday,
+            gender: user.gender,
+            gameType: user.gameType,
+            playTime: user.playTime,
           });
-          setAvatarUrl(userInfoData.user.avatarUrl);
+          setAvatarUrl(user.avatar);
         }
 
         setGameTypes(gameTypesData || []);
         setPlayTimes(playTimesData || []);
-        setLoading(false); // 加載完成
       } catch (error) {
         console.error("Failed to load data", error);
+      } finally {
         setLoading(false);
       }
     };
 
     fetchInitialData();
-    setIsMounted(true);
   }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value, // 使用 name 屬性動態更新對應的值
-    }));
-  };
-
-  const handleAvatarUpload = async (file) => {
-    // Upload the avatar file separately
-    const formData = new FormData();
-    formData.append("avatar", file);
-
-    try {
-      const response = await fetch("lhttp://localhost:3005/api/users/upload-avatar", {
-        method: "POST",
-        body: formData,
-        credentials: "include", // 若後端需要認證cookie
-      });
-
-      const result = await response.json();
-      if (result.status === "success") {
-        setAvatarUrl(result.data.avatar); // Store uploaded avatar URL
-      } else {
-        setErrorMessage("上傳頭像失敗，請重試。");
-      }
-    } catch (error) {
-      setErrorMessage("上傳失敗，請檢查網絡連線。");
-    }
+  const handleChange = ({ target: { name, value } }) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const validateForm = () => {
@@ -156,9 +127,8 @@ export default function PersonalInfo() {
     }
 
     try {
-      const completeFormData = { ...formData, avatar: avatarUrl }; // include avatar URL
-
-      const response = await fetch("/api/users/update", {
+      const completeFormData = { ...formData, avatar: avatarUrl };
+      const response = await fetch("http://localhost:3005/api/users/update", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -168,7 +138,6 @@ export default function PersonalInfo() {
       });
 
       const result = await response.json();
-
       if (result.status === "success") {
         setSubmitMessage("提交成功！資料已儲存。");
       } else {
@@ -181,8 +150,8 @@ export default function PersonalInfo() {
     }
   };
 
-  if (!isMounted || loading) {
-    return <div>加載中...</div>; // Loading screen
+  if (loading) {
+    return <div>加載中...</div>;
   }
 
   return (
@@ -195,8 +164,7 @@ export default function PersonalInfo() {
             <h2 className="text-2xl font-semibold text-[#003E52] text-center">
               個人資料設定
             </h2>
-            {/* Avatar Upload */}
-            <AvatarUpload onUpload={handleAvatarUpload} /> {/* 重新上傳頭像 */}
+            <AvatarUpload onUpload={setAvatarUrl} />
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <InputField
@@ -206,7 +174,6 @@ export default function PersonalInfo() {
                   onChange={handleChange}
                   required
                 />
-
                 <InputField
                   label="電話號碼"
                   name="phone"
@@ -251,7 +218,6 @@ export default function PersonalInfo() {
                   required
                 />
 
-                {/* 性別 */}
                 <div className="form-control">
                   <label className="label" htmlFor="gender">
                     性別
@@ -272,7 +238,6 @@ export default function PersonalInfo() {
                   </select>
                 </div>
 
-                {/* 遊戲類型 */}
                 <div className="form-control">
                   <label className="label" htmlFor="gameType">
                     最喜歡的遊戲類型
@@ -296,7 +261,6 @@ export default function PersonalInfo() {
                   </select>
                 </div>
 
-                {/* 常玩時段 */}
                 <div className="form-control">
                   <label className="label" htmlFor="playTime">
                     常玩時段
@@ -321,7 +285,6 @@ export default function PersonalInfo() {
                 </div>
               </div>
 
-              {/* 提交按鈕 */}
               <div className="form-control mt-6">
                 <button
                   type="submit"
@@ -334,7 +297,6 @@ export default function PersonalInfo() {
                 </button>
               </div>
 
-              {/* 錯誤/成功訊息 */}
               {errorMessage && (
                 <p className="text-red-500 mt-4">{errorMessage}</p>
               )}

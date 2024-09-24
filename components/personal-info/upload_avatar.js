@@ -1,24 +1,20 @@
 import { useState } from "react";
 
-export default function UploadAvatar() {
+export default function UploadAvatar({ onUpload }) {
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
   const [uploadStatus, setUploadStatus] = useState("");
 
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0]; // 定義 selectedFile
-
-    // 檢查檔案並設定預覽
+  const handleFileChange = ({ target: { files } }) => {
+    const selectedFile = files[0];
     if (selectedFile) {
-      setFile(selectedFile); // 將檔案設置到 state 中
-      const preview = URL.createObjectURL(selectedFile); // 為檔案生成 URL 預覽
-      setPreviewUrl(preview); // 設定圖片預覽的 URL
+      setFile(selectedFile);
+      setPreviewUrl(URL.createObjectURL(selectedFile));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!file) {
       setUploadStatus("請選擇一張圖片上傳");
       return;
@@ -33,13 +29,18 @@ export default function UploadAvatar() {
         {
           method: "POST",
           body: formData,
-          credentials: "include", // 確保有認證cookie傳遞
+          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
       );
 
       const result = await response.json();
       if (result.status === "success") {
+        const avatarUrl = `http://localhost:3005/avatar/${result.data.avatar}`;
         setUploadStatus("上傳成功！");
+        onUpload(avatarUrl);
       } else {
         setUploadStatus("上傳失敗，請重試。");
       }
@@ -53,15 +54,20 @@ export default function UploadAvatar() {
       <h1>上傳頭像</h1>
       <form onSubmit={handleSubmit}>
         <input type="file" accept="image/*" onChange={handleFileChange} />
-        <div className="avatar">
-          <div className="w-24 rounded-full">
-            {previewUrl && <img src={previewUrl} alt="圖片預覽" width="100" />}
-            {/* 圖片預覽 */}
+        {previewUrl && (
+          <div className="avatar mt-4 w-24 h-24 rounded-full border">
+            <img
+              src={previewUrl}
+              alt="圖片預覽"
+              className="w-full h-full object-cover"
+            />
           </div>
-        </div>
-        <button type="submit">上傳</button>
+        )}
+        <button type="submit" className="btn btn-primary mt-4">
+          上傳
+        </button>
       </form>
-      {uploadStatus && <p>{uploadStatus}</p>}
+      {uploadStatus && <p className="mt-4 text-red-500">{uploadStatus}</p>}
     </div>
   );
 }

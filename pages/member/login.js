@@ -6,7 +6,7 @@ import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { CSSTransition } from "react-transition-group";
 
 export default function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState(""); // 使用 email 而不是 username
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,7 +23,7 @@ export default function Login() {
       const response = await fetch("http://localhost:3005/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email, password }), // 傳送 email 和 password
         credentials: "include", // 確保 cookies 被發送
       });
 
@@ -90,16 +90,16 @@ export default function Login() {
               <div className="mt-4">
                 <label
                   className="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-200"
-                  htmlFor="LoggingUsername"
+                  htmlFor="LoggingEmail"
                 >
-                  使用者名稱
+                  電子郵件
                 </label>
                 <input
-                  id="LoggingUsername"
+                  id="LoggingEmail"
                   className="block w-full px-4 py-2 text-gray-700 bg-white border rounded-lg dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring focus:ring-blue-300"
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
