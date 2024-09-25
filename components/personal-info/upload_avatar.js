@@ -50,24 +50,39 @@ export default function UploadAvatar({ onUpload }) {
   };
 
   return (
-    <div>
-      <h1>上傳頭像</h1>
-      <form onSubmit={handleSubmit}>
-        <input type="file" accept="image/*" onChange={handleFileChange} />
+    <div className="flex flex-col items-center justify-center">
+      <h1 className="text-xl font-semibold mt-6 text-[#003E52]">上傳頭像</h1>
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col items-center space-y-4"
+      >
         {previewUrl && (
-          <div className="avatar mt-4 w-24 h-24 rounded-full border">
-            <img
-              src={previewUrl}
-              alt="圖片預覽"
-              className="w-full h-full object-cover"
-            />
+          <div className="avatar mt-4">
+            <div className="ring-primary ring-[#003E52] ring-offset-base-100 w-24 rounded-full ring ring-offset-2">
+              <img
+                src={previewUrl}
+                alt="圖片預覽"
+                className="w-full h-full object-cover rounded-full"
+              />
+            </div>
           </div>
         )}
-        <button type="submit" className="btn btn-primary mt-4">
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="file-input file-input-bordered file-input-primary w-full max-w-xs "
+        />
+        <button
+          type="submit"
+          className="btn btn-primary w-full max-w-xs bg-[#003E52]"
+        >
           上傳
         </button>
       </form>
-      {uploadStatus && <p className="mt-4 text-red-500">{uploadStatus}</p>}
+      {uploadStatus && (
+        <p className="mt-4 text-red-500 text-center ">{uploadStatus}</p>
+      )}
     </div>
   );
 }

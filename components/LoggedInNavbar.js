@@ -113,13 +113,15 @@ export default function Navbar() {
             >
               {/* 顯示使用者 avatar 和 username */}
 
-              <img
-                src={
-                  `${userData.avatar}?t=${new Date().getTime()}` ||
-                  "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-                }
-                alt="User Avatar"
-              />
+              <div className="ring-primary ring-offset-base-100 w-12 rounded-full ring ring-offset-2 ">
+                <img
+                  src={
+                    `${userData.avatar}?t=${new Date().getTime()}` ||
+                    "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                  }
+                />
+              </div>
+
               <span>{userData.username || "User"}</span>
             </div>
             <ul
