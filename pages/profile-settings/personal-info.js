@@ -41,7 +41,7 @@ export default function PersonalInfo() {
           fetch("http://localhost:3005/api/users", {
             method: "GET",
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              Authorization: `Bearer ${localStorage.getItem("token")}`, // 確認 token 中包含正確的 payload
             },
           }),
         ]);

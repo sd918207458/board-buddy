@@ -52,6 +52,11 @@ export default function Navbar() {
     }
   };
 
+  // 當上傳頭像時，更新 Navbar 中的頭像
+  const handleUploadAvatar = (avatarUrl) => {
+    setUserData((prevData) => ({ ...prevData, avatar: avatarUrl }));
+  };
+
   return (
     <div className="navbar bg-[#003E52] text-white sticky top-0 z-50">
       <div className="flex-1">
@@ -107,9 +112,10 @@ export default function Navbar() {
               className=" w-12 rounded-full avatar flex flex-col items-center"
             >
               {/* 顯示使用者 avatar 和 username */}
+
               <img
                 src={
-                  userData.avatar ||
+                  `${userData.avatar}?t=${new Date().getTime()}` ||
                   "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
                 }
                 alt="User Avatar"

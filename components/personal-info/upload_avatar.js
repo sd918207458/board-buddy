@@ -38,9 +38,9 @@ export default function UploadAvatar({ onUpload }) {
 
       const result = await response.json();
       if (result.status === "success") {
-        const avatarUrl = `http://localhost:3005/avatar/${result.data.avatar}`;
+        const avatarUrl = result.data.avatar;
         setUploadStatus("上傳成功！");
-        onUpload(avatarUrl);
+        onUpload(avatarUrl); // 更新頭像 URL
       } else {
         setUploadStatus("上傳失敗，請重試。");
       }
