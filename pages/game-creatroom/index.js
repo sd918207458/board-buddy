@@ -9,9 +9,6 @@ export default function Createroom() {
     room_name: "",
     room_intro: "",
     img: null,
-    game1: "",
-    game2: "",
-    game3: "",
     event_date: "",
     minperson: "",
     maxperson: "",
@@ -30,10 +27,6 @@ export default function Createroom() {
     const updatedTitles = [...gameTitles];
     updatedTitles[index] = value; // 更新特定索引的游戏标题
     setGameTitles(updatedTitles);
-
-    // 更新formData中相应的字段
-    const fieldName = `game${index + 1}`;
-    setFormData({ ...formData, [fieldName]: value });
   };
 
   const handleFileChange = (e) => {
@@ -75,7 +68,7 @@ export default function Createroom() {
     });
 
     try {
-      const response = await fetch(`http://localhost:3005/game-creatroom`, {
+      const response = await fetch(`http://localhost:3005/api/gamecreat`, {
         method: "POST",
         body: formDataToSend,
       });
@@ -88,9 +81,6 @@ export default function Createroom() {
           room_name: "",
           room_intro: "",
           img: null,
-          game1: "",
-          game2: "",
-          game3: "",
           event_date: "",
           minperson: "",
           maxperson: "",
@@ -101,7 +91,7 @@ export default function Createroom() {
         alert("房间创建成功！");
       } else {
         const errorData = await response.json();
-        alert(`创建房间失败: ${errorData.error}`);
+        alert(`创建房间失败: ${errorData.message}`);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -200,31 +190,29 @@ export default function Createroom() {
                 </div>
               </div>
               <div className="pt-3.5">
-                <label htmlFor="location" className="block text-sm text-gray-500 dark:text-gray-300">場地位置</label>
+                <label htmlFor="location" className="block text-sm text-gray-500 dark:text-gray-300">地點</label>
                 <input
                   type="text"
                   name="location"
-                  placeholder="請輸入場地位置"
+                  placeholder="請輸入地點"
                   className="block mt-2 w-full placeholder-gray-400/70 dark:placeholder-gray-500 rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-gray-700 focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-blue-300"
                   value={formData.location}
                   onChange={handleChange}
                 />
               </div>
               <div className="pt-3.5">
-                <label htmlFor="roomrule" className="block text-sm text-gray-500 dark:text-gray-300">揪團規則</label>
+                <label htmlFor="roomrule" className="block text-sm text-gray-500 dark:text-gray-300">房間規則</label>
                 <textarea
                   name="roomrule"
-                  placeholder="請輸入規則"
+                  placeholder="請輸入房間規則"
                   className="block mt-2 w-full placeholder-gray-400/70 dark:placeholder-gray-500 rounded-lg border border-gray-200 bg-white px-4 h-32 py-2.5 text-gray-700 focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-blue-300"
                   value={formData.roomrule}
                   onChange={handleChange}
                 ></textarea>
               </div>
-              <div className="flex justify-center pt-3.5">
-                <button type="submit" className="bg-blue-500 text-white rounded-lg px-4 py-2">
-                  {isLoading ? "正在創建..." : "創建房間"}
-                </button>
-              </div>
+              <button type="submit" className="mt-4 p-2 bg-green-500 text-white rounded-lg" disabled={isLoading}>
+                {isLoading ? "创建中..." : "创建房间"}
+              </button>
             </form>
           </div>
         </div>
