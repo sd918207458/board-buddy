@@ -28,11 +28,7 @@ export default function LoggedOutNavbar() {
       <div className="flex-1">
         <Link href="/" legacyBehavior>
           <a className="btn btn-ghost normal-case text-xl text-white">
-            <img
-              src="https://your-logo-url-here.com"
-              className="w-10 h-10 mr-2"
-              alt="Logo"
-            />
+            <img src="/logo.jfif" className="w-10 h-10 mr-2" alt="Logo" />
           </a>
         </Link>
         <nav className="flex space-x-6">

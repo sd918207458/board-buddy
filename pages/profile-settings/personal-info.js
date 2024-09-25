@@ -24,57 +24,44 @@ export default function PersonalInfo() {
     playTime: "",
   });
 
-  const [gameTypes, setGameTypes] = useState([]);
-  const [playTimes, setPlayTimes] = useState([]);
   const [avatarUrl, setAvatarUrl] = useState("");
   const [submitMessage, setSubmitMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const [gameTypesRes, playTimesRes, userInfoRes] = await Promise.all([
-          fetch("/api/game-types"),
-          fetch("/api/play-times"),
-          fetch("http://localhost:3005/api/users", {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`, // 確認 token 中包含正確的 payload
-            },
-          }),
-        ]);
+        const userInfoRes = await fetch("http://localhost:3005/api/users", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        const userInfoData = await userInfoRes.json();
 
-        const [gameTypesData, playTimesData, userInfoData] = await Promise.all([
-          gameTypesRes.json(),
-          playTimesRes.json(),
-          userInfoRes.json(),
-        ]);
-
-        if (userInfoData.status === "success") {
-          const { user } = userInfoData.data;
-          setFormData({
-            username: user.username,
-            phone: user.phone,
-            emailAddress: user.email,
-            password: "",
-            first_name: user.first_name,
-            last_name: user.last_name,
-            birthday: user.birthday,
-            gender: user.gender,
-            gameType: user.gameType,
-            playTime: user.playTime,
-          });
-          setAvatarUrl(user.avatar);
+        if (userInfoData && userInfoData.status === "success") {
+          const { user } = userInfoData.data || {};
+          if (user) {
+            setFormData({
+              username: user.username || "",
+              phone: user.phone_number || "",
+              emailAddress: user.email || "",
+              password: "",
+              first_name: user.first_name || "",
+              last_name: user.last_name || "",
+              birthday: user.date_of_birth || "",
+              gender: user.gender || "",
+              gameType: user.favorite_games || "",
+              playTime: user.preferred_play_times || "",
+            });
+            setAvatarUrl(user.avatar || "");
+          }
+        } else {
+          console.error("Failed to retrieve user data");
         }
-
-        setGameTypes(gameTypesData || []);
-        setPlayTimes(playTimesData || []);
       } catch (error) {
         console.error("Failed to load data", error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -86,24 +73,8 @@ export default function PersonalInfo() {
   };
 
   const validateForm = () => {
-    const {
-      username,
-      phone,
-      emailAddress,
-      birthday,
-      gender,
-      gameType,
-      playTime,
-    } = formData;
-    if (
-      !username ||
-      !phone ||
-      !emailAddress ||
-      !birthday ||
-      !gender ||
-      !gameType ||
-      !playTime
-    ) {
+    const { username, phone, emailAddress } = formData;
+    if (!username || !phone || !emailAddress) {
       return "所有欄位都是必填的";
     }
     if (!/\S+@\S+\.\S+/.test(emailAddress)) {
@@ -129,7 +100,8 @@ export default function PersonalInfo() {
     try {
       const completeFormData = { ...formData, avatar: avatarUrl };
       const response = await fetch("http://localhost:3005/api/users/update", {
-        method: "POST",
+        // 確認此路徑與後端一致
+        method: "PUT", // 使用 PUT 方法進行更新
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -149,10 +121,6 @@ export default function PersonalInfo() {
       setIsSubmitting(false);
     }
   };
-
-  if (loading) {
-    return <div>加載中...</div>;
-  }
 
   return (
     <>
@@ -195,7 +163,6 @@ export default function PersonalInfo() {
                   value={formData.password}
                   onChange={handleChange}
                   type="password"
-                  required
                 />
                 <InputField
                   label="名字"
@@ -217,7 +184,6 @@ export default function PersonalInfo() {
                   type="date"
                   required
                 />
-
                 <div className="form-control">
                   <label className="label" htmlFor="gender">
                     性別
@@ -237,54 +203,7 @@ export default function PersonalInfo() {
                     <option value="female">女</option>
                   </select>
                 </div>
-
-                <div className="form-control">
-                  <label className="label" htmlFor="gameType">
-                    最喜歡的遊戲類型
-                  </label>
-                  <select
-                    id="gameType"
-                    name="gameType"
-                    value={formData.gameType}
-                    onChange={handleChange}
-                    className="select select-bordered w-full"
-                    required
-                  >
-                    <option value="" disabled>
-                      請選擇
-                    </option>
-                    {gameTypes.map((type) => (
-                      <option key={type.id} value={type.id}>
-                        {type.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="form-control">
-                  <label className="label" htmlFor="playTime">
-                    常玩時段
-                  </label>
-                  <select
-                    id="playTime"
-                    name="playTime"
-                    value={formData.playTime}
-                    onChange={handleChange}
-                    className="select select-bordered w-full"
-                    required
-                  >
-                    <option value="" disabled>
-                      請選擇
-                    </option>
-                    {playTimes.map((time) => (
-                      <option key={time.id} value={time.id}>
-                        {time.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
               </div>
-
               <div className="form-control mt-6">
                 <button
                   type="submit"
@@ -296,7 +215,6 @@ export default function PersonalInfo() {
                   {isSubmitting ? "提交中..." : "保存修改"}
                 </button>
               </div>
-
               {errorMessage && (
                 <p className="text-red-500 mt-4">{errorMessage}</p>
               )}

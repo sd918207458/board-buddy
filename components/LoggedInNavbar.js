@@ -62,11 +62,7 @@ export default function Navbar() {
       <div className="flex-1">
         <Link href="/" legacyBehavior>
           <a className="btn btn-ghost normal-case text-xl text-white">
-            <img
-              src="https://your-logo-url-here.com"
-              className="w-10 h-10 mr-2"
-              alt="Logo"
-            />
+            <img src="/logo.jfif" className="w-10 h-10 mr-2" alt="Logo" />
           </a>
         </Link>
         <nav className="flex space-x-6">
@@ -116,8 +112,9 @@ export default function Navbar() {
               <div className="ring-primary ring-offset-base-100 w-12 rounded-full ring ring-offset-2 ">
                 <img
                   src={
-                    `${userData.avatar}?t=${new Date().getTime()}` ||
-                    "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                    userData.avatar
+                      ? `${userData.avatar}`
+                      : "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
                   }
                 />
               </div>
