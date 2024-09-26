@@ -6,6 +6,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import InputField from "@/components/personal-info/InputField";
 import AvatarUpload from "@/components/personal-info/upload_avatar";
 
+// 動態導入日期選擇器，避免 SSR 問題
 const DatePicker1 = dynamic(() => import("@/components/datepicker"), {
   ssr: false,
 });
@@ -24,11 +25,12 @@ export default function PersonalInfo() {
     playTime: "",
   });
 
-  const [avatarUrl, setAvatarUrl] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState(""); // 用來顯示頭像
   const [submitMessage, setSubmitMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // 初次加載時取得用戶數據
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
@@ -47,7 +49,7 @@ export default function PersonalInfo() {
               username: user.username || "",
               phone: user.phone_number || "",
               emailAddress: user.email || "",
-              password: "",
+              password: "", // 密碼不顯示
               first_name: user.first_name || "",
               last_name: user.last_name || "",
               birthday: user.date_of_birth || "",
@@ -68,10 +70,12 @@ export default function PersonalInfo() {
     fetchInitialData();
   }, []);
 
+  // 更新表單的資料
   const handleChange = ({ target: { name, value } }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // 表單驗證
   const validateForm = () => {
     const { username, phone, emailAddress } = formData;
     if (!username || !phone || !emailAddress) {
@@ -86,6 +90,7 @@ export default function PersonalInfo() {
     return "";
   };
 
+  // 表單提交處理
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -100,7 +105,6 @@ export default function PersonalInfo() {
     try {
       const completeFormData = { ...formData, avatar: avatarUrl };
       const response = await fetch("http://localhost:3005/api/users/update", {
-        // 確認此路徑與後端一致
         method: "PUT", // 使用 PUT 方法進行更新
         headers: {
           "Content-Type": "application/json",
@@ -132,7 +136,7 @@ export default function PersonalInfo() {
             <h2 className="text-2xl font-semibold text-[#003E52] text-center">
               個人資料設定
             </h2>
-            <AvatarUpload onUpload={setAvatarUrl} />
+            <AvatarUpload onUpload={setAvatarUrl} /> {/* 用來上傳頭像 */}
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <InputField

@@ -96,19 +96,40 @@ export default function Request() {
     }
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // 模擬提交處理
-      setSubmitMessage("提交成功！我們已收到您的退換貨申請。");
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        orderNumber: "",
-        orderDate: "",
-        productName: "",
-        productModel: "",
-        productQuantity: "",
-        returnReason: "",
+      const response = await fetch("/api/request/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          order_id: formData.orderNumber,
+          member_id: 1, // 假設會員ID為1，實際可根據用戶狀態動態設置
+          order_date: formData.orderDate,
+          product_name: formData.productName,
+          product_model: formData.productModel,
+          product_quantity: formData.productQuantity,
+          reason: formData.returnReason,
+        }),
       });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setSubmitMessage(result.message);
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          orderNumber: "",
+          orderDate: "",
+          productName: "",
+          productModel: "",
+          productQuantity: "",
+          returnReason: "",
+        });
+      } else {
+        setErrorMessage(result.message);
+      }
     } catch (error) {
       setErrorMessage("提交失敗，請稍後重試。");
     } finally {
@@ -246,7 +267,6 @@ export default function Request() {
               ></textarea>
             </div>
 
-            {/* CSSTransition 動畫效果 */}
             <CSSTransition
               in={!!errorMessage}
               timeout={300}

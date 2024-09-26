@@ -25,6 +25,30 @@ export default function OrderTracking() {
     }
   }, [activeTab, currentPage]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const endpoint = `/api/orders/${activeTab}?page=${currentPage}&limit=${itemsPerPage}`;
+      try {
+        const response = await fetch(endpoint, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        const data = await response.json();
+        if (data.status === "success") {
+          setCurrentData(data.orders);
+        } else {
+          throw new Error("Failed to fetch orders");
+        }
+      } catch (error) {
+        console.error("Error loading orders: ", error);
+        setHasError(true);
+      }
+    };
+
+    fetchData();
+  }, [activeTab, currentPage]);
+
   // 根據選擇的 Tab 加載對應的數據
   const loadDataForCurrentPage = () => {
     let selectedUsers = [];

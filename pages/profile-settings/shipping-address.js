@@ -24,41 +24,66 @@ export default function ShippingAddress() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    if (!formData.username || !formData.phone || !formData.city) {
-      setErrorMessage("請填寫所有必填欄位");
-      setIsLoading(false);
-      return;
-    }
-
-    setTimeout(() => {
-      if (isEditing) {
-        setAddresses((prev) =>
-          prev.map((addr) => (addr.id === formData.id ? formData : addr))
-        );
-      } else {
-        setAddresses((prev) => [...prev, { ...formData, id: Date.now() }]);
-      }
-      setIsLoading(false);
+    try {
+      const response = await fetch("/api/shipment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(formData),
+      });
+      if (!response.ok) throw new Error("Failed to submit address");
+      const result = await response.json();
+      setAddresses([...addresses, result.data]);
       resetForm();
       closeModal();
-    }, 1000);
+    } catch (error) {
+      console.error("Error submitting address:", error);
+      setErrorMessage("提交地址失敗");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDelete = (id) => {
-    setAddresses((prev) => prev.filter((addr) => addr.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`/api/shipment/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to delete address");
+      setAddresses(addresses.filter((addr) => addr.id !== id));
+    } catch (error) {
+      console.error("Error deleting address:", error);
+      setErrorMessage("刪除地址失敗");
+    }
   };
 
-  const handleSetDefault = (id) => {
-    setAddresses((prev) =>
-      prev.map((addr) => ({
+  const handleSetDefault = async (id) => {
+    try {
+      const response = await fetch(`/api/shipment/${id}/default`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to set default address");
+      const updatedAddresses = addresses.map((addr) => ({
         ...addr,
         isDefault: addr.id === id,
-      }))
-    );
+      }));
+      setAddresses(updatedAddresses);
+    } catch (error) {
+      console.error("Error setting default address:", error);
+      setErrorMessage("設定預設地址失敗");
+    }
   };
 
   const resetForm = () => {
@@ -81,6 +106,26 @@ export default function ShippingAddress() {
 
   const closeModal = () => {
     document.getElementById("my_modal_1").close();
+  };
+  //連到後端
+  useEffect(() => {
+    fetchAddresses();
+  }, []);
+
+  const fetchAddresses = async () => {
+    try {
+      const response = await fetch("/api/addresses", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // 確保你有實現認證和授權機制
+        },
+      });
+      if (!response.ok) throw new Error("Failed to fetch");
+      const data = await response.json();
+      setAddresses(data.data);
+    } catch (error) {
+      console.error("Error fetching addresses:", error);
+      setErrorMessage("無法加載地址數據");
+    }
   };
 
   return (

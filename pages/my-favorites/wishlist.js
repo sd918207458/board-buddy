@@ -165,29 +165,7 @@ export default function OrderTracking() {
               {/* 重複的店家卡片可以在這裡展開 */}
             </section>
           );
-        case "history":
-          return (
-            <section className="max-w-4xl mx-auto grid ">
-              {/* 收藏文章卡片 */}
-              <div className="card card-side bg-base-100 shadow-xl">
-                <figure>
-                  <img
-                    src="https://img.daisyui.com/images/stock/photo-1635805737707-575885ab0820.webp"
-                    alt="Movie"
-                    className="rounded-t-lg"
-                  />
-                </figure>
-                <div className="card-body">
-                  <h2 className="card-title">New movie is released!</h2>
-                  <p>Click the button to watch on Jetflix app.</p>
-                  <div className="card-actions justify-end">
-                    <button className="btn btn-primary">Watch</button>
-                  </div>
-                </div>
-              </div>
-              {/* 重複的收藏文章卡片可以在這裡展開 */}
-            </section>
-          );
+
         default:
           return null;
       }
@@ -249,14 +227,6 @@ export default function OrderTracking() {
                 onClick={() => setActiveTab("pending")}
               >
                 收藏店家
-              </button>
-              <button
-                className={`tab ${
-                  activeTab === "history" ? "tab-active tab-primary" : ""
-                }`}
-                onClick={() => setActiveTab("history")}
-              >
-                收藏文章
               </button>
             </div>
           )}
