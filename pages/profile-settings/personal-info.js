@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { AuthProvider } from "@/hooks/use-auth";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import InputField from "@/components/personal-info/InputField";
@@ -40,6 +41,13 @@ export default function PersonalInfo() {
           throw new Error("未找到有效的 token");
         }
 
+        const parsedToken = parseJwt(token);
+        if (!parsedToken || !parsedToken.id) {
+          throw new Error("無效的存取令牌");
+        }
+
+        const userId = parsedToken.id;
+
         const userInfoRes = await fetch(
           `http://localhost:3005/api/users/${userId}`,
           {
@@ -71,8 +79,6 @@ export default function PersonalInfo() {
             playTime: user.preferred_play_times || "",
           });
           setAvatarUrl(user.avatar || "");
-        } else {
-          console.error("Failed to retrieve user data", userInfoData);
         }
       } catch (error) {
         console.error("Failed to load data:", error.message);
@@ -81,6 +87,27 @@ export default function PersonalInfo() {
 
     fetchMemberData();
   }, []);
+
+  const parseJwt = (token) => {
+    try {
+      const base64Url = token.split(".")[1];
+      if (!base64Url) throw new Error("無效的 JWT 格式");
+
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map(function (c) {
+            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+          })
+          .join("")
+      );
+      return JSON.parse(jsonPayload);
+    } catch (error) {
+      console.error("JWT 解析錯誤:", error.message);
+      return null; // 如果出現錯誤，返回 null
+    }
+  };
 
   // 更新表單的資料
   const handleChange = ({ target: { name, value } }) => {

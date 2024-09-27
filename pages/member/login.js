@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
+import { useAuth } from "@/hooks/use-auth"; // 引入 useAuth
 import Footer from "@/components/footer";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { CSSTransition } from "react-transition-group";
@@ -12,6 +13,26 @@ export default function Login() {
   const [errorMessage, setErrorMessage] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
+  const { setAuth } = useAuth(); // 使用 useAuth 來獲取 setAuth 函數
+
+  const parseJwt = (token) => {
+    try {
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map(function (c) {
+            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+          })
+          .join("")
+      );
+      return JSON.parse(jsonPayload);
+    } catch (error) {
+      console.error("JWT解析錯誤:", error);
+      return null;
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -28,16 +49,36 @@ export default function Login() {
 
       const data = await response.json();
 
-      if (response.ok) {
-        // 確認 data.accessToken 是否存在
-        console.log("Access Token:", data.accessToken);
-        // 將 JWT token 存入 localStorage
-        localStorage.setItem("token", data.accessToken);
+      if (response.ok && data.data.accessToken) {
+        // 確保從 data 中讀取 accessToken
+        console.log("Access Token:", data.data.accessToken);
 
-        // 跳轉到首頁
-        router.push("/");
+        // 儲存 token 到 localStorage
+        localStorage.setItem("token", data.data.accessToken);
+        console.log(
+          "Token 已儲存至 localStorage:",
+          localStorage.getItem("token")
+        );
+
+        // 解碼JWT來獲取id
+        const decodedToken = parseJwt(data.data.accessToken);
+
+        if (decodedToken && decodedToken.id) {
+          // 更新 AuthContext 狀態
+          setAuth({
+            isAuth: true,
+            userData: {
+              id: decodedToken.id,
+              email: decodedToken.email,
+            },
+          });
+
+          // 跳轉到首頁
+          router.push("/");
+        } else {
+          setErrorMessage("無效的存取令牌");
+        }
       } else {
-        // 如果登入失敗，顯示錯誤訊息
         setErrorMessage(data.message || "登入失敗");
       }
     } catch (error) {
