@@ -9,7 +9,6 @@ export default function Navbar() {
   const router = useRouter();
 
   useEffect(() => {
-    // 檢查是否已登入，透過localStorage中的 token 判斷
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
 
@@ -23,7 +22,7 @@ export default function Navbar() {
         .then((data) => {
           if (data.status === "success" && data.data.user) {
             setUserData({
-              avatar: data.data.user.avatar,
+              avatar: data.data.user.avatar, // 獲取 avatar
               username: data.data.user.username,
             });
           }
@@ -37,7 +36,7 @@ export default function Navbar() {
   // 登出邏輯，清除token，並保留在原本的頁面
   const handleLogout = async () => {
     try {
-      await fetch("/api/logout", {
+      await fetch("http://localhost:3005/api/auth/logout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -84,12 +83,6 @@ export default function Navbar() {
               <span>商城</span>
             </a>
           </Link>
-          <Link href="/forum" legacyBehavior>
-            <a className="btn btn-ghost text-white flex flex-col items-center">
-              <GiTalk className="w-6 h-6" />
-              <span>討論區</span>
-            </a>
-          </Link>
           <Link href="/profile-settings/FAQ" legacyBehavior>
             <a className="btn btn-ghost text-white flex flex-col items-center">
               <GiTalk className="w-6 h-6" />
@@ -108,14 +101,14 @@ export default function Navbar() {
               className=" w-12 rounded-full avatar flex flex-col items-center"
             >
               {/* 顯示使用者 avatar 和 username */}
-
               <div className="ring-primary ring-offset-base-100 w-12 rounded-full ring ring-offset-2 ">
                 <img
                   src={
-                    userData.avatar
-                      ? `${userData.avatar}`
-                      : "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                    userData.avatar // 檢查是否有使用者的 avatar，如果有就顯示，否則顯示預設圖片
+                      ? `http://localhost:3005/avatar/${userData.avatar}`
+                      : "/logo.jfif"
                   }
+                  alt="User Avatar"
                 />
               </div>
 

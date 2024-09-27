@@ -41,6 +41,8 @@ export default function UploadAvatar({ onUpload }) {
         const avatarUrl = result.data.avatar;
         setUploadStatus("上傳成功！");
         onUpload(avatarUrl); // 更新頭像 URL
+      } else if (result.message) {
+        setUploadStatus(`上傳失敗: ${result.message}`);
       } else {
         setUploadStatus("上傳失敗，請重試。");
       }

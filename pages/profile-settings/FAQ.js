@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "@/components/NavbarSwitcher";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
@@ -30,7 +29,6 @@ export default function FAQ() {
 
   return (
     <>
-      <Navbar />
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
         <div className="container mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
           <Breadcrumbs />

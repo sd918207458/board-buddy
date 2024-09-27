@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import Navbar from "@/components/NavbarSwitcher";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import InputField from "@/components/personal-info/InputField";
 import AvatarUpload from "@/components/personal-info/upload_avatar";
+
+// 開發期間使用的 userId，可以從 useAuth 中得到
+const userId = 1;
 
 // 動態導入日期選擇器，避免 SSR 問題
 const DatePicker1 = dynamic(() => import("@/components/datepicker"), {
@@ -16,7 +18,6 @@ export default function PersonalInfo() {
     username: "",
     phone: "",
     emailAddress: "",
-    password: "",
     first_name: "",
     last_name: "",
     birthday: "",
@@ -32,42 +33,53 @@ export default function PersonalInfo() {
 
   // 初次加載時取得用戶數據
   useEffect(() => {
-    const fetchInitialData = async () => {
+    const fetchMemberData = async () => {
       try {
-        const userInfoRes = await fetch("http://localhost:3005/api/users", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("未找到有效的 token");
+        }
+
+        const userInfoRes = await fetch(
+          `http://localhost:3005/api/users/${userId}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!userInfoRes.ok) {
+          const error = await userInfoRes.json();
+          throw new Error(error.message || "獲取用戶資料失敗");
+        }
+
         const userInfoData = await userInfoRes.json();
 
         if (userInfoData && userInfoData.status === "success") {
-          const { user } = userInfoData.data || {};
-          if (user) {
-            setFormData({
-              username: user.username || "",
-              phone: user.phone_number || "",
-              emailAddress: user.email || "",
-              password: "", // 密碼不顯示
-              first_name: user.first_name || "",
-              last_name: user.last_name || "",
-              birthday: user.date_of_birth || "",
-              gender: user.gender || "",
-              gameType: user.favorite_games || "",
-              playTime: user.preferred_play_times || "",
-            });
-            setAvatarUrl(user.avatar || "");
-          }
+          const user = userInfoData.data.user || {};
+          setFormData({
+            username: user.username || "",
+            phone: user.phone_number || "",
+            emailAddress: user.email || "",
+            first_name: user.first_name || "",
+            last_name: user.last_name || "",
+            birthday: user.date_of_birth || "",
+            gender: user.gender || "",
+            gameType: user.favorite_games || "",
+            playTime: user.preferred_play_times || "",
+          });
+          setAvatarUrl(user.avatar || "");
         } else {
-          console.error("Failed to retrieve user data");
+          console.error("Failed to retrieve user data", userInfoData);
         }
       } catch (error) {
-        console.error("Failed to load data", error);
+        console.error("Failed to load data:", error.message);
       }
     };
 
-    fetchInitialData();
+    fetchMemberData();
   }, []);
 
   // 更新表單的資料
@@ -128,7 +140,6 @@ export default function PersonalInfo() {
 
   return (
     <>
-      <Navbar />
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52]">
         <div className="card w-full max-w-lg mx-auto bg-white shadow-lg lg:max-w-4xl rounded-lg">
           <section className="p-6">
@@ -138,11 +149,11 @@ export default function PersonalInfo() {
             </h2>
             <AvatarUpload onUpload={setAvatarUrl} /> {/* 用來上傳頭像 */}
             <form onSubmit={handleSubmit}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="max-w-4xl mx-auto grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
                 <InputField
                   label="使用者名稱"
-                  name="username"
-                  value={formData.username}
+                  name="username" // name 必須對應狀態中的屬性
+                  value={formData.username} // 傳入相應的狀態值
                   onChange={handleChange}
                   required
                 />
@@ -160,13 +171,6 @@ export default function PersonalInfo() {
                   onChange={handleChange}
                   type="email"
                   required
-                />
-                <InputField
-                  label="密碼"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  type="password"
                 />
                 <InputField
                   label="名字"
@@ -208,17 +212,16 @@ export default function PersonalInfo() {
                   </select>
                 </div>
               </div>
-              <div className="form-control mt-6">
-                <button
-                  type="submit"
-                  className={`btn btn-primary w-full bg-[#036672] hover:bg-[#024c52] ${
-                    isSubmitting ? "loading" : ""
-                  }`}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "提交中..." : "保存修改"}
-                </button>
-              </div>
+              <button
+                type="submit"
+                className={`btn btn-primary mt-6 w-full bg-[#036672] hover:bg-[#024c52] ${
+                  isSubmitting ? "loading" : ""
+                }`}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "提交中..." : "保存修改"}
+              </button>
+
               {errorMessage && (
                 <p className="text-red-500 mt-4">{errorMessage}</p>
               )}

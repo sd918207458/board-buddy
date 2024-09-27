@@ -12,9 +12,9 @@ const HeroSection = () => {
     >
       <div className="hero-overlay bg-opacity-60"></div>
       <div className="hero-content text-neutral-content text-center">
-        <div className="max-w-md">
+        <div className="">
           <h1 className="mb-5 text-5xl font-bold drop-shadow-lg">
-            歡迎加入桌遊世界
+            歡迎加入Board Buddy
           </h1>
           <p className="mb-5">
             探索最新的桌遊，參加揪團活動，並與朋友一起享受遊戲的樂趣！

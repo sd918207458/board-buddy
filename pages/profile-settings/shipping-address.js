@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import Navbar from "@/components/NavbarSwitcher";
+import React, { useState, useEffect } from "react";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import AddressCard from "@/components/address/AddressCard";
@@ -29,7 +28,7 @@ export default function ShippingAddress() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/shipment", {
+      const response = await fetch("http://localhost:3005/api/shipment", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,7 +51,7 @@ export default function ShippingAddress() {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`/api/shipment/${id}`, {
+      const response = await fetch(`http://localhost:3005/api/shipment/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -68,12 +67,15 @@ export default function ShippingAddress() {
 
   const handleSetDefault = async (id) => {
     try {
-      const response = await fetch(`/api/shipment/${id}/default`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const response = await fetch(
+        `http://localhost:3005/api/shipment/${id}/default`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
       if (!response.ok) throw new Error("Failed to set default address");
       const updatedAddresses = addresses.map((addr) => ({
         ...addr,
@@ -114,7 +116,7 @@ export default function ShippingAddress() {
 
   const fetchAddresses = async () => {
     try {
-      const response = await fetch("/api/addresses", {
+      const response = await fetch("http://localhost:3005/api/addresses", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`, // 確保你有實現認證和授權機制
         },
@@ -130,7 +132,6 @@ export default function ShippingAddress() {
 
   return (
     <>
-      <Navbar />
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
         <div className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
           <div className="px-6 py-4">

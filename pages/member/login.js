@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import Navbar from "@/components/NavbarSwitcher";
 import Footer from "@/components/footer";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { CSSTransition } from "react-transition-group";
@@ -23,13 +22,15 @@ export default function Login() {
       const response = await fetch("http://localhost:3005/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }), // 傳送 email 和 password
+        body: JSON.stringify({ email, password }),
         credentials: "include", // 確保 cookies 被發送
       });
 
       const data = await response.json();
 
       if (response.ok) {
+        // 確認 data.accessToken 是否存在
+        console.log("Access Token:", data.accessToken);
         // 將 JWT token 存入 localStorage
         localStorage.setItem("token", data.accessToken);
 
@@ -49,7 +50,6 @@ export default function Login() {
 
   return (
     <>
-      <Navbar />
       <div className="flex items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
         <div className="flex w-full max-w-sm mx-auto overflow-hidden bg-white rounded-lg shadow-lg dark:bg-gray-800 lg:max-w-4xl">
           <div

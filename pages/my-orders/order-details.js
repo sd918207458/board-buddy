@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "@/components/NavbarSwitcher";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { CSSTransition, TransitionGroup } from "react-transition-group"; // 引入 React Transition Group
@@ -14,7 +13,6 @@ export default function OrderDetails() {
 
   return (
     <>
-      <Navbar />
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
         <TransitionGroup>
           {/* 確保動畫僅在客戶端渲染後運行 */}

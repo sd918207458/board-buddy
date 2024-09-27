@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import Navbar from "@/components/NavbarSwitcher";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ImageUpload from "@/hooks/useAvatar";
@@ -172,7 +171,6 @@ export default function PersonalInfo() {
 
   return (
     <>
-      <Navbar />
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52]">
         <div className="card w-full max-w-lg mx-auto bg-white shadow-lg lg:max-w-4xl rounded-lg">
           <section className="p-6">

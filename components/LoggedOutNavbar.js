@@ -50,12 +50,12 @@ export default function LoggedOutNavbar() {
               <span>商城</span>
             </a>
           </Link>
-          <Link href="/forum" legacyBehavior>
+          {/* <Link href="/forum" legacyBehavior>
             <a className="btn btn-ghost text-white flex flex-col items-center">
               <GiTalk className="w-6 h-6" />
               <span>討論區</span>
             </a>
-          </Link>
+          </Link> */}
           <Link href="/profile-settings/FAQ" legacyBehavior>
             <a className="btn btn-ghost text-white flex flex-col items-center">
               <GiTalk className="w-6 h-6" />

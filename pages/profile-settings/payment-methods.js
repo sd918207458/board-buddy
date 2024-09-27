@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Navbar from "@/components/NavbarSwitcher";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
@@ -7,15 +6,14 @@ import Coupon from "@/components/payment/Coupon";
 
 export default function PaymentMethods() {
   const [paymentMethods, setPaymentMethods] = useState([]);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [discount, setDiscount] = useState(0); // 儲存優惠券折扣
   const [currentMethod, setCurrentMethod] = useState({
     id: null,
     type: "cash", // 預設為現金付款
-    method: "現金付款",
     cardholderName: "",
     cardNumber: "",
     expiryDate: "",
-    cvv: "",
     isDefault: false,
   });
   const [isEditing, setIsEditing] = useState(false);
@@ -24,6 +22,31 @@ export default function PaymentMethods() {
 
   useEffect(() => {
     fetchPaymentMethods();
+  }, []);
+
+  const fetchDefaultPaymentMethod = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:3005/api/payment-methods/default",
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+
+      const result = await response.json();
+      if (result.status === "success") {
+        setSelectedPaymentMethod(result.data);
+      } else {
+        console.error("未找到預設付款方式", result.message);
+      }
+    } catch (error) {
+      console.error("獲取預設付款方式失敗", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDefaultPaymentMethod();
   }, []);
 
   const fetchPaymentMethods = async () => {
@@ -66,19 +89,6 @@ export default function PaymentMethods() {
     }));
   };
 
-  const getCardType = (cardNumber) => {
-    const firstDigit = cardNumber.charAt(0);
-    if (firstDigit === "4") return "Visa";
-    if (firstDigit === "5") return "MasterCard";
-    if (firstDigit === "3") return "Amex";
-    return "Unknown";
-  };
-
-  const convertToDate = (expiryDate) => {
-    const [month, year] = expiryDate.split("/");
-    return new Date(`20${year}-${month}-01`); // YYYY-MM-DD 格式
-  };
-
   const handleSubmit = async () => {
     setIsLoading(true);
 
@@ -86,8 +96,8 @@ export default function PaymentMethods() {
       const paymentData = {
         member_id: localStorage.getItem("member_id"),
         card_number: currentMethod.cardNumber.replace(/\s/g, "").slice(-4),
-        card_type: getCardType(currentMethod.cardNumber),
-        expiration_date: convertToDate(currentMethod.expiryDate),
+        card_type: currentMethod.cardType,
+        expiration_date: currentMethod.expiryDate,
         cardholder_name: currentMethod.cardholderName,
       };
 
@@ -100,7 +110,7 @@ export default function PaymentMethods() {
             headers: {
               "Content-Type": "application/json",
             },
-            credentials: "include", // 確保 cookie 被發送
+            credentials: "include",
             body: JSON.stringify(paymentData),
           }
         );
@@ -110,7 +120,7 @@ export default function PaymentMethods() {
           headers: {
             "Content-Type": "application/json",
           },
-          credentials: "include", // 確保 cookie 被發送
+          credentials: "include",
           body: JSON.stringify(paymentData),
         });
       }
@@ -141,10 +151,7 @@ export default function PaymentMethods() {
           headers: {
             "Content-Type": "application/json",
           },
-          credentials: "include", // 確保 cookie 被發送
-          body: JSON.stringify({
-            member_id: localStorage.getItem("member_id"),
-          }),
+          credentials: "include",
         }
       );
 
@@ -193,11 +200,9 @@ export default function PaymentMethods() {
     setCurrentMethod({
       id: null,
       type: "cash",
-      method: "現金付款",
       cardholderName: "",
       cardNumber: "",
       expiryDate: "",
-      cvv: "",
       isDefault: false,
     });
     setIsEditing(false);
@@ -205,7 +210,6 @@ export default function PaymentMethods() {
 
   return (
     <>
-      <Navbar />
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
         <div className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
           <div className="px-6 py-4">
@@ -228,7 +232,7 @@ export default function PaymentMethods() {
                     classNames="fade"
                   >
                     <div className="card bg-base-100 shadow-xl mb-4">
-                      <div className="card-body ">
+                      <div className="card-body">
                         <h2 className="card-title">付款方式</h2>
                         <p>付款方式: {method.method}</p>
                         {method.cardNumber && <p>卡號: {method.cardNumber}</p>}

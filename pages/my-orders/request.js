@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Navbar from "@/components/NavbarSwitcher";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { CSSTransition } from "react-transition-group";
@@ -141,7 +140,6 @@ export default function Request() {
 
   return (
     <>
-      <Navbar />
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52]">
         <div className="card w-full max-w-lg mx-auto overflow-hidden bg-white dark:bg-gray-800 shadow-lg lg:max-w-4xl rounded-lg">
           <div className="w-full p-4">

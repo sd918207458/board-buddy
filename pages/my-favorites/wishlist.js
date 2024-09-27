@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Navbar from "@/components/NavbarSwitcher";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
@@ -196,7 +195,6 @@ export default function OrderTracking() {
 
   return (
     <>
-      <Navbar />
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
         <div className="w-full max-w-4xl mx-auto bg-white rounded-lg shadow-lg dark:bg-gray-800">
           <div className="w-full p-4">

@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from "react";
-import Navbar from "@/components/NavbarSwitcher";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import UserTable from "@/components/table"; // 表格組件
-import users from "./../../public/user_table"; // 用於全訂單數據
-import users_1 from "./../../public/users_1"; // 用於其他狀態訂單數據
 import { CSSTransition, TransitionGroup } from "react-transition-group"; // 引入 React Transition Group
 
 export default function OrderTracking() {
@@ -12,31 +9,30 @@ export default function OrderTracking() {
   const [activeTab, setActiveTab] = useState("all"); // 管理當前選擇的 Tab
   const [hasError, setHasError] = useState(false); // 用來追踪錯誤
   const [currentPage, setCurrentPage] = useState(1); // 用於處理分頁的狀態
-  const itemsPerPage = 10; // 每頁顯示 5 筆訂單
+  const [totalPages, setTotalPages] = useState(1); // 儲存 API 返回的總頁數
+  const itemsPerPage = 10; // 每頁顯示 10 筆訂單
   const [currentData, setCurrentData] = useState([]); // 用來存儲當前顯示的訂單數據
 
   useEffect(() => {
-    try {
-      setIsMounted(true);
-      loadDataForCurrentPage(); // 初始化加載數據
-    } catch (error) {
-      console.error("Error mounting component: ", error);
-      setHasError(true);
-    }
-  }, [activeTab, currentPage]);
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
-      const endpoint = `/api/orders/${activeTab}?page=${currentPage}&limit=${itemsPerPage}`;
+      const endpoint = `http://localhost:3005/api/orders/${activeTab}?page=${currentPage}&limit=${itemsPerPage}`;
       try {
         const response = await fetch(endpoint, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
         const data = await response.json();
         if (data.status === "success") {
-          setCurrentData(data.orders);
+          setCurrentData(data.orders || []); // 確保返回數據為陣列
+          setTotalPages(data.pageCount); // 儲存 API 返回的總頁數
         } else {
           throw new Error("Failed to fetch orders");
         }
@@ -49,44 +45,8 @@ export default function OrderTracking() {
     fetchData();
   }, [activeTab, currentPage]);
 
-  // 根據選擇的 Tab 加載對應的數據
-  const loadDataForCurrentPage = () => {
-    let selectedUsers = [];
-    switch (activeTab) {
-      case "all":
-        selectedUsers = users;
-        break;
-      case "pending":
-        selectedUsers = users_1;
-        break;
-      case "history":
-        selectedUsers = users;
-        break;
-      case "canceled":
-        selectedUsers = users_1;
-        break;
-      default:
-        selectedUsers = users;
-        break;
-    }
-
-    // 計算當前頁面的訂單數據
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const paginatedData = selectedUsers.slice(startIndex, endIndex);
-
-    setCurrentData(paginatedData); // 更新當前頁的訂單數據
-  };
-
-  // 渲染對應的表格
   const renderTable = () => {
-    try {
-      return <UserTable users={currentData} />; // 顯示當前頁的訂單數據
-    } catch (error) {
-      console.error("Error rendering table: ", error);
-      setHasError(true); // 捕獲渲染表格過程中的錯誤
-      return null;
-    }
+    return <UserTable users={currentData || []} />; // 保證傳入的是陣列
   };
 
   if (hasError) {
@@ -101,16 +61,11 @@ export default function OrderTracking() {
     );
   }
 
-  // 計算總頁數
-  const totalItems = activeTab === "all" ? users.length : users_1.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-
   // 渲染分頁邏輯，當頁碼超過 5 頁時，用 ... 省略中間頁碼
   const renderPagination = () => {
     const pages = [];
 
     if (totalPages <= 5) {
-      // 小於等於 5 頁時，顯示所有頁碼
       for (let i = 1; i <= totalPages; i++) {
         pages.push(
           <button
@@ -123,7 +78,6 @@ export default function OrderTracking() {
         );
       }
     } else {
-      // 超過 5 頁時顯示前兩頁、當前頁附近以及最後兩頁
       pages.push(
         <button
           key={1}
@@ -142,7 +96,6 @@ export default function OrderTracking() {
         );
       }
 
-      // 顯示當前頁及其前後頁
       for (
         let i = Math.max(2, currentPage - 1);
         i <= Math.min(currentPage + 1, totalPages - 1);
@@ -185,7 +138,6 @@ export default function OrderTracking() {
 
   return (
     <>
-      <Navbar />
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
         <div className="w-full max-w-4xl mx-auto bg-white rounded-lg shadow-lg dark:bg-gray-800">
           <div className="w-full p-4">
@@ -205,7 +157,7 @@ export default function OrderTracking() {
                 className={`tab ${activeTab === "all" ? "tab-active" : ""}`}
                 onClick={() => {
                   setActiveTab("all");
-                  setCurrentPage(1); // 切換 Tab 時重置到第 1 頁
+                  setCurrentPage(1);
                 }}
               >
                 全部訂單
@@ -214,7 +166,7 @@ export default function OrderTracking() {
                 className={`tab ${activeTab === "pending" ? "tab-active" : ""}`}
                 onClick={() => {
                   setActiveTab("pending");
-                  setCurrentPage(1); // 切換 Tab 時重置到第 1 頁
+                  setCurrentPage(1);
                 }}
               >
                 尚未出貨
@@ -223,7 +175,7 @@ export default function OrderTracking() {
                 className={`tab ${activeTab === "history" ? "tab-active" : ""}`}
                 onClick={() => {
                   setActiveTab("history");
-                  setCurrentPage(1); // 切換 Tab 時重置到第 1 頁
+                  setCurrentPage(1);
                 }}
               >
                 歷史訂單
@@ -234,7 +186,7 @@ export default function OrderTracking() {
                 }`}
                 onClick={() => {
                   setActiveTab("canceled");
-                  setCurrentPage(1); // 切換 Tab 時重置到第 1 頁
+                  setCurrentPage(1);
                 }}
               >
                 取消訂單
@@ -242,7 +194,7 @@ export default function OrderTracking() {
             </div>
           )}
 
-          {/* 使用 React Transition Group 來處理表格切換的動畫效果 */}
+          {/* 表格 */}
           {isMounted && (
             <TransitionGroup className="p-6">
               <CSSTransition key={activeTab} timeout={300} classNames="fade">
