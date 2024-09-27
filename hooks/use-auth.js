@@ -32,17 +32,19 @@ export function AuthProvider({ children }) {
       const resData = await res.json();
       console.log(resData);
 
-      if (resData.status === "success") {
-        const member = resData.data.member;
+      if (resData.status === "success" && resData.data && resData.data.user) {
+        const user = resData.data.user;
         // 設定全域的AuthContext(useAuth勾子)
         const nextAuth = {
           isAuth: true,
           userData: {
-            id: member.id,
-            username: member.username,
+            id: user.member_id, // 確保 user.id 是正確的路徑
+            username: user.username, // 根據返回的結構設置其他字段
           },
         };
         setAuth(nextAuth);
+      } else {
+        console.error("無法找到用戶資料");
       }
     } catch (e) {
       console.error(e);

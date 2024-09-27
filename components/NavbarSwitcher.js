@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 const NavbarSwitcher = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // 控制載入狀態
+  const [avatarUrl, setAvatarUrl] = useState(""); // 用來管理頭像 URL
   const router = useRouter();
 
   useEffect(() => {
@@ -18,11 +19,12 @@ const NavbarSwitcher = () => {
       .then((data) => {
         if (data.status !== "success") {
           // 如果 token 無效，清理 localStorage 並登出
-          localStorage.removeItem("token"); // 如果還在使用 localStorage 儲存 token，這一步可以保留
+          localStorage.removeItem("token");
           setIsLoggedIn(false);
           console.error("Token 無效，登出", data);
         } else {
           setIsLoggedIn(true);
+          setAvatarUrl(data.data.user.avatar); // 設置初始頭像
         }
       })
       .catch((error) => {
@@ -30,17 +32,23 @@ const NavbarSwitcher = () => {
         setIsLoggedIn(false);
       })
       .finally(() => {
-        // 確保在請求完成後，無論成功或失敗，都將 `isLoading` 設置為 false
         setIsLoading(false);
       });
   }, [router]);
+
+  const handleAvatarUpdate = (newAvatarUrl) => {
+    setAvatarUrl(newAvatarUrl); // 更新頭像
+  };
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  // 根據是否登入來渲染不同的 Navbar
-  return isLoggedIn ? <LoggedInNavbar /> : <LoggedOutNavbar />;
+  return isLoggedIn ? (
+    <LoggedInNavbar avatarUrl={avatarUrl} onAvatarUpdate={handleAvatarUpdate} />
+  ) : (
+    <LoggedOutNavbar />
+  );
 };
 
 export default NavbarSwitcher;

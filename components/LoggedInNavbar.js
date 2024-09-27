@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { GiHouse, GiThreeFriends, GiShoppingBag, GiTalk } from "react-icons/gi";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import UploadAvatar from "./personal-info/upload_avatar";
 
-export default function Navbar() {
+export default function LoggedInNavbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState({ avatar: "", username: "" }); // 用來儲存使用者資料
   const router = useRouter();
@@ -33,7 +34,7 @@ export default function Navbar() {
     }
   }, []);
 
-  // 登出邏輯，清除token，並保留在原本的頁面
+  // 登出邏輯，清除 token，並保留在原本的頁面
   const handleLogout = async () => {
     try {
       await fetch("http://localhost:3005/api/auth/logout", {
@@ -41,7 +42,7 @@ export default function Navbar() {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // 確保請求附帶cookie
+        credentials: "include", // 確保請求附帶 cookie
       });
 
       localStorage.removeItem("token");
@@ -104,12 +105,15 @@ export default function Navbar() {
               <div className="ring-primary ring-offset-base-100 w-12 rounded-full ring ring-offset-2 ">
                 <img
                   src={
-                    userData.avatar // 檢查是否有使用者的 avatar，如果有就顯示，否則顯示預設圖片
+                    userData.avatar
                       ? `http://localhost:3005/avatar/${userData.avatar}`
-                      : "/logo.jfif"
+                      : "/default-avatar.png"
                   }
                   alt="User Avatar"
+                  className="avatar"
                 />
+                {/* 頭像上傳組件 */}
+                <UploadAvatar onUpload={handleUploadAvatar} />
               </div>
 
               <span>{userData.username || "User"}</span>
