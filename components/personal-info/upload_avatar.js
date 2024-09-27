@@ -41,6 +41,8 @@ export default function UploadAvatar({ onUpload }) {
         const avatarUrl = result.data.avatar;
         setUploadStatus("上傳成功！");
         onUpload(avatarUrl); // 更新頭像 URL
+        setFile(null); // 清除選擇的檔案
+        setPreviewUrl(""); // 清除預覽
       } else if (result.message) {
         setUploadStatus(`上傳失敗: ${result.message}`);
       } else {

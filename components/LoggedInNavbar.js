@@ -4,37 +4,24 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import UploadAvatar from "./personal-info/upload_avatar";
 
-export default function LoggedInNavbar() {
+export default function Navbar({ avatarUrl, username, onAvatarUpdate }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userData, setUserData] = useState({ avatar: "", username: "" }); // 用來儲存使用者資料
-  const router = useRouter();
+  const [userData, setUserData] = useState({
+    avatar: avatarUrl,
+    username: username,
+  });
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
-
-    if (token) {
-      // 發送請求到後端以獲取當前使用者資料
-      fetch("http://localhost:3005/api/auth/check", {
-        method: "GET",
-        credentials: "include",
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.status === "success" && data.data.user) {
-            setUserData({
-              avatar: data.data.user.avatar, // 獲取 avatar
-              username: data.data.user.username,
-            });
-          }
-        })
-        .catch((error) => {
-          console.error("獲取使用者資料失敗", error);
-        });
-    }
   }, []);
 
-  // 登出邏輯，清除 token，並保留在原本的頁面
+  // 當 `avatarUrl` 或 `username` 變化時，更新頭像和使用者名稱
+  useEffect(() => {
+    setUserData((prevData) => ({ ...prevData, avatar: avatarUrl, username }));
+  }, [avatarUrl, username]);
+
+  // 登出邏輯，清除token，並保留在原本的頁面
   const handleLogout = async () => {
     try {
       await fetch("http://localhost:3005/api/auth/logout", {
@@ -42,7 +29,7 @@ export default function LoggedInNavbar() {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // 確保請求附帶 cookie
+        credentials: "include", // 確保請求附帶cookie
       });
 
       localStorage.removeItem("token");
@@ -53,8 +40,9 @@ export default function LoggedInNavbar() {
   };
 
   // 當上傳頭像時，更新 Navbar 中的頭像
-  const handleUploadAvatar = (avatarUrl) => {
-    setUserData((prevData) => ({ ...prevData, avatar: avatarUrl }));
+  const handleUploadAvatar = (newAvatarUrl) => {
+    setUserData((prevData) => ({ ...prevData, avatar: newAvatarUrl }));
+    onAvatarUpdate(newAvatarUrl); // 傳遞新頭像 URL 給父組件 (NavbarSwitcher)
   };
 
   return (

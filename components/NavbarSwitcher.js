@@ -7,6 +7,7 @@ const NavbarSwitcher = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // 控制載入狀態
   const [avatarUrl, setAvatarUrl] = useState(""); // 用來管理頭像 URL
+  const [username, setUsername] = useState(""); // 用來管理使用者名稱
   const router = useRouter();
 
   useEffect(() => {
@@ -25,6 +26,7 @@ const NavbarSwitcher = () => {
         } else {
           setIsLoggedIn(true);
           setAvatarUrl(data.data.user.avatar); // 設置初始頭像
+          setUsername(data.data.user.username); // 設置初始使用者名稱
         }
       })
       .catch((error) => {
@@ -45,7 +47,11 @@ const NavbarSwitcher = () => {
   }
 
   return isLoggedIn ? (
-    <LoggedInNavbar avatarUrl={avatarUrl} onAvatarUpdate={handleAvatarUpdate} />
+    <LoggedInNavbar
+      avatarUrl={avatarUrl}
+      username={username}
+      onAvatarUpdate={handleAvatarUpdate}
+    />
   ) : (
     <LoggedOutNavbar />
   );
