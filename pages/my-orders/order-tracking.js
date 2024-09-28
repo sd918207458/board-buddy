@@ -19,6 +19,7 @@ export default function OrderTracking() {
 
   useEffect(() => {
     const fetchData = async () => {
+      // 根據當前 activeTab 來生成 API 的端點
       const endpoint = `http://localhost:3005/api/orders/${activeTab}?page=${currentPage}&limit=${itemsPerPage}`;
       try {
         const response = await fetch(endpoint, {
@@ -31,8 +32,8 @@ export default function OrderTracking() {
         }
         const data = await response.json();
         if (data.status === "success") {
-          setCurrentData(data.orders || []); // 確保返回數據為陣列
-          setTotalPages(data.pageCount); // 儲存 API 返回的總頁數
+          setCurrentData(data.data.orders || []); // 確保返回數據為陣列
+          setTotalPages(data.data.pageCount); // 儲存 API 返回的總頁數
         } else {
           throw new Error("Failed to fetch orders");
         }
@@ -43,7 +44,7 @@ export default function OrderTracking() {
     };
 
     fetchData();
-  }, [activeTab, currentPage]);
+  }, [activeTab, currentPage]); // activeTab 和 currentPage 發生變化時，重新獲取數據
 
   const renderTable = () => {
     return <UserTable users={currentData || []} />; // 保證傳入的是陣列

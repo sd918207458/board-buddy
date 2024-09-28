@@ -10,16 +10,52 @@ export default function OrderTracking() {
   const [hasError, setHasError] = useState(false); // 用來追踪錯誤
   const [currentPage, setCurrentPage] = useState(1); // 用於處理分頁的狀態
   const totalPages = 10; // 模擬總頁數
+  const [favoriteProducts, setFavoriteProducts] = useState([]); // 收藏的商品
+  const [favoriteStores, setFavoriteStores] = useState([]); // 收藏的店家
 
   useEffect(() => {
     try {
       setIsMounted(true);
-      setTimeout(() => setLoading(false), 1500); // 模擬資料加載
+      fetchFavorites(activeTab); // 加載收藏
     } catch (error) {
       console.error("Error mounting component: ", error);
       setHasError(true);
     }
-  }, []);
+  }, [activeTab]);
+
+  const fetchFavorites = async (tab) => {
+    setLoading(true);
+    try {
+      let endpoint;
+      if (tab === "all") {
+        endpoint = "/api/favorites/products";
+      } else if (tab === "pending") {
+        endpoint = "/api/favorites/stores";
+      }
+
+      const response = await fetch(endpoint, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      const data = await response.json();
+      if (data.status === "success") {
+        if (tab === "all") {
+          setFavoriteProducts(data.favorites || []);
+        } else if (tab === "pending") {
+          setFavoriteStores(data.favorites || []);
+        }
+      } else {
+        setHasError(true);
+      }
+    } catch (error) {
+      console.error("Error fetching favorites: ", error);
+      setHasError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const renderTable = () => {
     if (loading) {
@@ -30,143 +66,79 @@ export default function OrderTracking() {
       );
     }
 
-    try {
-      switch (activeTab) {
-        case "all":
-          return (
-            <section className="max-w-4xl mx-auto grid grid-cols-2 gap-6 mt-4 sm:grid-cols-2">
-              {/* 商品卡片 */}
-              <div className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105">
-                <figure>
-                  <img
-                    src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                    alt="Shoes"
-                    className="rounded-t-lg"
-                  />
-                </figure>
-                <div className="card-body">
-                  <h2 className="card-title">Shoes!</h2>
-                  <p>If a dog chews shoes whose shoes does he choose?</p>
-                  <div className="card-actions justify-end">
-                    <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
-                      Buy Now
-                    </button>
-                  </div>
-                </div>
-              </div>
-              {/* 商品卡片 */}
-              <div className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105">
-                <figure>
-                  <img
-                    src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                    alt="Shoes"
-                    className="rounded-t-lg"
-                  />
-                </figure>
-                <div className="card-body">
-                  <h2 className="card-title">Shoes!</h2>
-                  <p>If a dog chews shoes whose shoes does he choose?</p>
-                  <div className="card-actions justify-end">
-                    <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
-                      Buy Now
-                    </button>
-                  </div>
-                </div>
-              </div>
-              {/* 商品卡片 */}
-              <div className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105">
-                <figure>
-                  <img
-                    src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                    alt="Shoes"
-                    className="rounded-t-lg"
-                  />
-                </figure>
-                <div className="card-body">
-                  <h2 className="card-title">Shoes!</h2>
-                  <p>If a dog chews shoes whose shoes does he choose?</p>
-                  <div className="card-actions justify-end">
-                    <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
-                      Buy Now
-                    </button>
-                  </div>
-                </div>
-              </div>
-              {/* 重複的商品卡片可以在這裡展開 */}
-            </section>
-          );
-        case "pending":
-          return (
-            <section className="max-w-4xl mx-auto grid grid-cols-2 gap-6 mt-4 sm:grid-cols-2">
-              {/* 店家卡片 */}
-              <div className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105">
-                <figure>
-                  <img
-                    src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                    alt="Shoes"
-                    className="rounded-t-lg"
-                  />
-                </figure>
-                <div className="card-body">
-                  <h2 className="card-title">
-                    Shoes! <div className="badge badge-secondary">NEW</div>
-                  </h2>
-                  <p>If a dog chews shoes whose shoes does he choose?</p>
-                  <div className="card-actions justify-end">
-                    <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
-                      Learn More
-                    </button>
-                  </div>
-                </div>
-              </div>
-              {/* 店家卡片 */}
-              <div className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105">
-                <figure>
-                  <img
-                    src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                    alt="Shoes"
-                    className="rounded-t-lg"
-                  />
-                </figure>
-                <div className="card-body">
-                  <h2 className="card-title">
-                    Shoes! <div className="badge badge-secondary">NEW</div>
-                  </h2>
-                  <p>If a dog chews shoes whose shoes does he choose?</p>
-                  <div className="card-actions justify-end">
-                    <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
-                      Learn More
-                    </button>
-                  </div>
-                </div>
-              </div>
-              {/* 店家卡片 */}
-              <div className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105">
-                <figure>
-                  <img
-                    src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                    alt="Shoes"
-                    className="rounded-t-lg"
-                  />
-                </figure>
-                <div className="card-body">
-                  <h2 className="card-title">
-                    Shoes! <div className="badge badge-secondary">NEW</div>
-                  </h2>
-                  <p>If a dog chews shoes whose shoes does he choose?</p>
-                  <div className="card-actions justify-end">
-                    <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
-                      Learn More
-                    </button>
-                  </div>
-                </div>
-              </div>
-              {/* 重複的店家卡片可以在這裡展開 */}
-            </section>
-          );
+    if (activeTab === "all" && favoriteProducts.length === 0) {
+      return <div className="text-center">尚無收藏的商品。</div>;
+    }
 
-        default:
-          return null;
+    if (activeTab === "pending" && favoriteStores.length === 0) {
+      return <div className="text-center">尚無收藏的店家。</div>;
+    }
+
+    try {
+      if (activeTab === "all") {
+        return (
+          <section className="max-w-4xl mx-auto grid grid-cols-2 gap-6 mt-4 sm:grid-cols-2">
+            {favoriteProducts.map((product) => (
+              <div
+                key={product.id}
+                className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105"
+              >
+                <figure>
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="rounded-t-lg h-48 w-full object-cover"
+                  />
+                </figure>
+                <div className="card-body">
+                  <h2 className="card-title">{product.name}</h2>
+                  <p>{product.description}</p>
+                  <div className="card-actions justify-end">
+                    <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
+                      立即購買
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </section>
+        );
+      } else if (activeTab === "pending") {
+        return (
+          <section className="max-w-4xl mx-auto grid grid-cols-2 gap-6 mt-4 sm:grid-cols-2">
+            {favoriteStores.map((store) => (
+              <div
+                key={store.id}
+                className="card bg-white w-96 shadow-lg hover:shadow-2xl transition-shadow duration-300 rounded-lg"
+              >
+                <figure className="relative">
+                  <img
+                    src={store.image}
+                    alt={store.name}
+                    className="h-48 w-full object-cover"
+                  />
+                </figure>
+                <div className="card-body">
+                  <h2 className="card-title text-lg font-bold text-gray-800 dark:text-white">
+                    {store.name}
+                    <span className="badge badge-secondary ml-2">熱門</span>
+                  </h2>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    {store.description}
+                  </p>
+                  <div className="flex justify-between items-center mt-4">
+                    <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
+                      瀏覽店家
+                    </button>
+                    <span className="text-gray-500 dark:text-gray-400 text-sm">
+                      {store.location}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </section>
+        );
       }
     } catch (error) {
       console.error("Error rendering table: ", error);
@@ -174,24 +146,6 @@ export default function OrderTracking() {
       return null;
     }
   };
-
-  if (hasError) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-red-100">
-        <div className="p-6 bg-white shadow-md rounded-lg">
-          <h2 className="text-2xl font-bold text-red-600">
-            發生錯誤，請稍後再試。
-          </h2>
-          <button
-            className="btn btn-primary mt-4"
-            onClick={() => window.location.reload()}
-          >
-            重新加載
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <>
@@ -242,35 +196,6 @@ export default function OrderTracking() {
               </CSSTransition>
             </TransitionGroup>
           )}
-
-          {/* 分頁按鈕 */}
-          <div className="join items-center justify-center mt-4 mb-6 w-full">
-            <button
-              className="join-item btn"
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(currentPage - 1)}
-            >
-              «
-            </button>
-            {Array.from({ length: totalPages }, (_, i) => (
-              <button
-                key={i + 1}
-                className={`join-item btn ${
-                  currentPage === i + 1 ? "btn-active" : ""
-                }`}
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                Page {i + 1}
-              </button>
-            ))}
-            <button
-              className="join-item btn"
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage(currentPage + 1)}
-            >
-              »
-            </button>
-          </div>
         </div>
       </div>
       <Footer />

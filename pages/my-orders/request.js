@@ -36,18 +36,43 @@ export default function Request() {
     name: "",
     email: "",
     phone: "",
-    orderNumber: "",
+    orderNumber: "", // 這將從下拉選單中獲取
     orderDate: "",
     productName: "",
     productModel: "",
     productQuantity: "",
     returnReason: "",
   });
+  const [orders, setOrders] = useState([]); // 存儲使用者的訂單資料
   const [submitMessage, setSubmitMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     setIsMounted(true);
+
+    // 獲取使用者的訂單資料
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch("/api/orders", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // 假設使用 JWT 驗證
+          },
+        });
+        const result = await response.json();
+        if (response.ok) {
+          setOrders(result.data);
+        } else {
+          setErrorMessage("無法載入訂單資料");
+        }
+      } catch (error) {
+        console.error("獲取訂單失敗:", error);
+        setErrorMessage("無法載入訂單資料");
+      }
+    };
+
+    fetchOrders();
   }, []);
 
   // 表單驗證邏輯
@@ -102,7 +127,7 @@ export default function Request() {
         },
         body: JSON.stringify({
           order_id: formData.orderNumber,
-          member_id: 1, // 假設會員ID為1，實際可根據用戶狀態動態設置
+          member_id: 1, // 假設會員ID為1，實際應根據用戶狀態動態設置
           order_date: formData.orderDate,
           product_name: formData.productName,
           product_model: formData.productModel,
@@ -190,17 +215,39 @@ export default function Request() {
                 }
                 required
               />
-              <InputField
-                label="訂單編號"
-                name="orderNumber"
-                value={formData.orderNumber}
-                onChange={(e) =>
-                  setFormData({ ...formData, [e.target.name]: e.target.value })
-                }
-                required
-              />
+
+              {/* 使用者選擇訂單 */}
+              <div className="form-control">
+                <label
+                  htmlFor="orderNumber"
+                  className="label text-gray-700 dark:text-gray-300"
+                >
+                  <span className="label-text">訂單編號</span>
+                </label>
+                <select
+                  id="orderNumber"
+                  name="orderNumber"
+                  value={formData.orderNumber}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      [e.target.name]: e.target.value,
+                    })
+                  }
+                  className="select select-bordered border-[#036672] focus:border-[#024c52]"
+                  required
+                >
+                  <option value="">請選擇訂單</option>
+                  {orders.map((order) => (
+                    <option key={order.order_id} value={order.order_id}>
+                      {`訂單編號: ${order.order_id} 日期: ${order.order_date}`}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
+            {/* 其他欄位 */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <InputField
                 label="訂單日期"
