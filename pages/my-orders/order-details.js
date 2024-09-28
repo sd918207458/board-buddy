@@ -25,7 +25,7 @@ export default function OrderDetails() {
   // 從後端抓取訂單詳細資料
   const fetchOrderDetails = async (orderId) => {
     try {
-      const response = await fetch(`/api/order-details/${orderId}`, {
+      const response = await fetch(`http://localhost:3005/api/order-details/${orderId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

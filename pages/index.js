@@ -11,7 +11,6 @@ import RecommendedGames from "@/components/home/RecommendedGames";
 export default function Home() {
   return (
     <>
-      <Breadcrumbs />
       <HeroSection /> {/* 首頁大圖區塊 */}
       <AboutUs /> {/* 關於我們區塊 */}
       <PopularProducts /> {/* 熱門商品輪播圖 */}

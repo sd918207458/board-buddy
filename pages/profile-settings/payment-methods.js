@@ -15,6 +15,7 @@ export default function PaymentMethods() {
     cardNumber: "",
     expiryDate: "",
     isDefault: false,
+    onlinePaymentService: "", // 存儲線上付款服務
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,30 +23,6 @@ export default function PaymentMethods() {
 
   useEffect(() => {
     fetchPaymentMethods();
-  }, []);
-
-  const fetchDefaultPaymentMethod = async () => {
-    try {
-      const response = await fetch(
-        "http://localhost:3005/api/payment-methods/default",
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
-
-      const result = await response.json();
-      if (result.status === "success") {
-        setSelectedPaymentMethod(result.data);
-      } else {
-        console.error("未找到預設付款方式", result.message);
-      }
-    } catch (error) {
-      console.error("獲取預設付款方式失敗", error);
-    }
-  };
-
-  useEffect(() => {
     fetchDefaultPaymentMethod();
   }, []);
 
@@ -58,15 +35,34 @@ export default function PaymentMethods() {
           credentials: "include", // 確保 cookie 被發送
         }
       );
-
       const result = await response.json();
       if (result.status === "success") {
         setPaymentMethods(result.data);
       } else {
-        console.error("獲取付款方式失敗，返回消息:", result.message);
+        console.error("獲取付款方式失敗:", result.message);
       }
     } catch (error) {
-      console.error("獲取付款方式失敗", error.message);
+      console.error("獲取付款方式失敗:", error.message);
+    }
+  };
+
+  const fetchDefaultPaymentMethod = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:3005/api/payment-methods/default",
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+      const result = await response.json();
+      if (result.status === "success") {
+        setSelectedPaymentMethod(result.data);
+      } else {
+        console.error("未找到預設付款方式:", result.message);
+      }
+    } catch (error) {
+      console.error("獲取預設付款方式失敗:", error.message);
     }
   };
 
@@ -76,7 +72,7 @@ export default function PaymentMethods() {
         setDiscount(10);
         resolve(10);
       } else {
-        reject("Invalid coupon");
+        reject("無效的優惠券");
       }
     });
   };
@@ -89,53 +85,73 @@ export default function PaymentMethods() {
     }));
   };
 
+  const handleEdit = (method) => {
+    setIsEditing(true);
+    setCurrentMethod({
+      id: method.id,
+      type: method.payment_type,
+      cardholderName: method.cardholder_name || "",
+      cardNumber: method.card_number || "",
+      expiryDate: method.expiration_date || "",
+      isDefault: method.is_default,
+      onlinePaymentService: method.online_payment_service || "",
+    });
+    openModal();
+  };
+
   const handleSubmit = async () => {
     setIsLoading(true);
-
     try {
-      const paymentData = {
-        member_id: localStorage.getItem("member_id"),
-        card_number: currentMethod.cardNumber.replace(/\s/g, "").slice(-4),
-        card_type: currentMethod.cardType,
-        expiration_date: currentMethod.expiryDate,
-        cardholder_name: currentMethod.cardholderName,
-      };
-
-      let response;
-      if (isEditing) {
-        response = await fetch(
-          `http://localhost:3005/api/payment-methods/${currentMethod.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-            body: JSON.stringify(paymentData),
-          }
-        );
+      let paymentData;
+      if (currentMethod.type === "creditCard") {
+        paymentData = {
+          member_id: localStorage.getItem("member_id"),
+          card_number: currentMethod.cardNumber.replace(/\s/g, "").slice(-4),
+          card_type: currentMethod.cardType,
+          expiration_date: currentMethod.expiryDate,
+          cardholder_name: currentMethod.cardholderName,
+          is_default: currentMethod.isDefault,
+        };
+      } else if (currentMethod.type === "onlinePayment") {
+        paymentData = {
+          member_id: localStorage.getItem("member_id"),
+          payment_type: "onlinePayment",
+          online_payment_service: currentMethod.onlinePaymentService,
+          is_default: currentMethod.isDefault,
+        };
       } else {
-        response = await fetch("http://localhost:3005/api/payment-methods", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify(paymentData),
-        });
+        paymentData = {
+          member_id: localStorage.getItem("member_id"),
+          payment_type: "cash",
+          is_default: currentMethod.isDefault,
+        };
       }
+
+      const method = currentMethod.id ? "PUT" : "POST";
+      const url = currentMethod.id
+        ? `http://localhost:3005/api/payment-methods/${currentMethod.id}`
+        : "http://localhost:3005/api/payment-methods";
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(paymentData),
+      });
 
       const result = await response.json();
       if (result.status === "success") {
-        alert(isEditing ? "付款方式已更新" : "付款方式已成功添加");
+        alert("付款方式已成功保存");
         fetchPaymentMethods();
         closeModal();
       } else {
-        console.error("提交失敗，返回消息:", result.message);
+        console.error("提交失敗:", result.message);
         alert("提交失敗，請重試");
       }
     } catch (error) {
-      console.error("提交失敗", error.message);
+      console.error("提交失敗:", error.message);
       alert("伺服器錯誤，請稍後再試");
     } finally {
       setIsLoading(false);
@@ -154,7 +170,6 @@ export default function PaymentMethods() {
           credentials: "include",
         }
       );
-
       const result = await response.json();
       if (result.status === "success") {
         alert("已設為預設付款方式");
@@ -163,7 +178,7 @@ export default function PaymentMethods() {
         alert("設置預設付款方式失敗");
       }
     } catch (error) {
-      console.error("設置預設付款方式失敗", error);
+      console.error("設置預設付款方式失敗:", error);
       alert("伺服器錯誤，請稍後再試");
     }
   };
@@ -174,10 +189,9 @@ export default function PaymentMethods() {
         `http://localhost:3005/api/payment-methods/${id}`,
         {
           method: "DELETE",
-          credentials: "include", // 確保 cookie 被發送
+          credentials: "include",
         }
       );
-
       const result = await response.json();
       if (result.status === "success") {
         alert("付款方式已刪除");
@@ -186,7 +200,7 @@ export default function PaymentMethods() {
         alert("刪除失敗");
       }
     } catch (error) {
-      console.error("刪除失敗", error);
+      console.error("刪除失敗:", error);
       alert("伺服器錯誤，請稍後再試");
     }
   };
@@ -203,6 +217,7 @@ export default function PaymentMethods() {
       cardholderName: "",
       cardNumber: "",
       expiryDate: "",
+      onlinePaymentService: "",
       isDefault: false,
     });
     setIsEditing(false);
@@ -234,12 +249,14 @@ export default function PaymentMethods() {
                     <div className="card bg-base-100 shadow-xl mb-4">
                       <div className="card-body">
                         <h2 className="card-title">付款方式</h2>
-                        <p>付款方式: {method.method}</p>
-                        {method.cardNumber && <p>卡號: {method.cardNumber}</p>}
-                        {method.expiryDate && (
-                          <p>到期日: {method.expiryDate}</p>
+                        <p>付款方式: {method.payment_type}</p>
+                        {method.card_number && (
+                          <p>卡號: {method.card_number}</p>
                         )}
-                        {method.isDefault && (
+                        {method.expiration_date && (
+                          <p>到期日: {method.expiration_date}</p>
+                        )}
+                        {method.is_default && (
                           <span className="badge badge-primary">預設</span>
                         )}
                         <div className="flex justify-between">
@@ -358,8 +375,8 @@ export default function PaymentMethods() {
                       <span className="label-text">選擇線上付款方式</span>
                     </label>
                     <select
-                      name="method"
-                      value={currentMethod.method}
+                      name="onlinePaymentService"
+                      value={currentMethod.onlinePaymentService}
                       onChange={handleChange}
                       className="select select-bordered"
                     >

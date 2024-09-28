@@ -28,9 +28,9 @@ export default function OrderTracking() {
     try {
       let endpoint;
       if (tab === "all") {
-        endpoint = "/api/favorites/products";
+        endpoint = "http://localhost:3005/api/favorites/products";
       } else if (tab === "pending") {
-        endpoint = "/api/favorites/stores";
+        endpoint = "http://localhost:3005/api/favorites/stores";
       }
 
       const response = await fetch(endpoint, {

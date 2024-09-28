@@ -53,7 +53,7 @@ export default function Request() {
     // 獲取使用者的訂單資料
     const fetchOrders = async () => {
       try {
-        const response = await fetch("/api/orders", {
+        const response = await fetch("http://localhost:3005/api/orders", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -120,7 +120,7 @@ export default function Request() {
     }
 
     try {
-      const response = await fetch("/api/request/create", {
+      const response = await fetch("http://localhost:3005/api/request/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

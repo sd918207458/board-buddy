@@ -110,13 +110,13 @@ export default function Navbar({ avatarUrl, username, onAvatarUpdate }) {
               tabIndex={0}
               className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
             >
-              <li>
+              {/* <li>
                 <Link href="/profile-settings" legacyBehavior>
                   <a className="btn btn-ghost text-black flex items-center">
                     會員中心
                   </a>
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link href="/profile-settings/personal-info" legacyBehavior>
                   <a className="btn btn-ghost text-black flex items-center">

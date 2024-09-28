@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Link from "next/link";
-import { CSSTransition } from "react-transition-group";
+import { Transition } from "react-transition-group";
 import card_data from "../../components/UI.json/card_data.json";
 
 const cardData = card_data;
@@ -10,37 +10,51 @@ const cardData = card_data;
 // 統一色系的卡片組件
 const Card = ({ title, description, href, image }) => {
   const [inProp, setInProp] = useState(false);
+  const nodeRef = useRef(null); // 使用 ref 替代 findDOMNode
+
+  const defaultStyle = {
+    transition: `transform 500ms ease-in-out`,
+    transform: "scale(1)",
+  };
+
+  const transitionStyles = {
+    entering: { transform: "scale(1.05)" },
+    entered: { transform: "scale(1.05)" },
+    exiting: { transform: "scale(1)" },
+    exited: { transform: "scale(1)" },
+  };
 
   return (
-    <CSSTransition
-      in={inProp}
-      timeout={500}
-      classNames="scale"
-      onEnter={() => setInProp(true)}
-      onExited={() => setInProp(false)}
-    >
-      <div
-        className="card bg-[#036672] text-white shadow-lg hover:shadow-2xl transition-shadow w-full md:w-80 lg:w-96 cursor-pointer"
-        onMouseEnter={() => setInProp(true)}
-        onMouseLeave={() => setInProp(false)}
-      >
-        <Link href={href} legacyBehavior>
-          <a>
-            <div className="card-body flex flex-row items-center">
-              <div className="avatar">
-                <div className="w-24 rounded-full ring ring-white ring-offset-base-100 ring-offset-2">
-                  <img src={image} alt="Avatar" />
+    <Transition in={inProp} timeout={500} nodeRef={nodeRef}>
+      {(state) => (
+        <div
+          ref={nodeRef}
+          style={{
+            ...defaultStyle,
+            ...transitionStyles[state],
+          }}
+          className="card bg-[#036672] text-white shadow-lg hover:shadow-2xl transition-shadow w-full md:w-80 lg:w-96 cursor-pointer"
+          onMouseEnter={() => setInProp(true)}
+          onMouseLeave={() => setInProp(false)}
+        >
+          <Link href={href} legacyBehavior>
+            <a>
+              <div className="card-body flex flex-row items-center">
+                <div className="avatar">
+                  <div className="w-24 rounded-full ring ring-white ring-offset-base-100 ring-offset-2">
+                    <img src={image} alt="Avatar" />
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <h2 className="card-title text-lg text-white">{title}</h2>
+                  <p className="text-sm text-gray-200">{description}</p>
                 </div>
               </div>
-              <div className="ml-4">
-                <h2 className="card-title text-lg text-white">{title}</h2>
-                <p className="text-sm text-gray-200">{description}</p>
-              </div>
-            </div>
-          </a>
-        </Link>
-      </div>
-    </CSSTransition>
+            </a>
+          </Link>
+        </div>
+      )}
+    </Transition>
   );
 };
 

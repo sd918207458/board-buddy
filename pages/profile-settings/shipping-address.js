@@ -3,10 +3,10 @@ import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import AddressCard from "@/components/address/AddressCard";
 import AddressForm from "@/components/address/AddressForm";
-
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 
 export default function ShippingAddress() {
+  // 確保 addresses 的初始值為空陣列
   const [addresses, setAddresses] = useState([]);
   const [formData, setFormData] = useState({
     username: "",
@@ -28,17 +28,27 @@ export default function ShippingAddress() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3005/api/shipment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        "http://localhost:3005/api/shipment/addresses",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
       if (!response.ok) throw new Error("Failed to submit address");
       const result = await response.json();
-      setAddresses([...addresses, result.data]);
+
+      // 檢查 addresses 是否為陣列，如果不是，設置為空陣列
+      setAddresses((prevAddresses) => {
+        return Array.isArray(prevAddresses)
+          ? [...prevAddresses, result.data]
+          : [result.data];
+      });
+
       resetForm();
       closeModal();
     } catch (error) {
@@ -51,12 +61,15 @@ export default function ShippingAddress() {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:3005/api/shipment/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const response = await fetch(
+        `http://localhost:3005/api/shipment/address/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
       if (!response.ok) throw new Error("Failed to delete address");
       setAddresses(addresses.filter((addr) => addr.id !== id));
     } catch (error) {
@@ -68,7 +81,7 @@ export default function ShippingAddress() {
   const handleSetDefault = async (id) => {
     try {
       const response = await fetch(
-        `http://localhost:3005/api/shipment/${id}/default`,
+        `http://localhost:3005/api/shipment/address/${id}/default`,
         {
           method: "PUT",
           headers: {
@@ -109,18 +122,22 @@ export default function ShippingAddress() {
   const closeModal = () => {
     document.getElementById("my_modal_1").close();
   };
-  //連到後端
+
+  // 連到後端
   useEffect(() => {
     fetchAddresses();
   }, []);
 
   const fetchAddresses = async () => {
     try {
-      const response = await fetch("http://localhost:3005/api/addresses", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // 確保你有實現認證和授權機制
-        },
-      });
+      const response = await fetch(
+        "http://localhost:3005/api/shipment/addresses",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // 確保你有實現認證和授權機制
+          },
+        }
+      );
       if (!response.ok) throw new Error("Failed to fetch");
       const data = await response.json();
       setAddresses(data.data);
@@ -142,26 +159,30 @@ export default function ShippingAddress() {
             </h2>
 
             <section className="max-w-4xl mx-auto grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
-              {addresses.length > 0 ? (
+              {addresses && addresses.length > 0 ? (
                 <TransitionGroup component={null}>
-                  {addresses.map((address) => (
-                    <CSSTransition
-                      key={address.id}
-                      timeout={300}
-                      classNames="fade"
-                    >
-                      <AddressCard
-                        address={address}
-                        handleEdit={() => {
-                          setIsEditing(true);
-                          setFormData(address);
-                          openModal();
-                        }}
-                        handleDelete={() => handleDelete(address.id)}
-                        handleSetDefault={() => handleSetDefault(address.id)}
-                      />
-                    </CSSTransition>
-                  ))}
+                  {addresses.map((address) => {
+                    // 防禦性檢查，確保 address 是有效的物件且有 id
+                    if (!address || !address.id) return null;
+                    return (
+                      <CSSTransition
+                        key={address.id}
+                        timeout={300}
+                        classNames="fade"
+                      >
+                        <AddressCard
+                          address={address}
+                          handleEdit={() => {
+                            setIsEditing(true);
+                            setFormData(address);
+                            openModal();
+                          }}
+                          handleDelete={() => handleDelete(address.id)}
+                          handleSetDefault={() => handleSetDefault(address.id)}
+                        />
+                      </CSSTransition>
+                    );
+                  })}
                 </TransitionGroup>
               ) : (
                 <div className="card text-center p-4 text-gray-800 col-span-2">
@@ -169,7 +190,7 @@ export default function ShippingAddress() {
                 </div>
               )}
 
-              {/* 新增付款方式卡片 */}
+              {/* 新增地址卡片 */}
               <div className="card bg-base-100 shadow-xl">
                 <div className="card-body flex justify-between">
                   <h2 className="card-title">新增地址</h2>
@@ -188,28 +209,26 @@ export default function ShippingAddress() {
           </div>
 
           <TransitionGroup>
-            {
-              <CSSTransition timeout={300} classNames="fade">
-                <dialog id="my_modal_1" className="modal">
-                  <div className="modal-box">
-                    <AddressForm
-                      formData={formData}
-                      handleChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          [e.target.name]: e.target.value,
-                        })
-                      }
-                      handleSubmit={handleSubmit}
-                      isEditing={isEditing}
-                      isLoading={isLoading}
-                      errorMessage={errorMessage}
-                      closeModal={closeModal} // 傳遞 closeModal 函數
-                    />
-                  </div>
-                </dialog>
-              </CSSTransition>
-            }
+            <CSSTransition timeout={300} classNames="fade">
+              <dialog id="my_modal_1" className="modal">
+                <div className="modal-box">
+                  <AddressForm
+                    formData={formData}
+                    handleChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        [e.target.name]: e.target.value,
+                      })
+                    }
+                    handleSubmit={handleSubmit}
+                    isEditing={isEditing}
+                    isLoading={isLoading}
+                    errorMessage={errorMessage}
+                    closeModal={closeModal} // 傳遞 closeModal 函數
+                  />
+                </div>
+              </dialog>
+            </CSSTransition>
           </TransitionGroup>
         </div>
       </div>
