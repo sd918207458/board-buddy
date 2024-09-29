@@ -54,6 +54,11 @@ export default function Login() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    // 觸發 Google 登入流程，將用戶重定向到後端 Google 認證路由
+    window.open("http://localhost:3005/api/google-login", "_self");
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMessage("");
@@ -211,7 +216,7 @@ export default function Login() {
               </div>
             </form>
 
-            <div className="flex items-center justify-between mt-4">
+            <div className="flex items-center justify-center mt-4">
               <span className="w-1/5 border-b dark:border-gray-600 lg:w-1/4" />
               <span className="text-xs text-gray-500 uppercase dark:text-gray-400">
                 還沒有帳戶嗎?
@@ -223,6 +228,16 @@ export default function Login() {
                 </a>
               </span>
               <span className="w-1/5 border-b dark:border-gray-600 lg:w-1/4" />
+            </div>
+
+            {/* Google 登入按鈕 */}
+            <div className="mt-6">
+              <button
+                onClick={handleGoogleLogin}
+                className="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-red-500 rounded-lg focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-50"
+              >
+                使用 Google 登入
+              </button>
             </div>
           </div>
         </div>

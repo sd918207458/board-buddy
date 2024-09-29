@@ -31,20 +31,14 @@ export default function ForgotPassword() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // 驗證電子信箱格式
   const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
-
-  // 驗證驗證碼格式
   const validateVerificationCode = () => verificationCode.length === 6;
-
-  // 驗證密碼格式
   const validatePasswords = () => {
     if (newPassword.length < 6) return "密碼至少需要6個字元";
     if (newPassword !== confirmPassword) return "兩次輸入的密碼不一致";
     return "";
   };
 
-  // 請求驗證碼 API
   const handleGetVerificationCode = async () => {
     if (!validateEmail(email)) {
       setErrorMessage("請輸入有效的電子信箱");
@@ -68,6 +62,7 @@ export default function ForgotPassword() {
       const result = await response.json();
       if (result.status === "success") {
         setShowVerificationCode(true);
+        setErrorMessage(""); // 清空錯誤信息
       } else {
         setErrorMessage(result.message || "無法發送驗證碼，請重試。");
       }
@@ -78,7 +73,6 @@ export default function ForgotPassword() {
     }
   };
 
-  // 提交驗證碼後，顯示新密碼欄位
   const handleSubmitVerificationCode = () => {
     if (!validateVerificationCode()) {
       setErrorMessage("請輸入有效的6位數驗證碼");
@@ -88,7 +82,6 @@ export default function ForgotPassword() {
     setShowNewPasswordFields(true);
   };
 
-  // 提交重設密碼表單
   const handleSubmitNewPassword = async () => {
     const passwordError = validatePasswords();
     if (passwordError) {
@@ -100,7 +93,7 @@ export default function ForgotPassword() {
 
     try {
       const response = await fetch(
-        "http://localhost:3005/api/reset/password/reset",
+        "http://localhost:3005/api/reset-password/reset",
         {
           method: "POST",
           headers: {
@@ -117,6 +110,11 @@ export default function ForgotPassword() {
       const result = await response.json();
       if (result.status === "success") {
         alert("密碼重置成功！");
+        setEmail(""); // 重置表單
+        setVerificationCode("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setShowNewPasswordFields(false);
       } else {
         setErrorMessage(result.message || "重置密碼失敗，請重試！");
       }
@@ -144,14 +142,12 @@ export default function ForgotPassword() {
               忘記密碼
             </h2>
 
-            {/* 錯誤提示 */}
             {errorMessage && (
               <div className="text-red-500 text-center mt-4">
                 {errorMessage}
               </div>
             )}
 
-            {/* 電子信箱輸入欄 */}
             <InputField
               label="電子信箱"
               type="email"
@@ -172,7 +168,6 @@ export default function ForgotPassword() {
               </button>
             </div>
 
-            {/* CSSTransition 讓驗證碼欄位帶有動畫效果 */}
             <CSSTransition
               in={showVerificationCode}
               timeout={500}
@@ -202,7 +197,6 @@ export default function ForgotPassword() {
               </div>
             </CSSTransition>
 
-            {/* CSSTransition 讓新密碼和確認新密碼欄位帶有動畫效果 */}
             <CSSTransition
               in={showNewPasswordFields}
               timeout={500}
@@ -223,7 +217,6 @@ export default function ForgotPassword() {
                       onChange={(e) => setNewPassword(e.target.value)}
                       className="input input-bordered w-full"
                     />
-                    {/* 密碼顯示/隱藏按鈕 */}
                     <button
                       type="button"
                       className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600"
@@ -250,7 +243,6 @@ export default function ForgotPassword() {
               </>
             </CSSTransition>
 
-            {/* 提交按鈕 */}
             <CSSTransition
               in={showNewPasswordFields}
               timeout={500}
@@ -270,12 +262,11 @@ export default function ForgotPassword() {
               </div>
             </CSSTransition>
 
-            {/* 已記得密碼提示 */}
             <div className="mt-4 text-center">
               想起密碼了?{" "}
               <a href="login" className="link">
                 登入
-              </a>
+              </a>{" "}
               吧!
             </div>
           </div>
