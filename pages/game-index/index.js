@@ -5,6 +5,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import Carousel1 from "@/components/carousel-game1";
 import Sidebar from "@/components/sidebar2";
 import SearchBar from '@/components/searchbar';
+import SearchBar2 from '@/components/searchbar2';
 import Carousel2 from "@/components/carousel-game2";
 import Gamecard from "@/components/gamecard";
 export default function Gameindex() {
@@ -14,7 +15,7 @@ export default function Gameindex() {
         <Navbar />
         <Breadcrumbs />
         <Carousel1/>
-        
+        <SearchBar2/>
         <SearchBar />
 
         {/* 為你精選 */}
