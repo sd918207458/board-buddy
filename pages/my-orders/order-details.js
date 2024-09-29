@@ -13,6 +13,19 @@ export default function OrderDetails() {
   const router = useRouter();
   const { order_id } = router.query; // 獲取 URL 中的訂單 ID
 
+  // 獲取存取令牌
+  const getToken = () => localStorage.getItem("token");
+
+  // 封裝帶有 token 的 fetch 請求函數
+  const fetchWithToken = async (url, options = {}) => {
+    const token = getToken();
+    const headers = {
+      ...options.headers,
+      Authorization: `Bearer ${token}`, // 附加 token 到 Authorization header
+    };
+    return fetch(url, { ...options, headers, credentials: "include" });
+  };
+
   // 使用 useEffect 確保動畫只在客戶端掛載後觸發
   useEffect(() => {
     setIsMounted(true); // 客戶端掛載後將 isMounted 設為 true
@@ -25,13 +38,12 @@ export default function OrderDetails() {
   // 從後端抓取訂單詳細資料
   const fetchOrderDetails = async (orderId) => {
     try {
-      const response = await fetch(`http://localhost:3005/api/order-details/${orderId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // 假設使用 JWT token 驗證
-        },
-      });
+      const response = await fetchWithToken(
+        `http://localhost:3005/api/order-details/${orderId}`,
+        {
+          method: "GET",
+        }
+      );
       const result = await response.json();
       if (response.ok) {
         setOrderDetails(result.orderDetails);

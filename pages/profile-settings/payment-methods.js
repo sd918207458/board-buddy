@@ -4,231 +4,182 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import Coupon from "@/components/payment/Coupon";
 
+// Toast 通知組件
+const Toast = ({ message, type, onClose }) => {
+  return (
+    <div
+      className={`fixed top-4 right-4 z-50 flex items-center p-4 space-x-4 text-white rounded-lg shadow-lg ${
+        type === "success" ? "bg-green-500" : "bg-red-500"
+      }`}
+    >
+      <span>{message}</span>
+      <button
+        className="text-white font-bold focus:outline-none"
+        onClick={onClose}
+      >
+        &times;
+      </button>
+    </div>
+  );
+};
+
+// Helper function to get token from localStorage
+const getToken = () => localStorage.getItem("token");
+
+// Helper function for API requests with token
+const fetchData = async (url, options = {}) => {
+  const token = getToken();
+  const headers = {
+    ...options.headers,
+    Authorization: `Bearer ${token}`,
+  };
+  const response = await fetch(url, {
+    ...options,
+    headers,
+    credentials: "include",
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "伺服器錯誤");
+  return data;
+};
+
+// Helper function for sending data to the server
+const sendData = (url, method, data) =>
+  fetchData(url, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+// Initial state for payment methods
+const initialMethodState = {
+  id: null,
+  type: "cash",
+  cardholderName: "",
+  cardNumber: "",
+  expiryDate: "",
+  onlinePaymentService: "",
+};
+
 export default function PaymentMethods() {
   const [paymentMethods, setPaymentMethods] = useState([]);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
-  const [discount, setDiscount] = useState(0); // 儲存優惠券折扣
-  const [currentMethod, setCurrentMethod] = useState({
-    id: null,
-    type: "cash", // 預設為現金付款
-    cardholderName: "",
-    cardNumber: "",
-    expiryDate: "",
-    isDefault: false,
-    onlinePaymentService: "", // 存儲線上付款服務
-  });
+  const [discount, setDiscount] = useState(0);
+  const [currentMethod, setCurrentMethod] = useState(initialMethodState);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [toast, setToast] = useState(null); // 用於顯示通知
 
-  // 初始獲取付款方式
   useEffect(() => {
     fetchPaymentMethods();
-    fetchDefaultPaymentMethod();
   }, []);
 
-  // 獲取所有付款方式
+  // 顯示通知
+  const showToast = (message, type) => {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast(null); // 5秒後自動關閉
+    }, 3000);
+  };
+
+  // Fetch all payment methods for the user
   const fetchPaymentMethods = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:3005/api/payment-methods",
-        {
-          method: "GET",
-          credentials: "include", // 確保 cookie 被發送
-        }
+      const result = await fetchData(
+        "http://localhost:3005/api/payment-methods"
       );
-      const result = await response.json();
       if (result.status === "success") {
         setPaymentMethods(result.data);
-      } else {
-        console.error("獲取付款方式失敗:", result.message);
       }
     } catch (error) {
-      console.error("獲取付款方式失敗:", error.message);
+      setErrorMessage(error.message);
     }
   };
 
-  // 獲取預設付款方式
-  const fetchDefaultPaymentMethod = async () => {
-    try {
-      const response = await fetch(
-        "http://localhost:3005/api/payment-methods/default",
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
-      const result = await response.json();
-      if (result.status === "success") {
-        setSelectedPaymentMethod(result.data);
-      } else {
-        console.error("未找到預設付款方式:", result.message);
-      }
-    } catch (error) {
-      console.error("獲取預設付款方式失敗:", error.message);
-    }
-  };
-
-  // 套用優惠券
+  // Apply a coupon
   const applyCoupon = (couponCode) => {
-    return new Promise((resolve, reject) => {
-      if (couponCode === "DISCOUNT10") {
-        setDiscount(10);
-        resolve(10);
-      } else {
-        reject("無效的優惠券");
-      }
-    });
+    if (couponCode === "DISCOUNT10") {
+      setDiscount(10);
+      showToast("優惠券已成功應用！", "success");
+    } else {
+      showToast("無效的優惠券代碼", "error");
+    }
   };
 
-  // 處理表單變更
+  // Handle form input changes
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type } = e.target;
     setCurrentMethod((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === "checkbox" ? e.target.checked : value,
     }));
   };
 
-  // 編輯付款方式
+  // Handle edit button click
   const handleEdit = (method) => {
     setIsEditing(true);
     setCurrentMethod({
-      id: method.id,
+      id: method.payment_id,
       type: method.payment_type,
       cardholderName: method.cardholder_name || "",
       cardNumber: method.card_number || "",
       expiryDate: method.expiration_date || "",
-      isDefault: method.is_default,
       onlinePaymentService: method.online_payment_service || "",
     });
-    openModal();
+    setIsModalOpen(true);
   };
 
-  // 提交付款方式
+  // Submit the form (for both adding and updating payment methods)
   const handleSubmit = async () => {
     setIsLoading(true);
+    const paymentData = {
+      type: currentMethod.type,
+      card_number: currentMethod.cardNumber,
+      card_type: currentMethod.cardType,
+      expiration_date: currentMethod.expiryDate,
+      cardholder_name: currentMethod.cardholderName,
+      online_payment_service: currentMethod.onlinePaymentService,
+    };
+    const method = currentMethod.id ? "PUT" : "POST";
+    const url = currentMethod.id
+      ? `http://localhost:3005/api/payment-methods/${currentMethod.id}`
+      : "http://localhost:3005/api/payment-methods";
+
     try {
-      const paymentData = buildPaymentData();
-      const method = currentMethod.id ? "PUT" : "POST";
-      const url = currentMethod.id
-        ? `http://localhost:3005/api/payment-methods/${currentMethod.id}`
-        : "http://localhost:3005/api/payment-methods";
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(paymentData),
-      });
-
-      const result = await response.json();
+      const result = await sendData(url, method, paymentData);
       if (result.status === "success") {
-        alert("付款方式已成功保存");
+        showToast("付款方式已成功保存", "success");
         fetchPaymentMethods();
-        closeModal();
-      } else {
-        alert("提交失敗，請重試");
+        setIsModalOpen(false);
       }
     } catch (error) {
-      alert("伺服器錯誤，請稍後再試");
+      showToast("伺服器錯誤，請稍後再試", "error");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 建立付款資料
-  const buildPaymentData = () => {
-    if (currentMethod.type === "creditCard") {
-      return {
-        member_id: localStorage.getItem("member_id"),
-        card_number: currentMethod.cardNumber.replace(/\s/g, "").slice(-4),
-        card_type: currentMethod.cardType,
-        expiration_date: currentMethod.expiryDate,
-        cardholder_name: currentMethod.cardholderName,
-        is_default: currentMethod.isDefault,
-      };
-    } else if (currentMethod.type === "onlinePayment") {
-      return {
-        member_id: localStorage.getItem("member_id"),
-        payment_type: "onlinePayment",
-        online_payment_service: currentMethod.onlinePaymentService,
-        is_default: currentMethod.isDefault,
-      };
-    } else {
-      return {
-        member_id: localStorage.getItem("member_id"),
-        payment_type: "cash",
-        is_default: currentMethod.isDefault,
-      };
-    }
-  };
-
-  // 設置預設付款方式
-  const handleSetDefault = async (id) => {
-    try {
-      const response = await fetch(
-        `http://localhost:3005/api/payment-methods/set-default/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-      const result = await response.json();
-      if (result.status === "success") {
-        alert("已設為預設付款方式");
-        fetchPaymentMethods();
-      } else {
-        alert("設置預設付款方式失敗");
-      }
-    } catch (error) {
-      alert("伺服器錯誤，請稍後再試");
-    }
-  };
-
-  // 刪除付款方式
+  // Delete a payment method
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(
+      const result = await sendData(
         `http://localhost:3005/api/payment-methods/${id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
+        "DELETE"
       );
-      const result = await response.json();
       if (result.status === "success") {
-        alert("付款方式已刪除");
-        fetchPaymentMethods();
-      } else {
-        alert("刪除失敗");
+        showToast("付款方式已刪除", "success");
+        setPaymentMethods((prev) =>
+          prev.filter((method) => method.payment_id !== id)
+        );
       }
     } catch (error) {
-      alert("伺服器錯誤，請稍後再試");
+      showToast("伺服器錯誤，請稍後再試", "error");
     }
-  };
-
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => {
-    setIsModalOpen(false);
-    resetForm();
   };
 
   const resetForm = () => {
-    setCurrentMethod({
-      id: null,
-      type: "cash",
-      cardholderName: "",
-      cardNumber: "",
-      expiryDate: "",
-      onlinePaymentService: "",
-      isDefault: false,
-    });
+    setCurrentMethod(initialMethodState);
     setIsEditing(false);
   };
 
@@ -251,7 +202,7 @@ export default function PaymentMethods() {
               <TransitionGroup component={null}>
                 {paymentMethods.map((method) => (
                   <CSSTransition
-                    key={method.id}
+                    key={method.payment_id}
                     timeout={300}
                     classNames="fade"
                   >
@@ -265,9 +216,6 @@ export default function PaymentMethods() {
                         {method.expiration_date && (
                           <p>到期日: {method.expiration_date}</p>
                         )}
-                        {method.is_default && (
-                          <span className="badge badge-primary">預設</span>
-                        )}
                         <div className="flex justify-between">
                           <button
                             className="btn btn-primary"
@@ -277,15 +225,9 @@ export default function PaymentMethods() {
                           </button>
                           <button
                             className="btn btn-error"
-                            onClick={() => handleDelete(method.id)}
+                            onClick={() => handleDelete(method.payment_id)}
                           >
                             刪除
-                          </button>
-                          <button
-                            className="btn btn-outline"
-                            onClick={() => handleSetDefault(method.id)}
-                          >
-                            設為預設
                           </button>
                         </div>
                       </div>
@@ -294,16 +236,12 @@ export default function PaymentMethods() {
                 ))}
               </TransitionGroup>
 
-              {/* 新增付款方式卡片 */}
               <div className="card bg-base-100 shadow-xl">
                 <div className="card-body flex justify-between">
                   <h2 className="card-title">新增錢包</h2>
                   <button
                     className="btn btn-primary"
-                    onClick={() => {
-                      setIsEditing(false);
-                      openModal();
-                    }}
+                    onClick={() => setIsModalOpen(true)}
                   >
                     新增
                   </button>
@@ -314,9 +252,7 @@ export default function PaymentMethods() {
               <h2 className="text-lg font-semibold text-gray-700 capitalize dark:text-white mb-4">
                 我的優惠券
               </h2>
-
               <Coupon applyCoupon={applyCoupon} />
-
               {discount > 0 && (
                 <p className="text-green-500 mt-4">優惠券折扣: NT${discount}</p>
               )}
@@ -395,21 +331,6 @@ export default function PaymentMethods() {
                   </div>
                 )}
 
-                <div className="form-control mt-4">
-                  <label className="cursor-pointer label">
-                    <input
-                      type="checkbox"
-                      name="isDefault"
-                      checked={currentMethod.isDefault}
-                      onChange={handleChange}
-                      className="checkbox"
-                    />
-                    <span className="label-text ml-2">
-                      設為我的預設付款方式
-                    </span>
-                  </label>
-                </div>
-
                 <div className="modal-action">
                   <button
                     className={`btn btn-success ${isLoading ? "loading" : ""}`}
@@ -418,7 +339,7 @@ export default function PaymentMethods() {
                   >
                     {isEditing ? "保存修改" : "新增錢包"}
                   </button>
-                  <button className="btn" onClick={closeModal}>
+                  <button className="btn" onClick={() => setIsModalOpen(false)}>
                     取消
                   </button>
                 </div>
@@ -427,6 +348,15 @@ export default function PaymentMethods() {
           )}
         </div>
       </div>
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
       <Footer />
     </>
   );

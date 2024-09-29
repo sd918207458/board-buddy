@@ -5,48 +5,41 @@ import AddressCard from "@/components/address/AddressCard";
 import AddressForm from "@/components/address/AddressForm";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 
+// Helper function to get token
+const getToken = () => localStorage.getItem("token");
+
+// Helper function to make authenticated fetch requests
+const fetchWithAuth = async (url, options = {}) => {
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${getToken()}`,
+    ...options.headers,
+  };
+  return fetch(url, { ...options, headers, credentials: "include" });
+};
+
 export default function ShippingAddress() {
   const [addresses, setAddresses] = useState([]);
-  const [formData, setFormData] = useState({
-    username: "",
-    phone: "",
-    city: "",
-    area: "",
-    street: "", // 確保這裡與後端的 `address` 一致
-    detailed_address: "", // 確保這裡與後端的 `detailed_address` 一致
-    isDefault: false,
-    address_id: null,
-    deliveryMethod: "homeDelivery",
-    storeType: "",
-    storeName: "",
-  });
-  const [userData, setUserData] = useState(null); // 存儲用戶資料
+  const [formData, setFormData] = useState(initialFormData());
+  const [userData, setUserData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // 取得存取令牌
-  const getToken = () => {
-    return localStorage.getItem("token");
-  };
+  // Load user info and addresses on component mount
+  useEffect(() => {
+    fetchUserInfo();
+    fetchAddresses();
+  }, []);
 
   const fetchUserInfo = async () => {
     try {
-      const response = await fetch("http://localhost:3005/api/users/check", {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-        credentials: "include",
-      });
-
+      const response = await fetchWithAuth(
+        "http://localhost:3005/api/users/check"
+      );
       const userDataResponse = await response.json();
-      console.log("用戶資料: ", userDataResponse);
-
       if (userDataResponse?.data?.user) {
-        // 設定使用者資料
         setUserData(userDataResponse.data.user);
-
-        // 將用戶資料填入表單中
         setFormData((prevFormData) => ({
           ...prevFormData,
           username: userDataResponse.data.user.username || "",
@@ -59,51 +52,43 @@ export default function ShippingAddress() {
     }
   };
 
-  useEffect(() => {
-    fetchUserInfo();
-    fetchAddresses();
-  }, []);
+  const fetchAddresses = async () => {
+    try {
+      const response = await fetchWithAuth(
+        "http://localhost:3005/api/shipment/addresses"
+      );
+      const data = await response.json();
+      setAddresses(data.data);
+    } catch (error) {
+      console.error("Error fetching addresses:", error);
+      setErrorMessage("無法加載地址數據");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage("");
+    const method = isEditing ? "PUT" : "POST";
+    const url = isEditing
+      ? `http://localhost:3005/api/shipment/addresses/${formData.address_id}`
+      : "http://localhost:3005/api/shipment/addresses";
 
     try {
-      const method = isEditing ? "PUT" : "POST";
-      const url = isEditing
-        ? `http://localhost:3005/api/shipment/addresses/${formData.address_id}`
-        : "http://localhost:3005/api/shipment/addresses";
-
-      const response = await fetch(url, {
+      const response = await fetchWithAuth(url, {
         method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getToken()}`,
-        },
-        credentials: "include",
         body: JSON.stringify(formData),
       });
-
       const result = await response.json();
+      if (!response.ok) throw new Error("Failed to submit address");
 
-      if (!response.ok) {
-        throw new Error("Failed to submit address");
-      }
-
-      setAddresses((prevAddresses) => {
-        if (!Array.isArray(prevAddresses)) {
-          prevAddresses = [];
-        }
-
-        if (isEditing) {
-          return prevAddresses.map((addr) =>
-            addr.address_id === formData.address_id ? result.data : addr
-          );
-        }
-        return [...prevAddresses, result.data];
-      });
-
+      setAddresses((prevAddresses) =>
+        isEditing
+          ? prevAddresses.map((addr) =>
+              addr.address_id === formData.address_id ? result.data : addr
+            )
+          : [...prevAddresses, result.data]
+      );
       resetForm();
       closeModal();
     } catch (error) {
@@ -117,32 +102,21 @@ export default function ShippingAddress() {
   const handleEdit = (address) => {
     setIsEditing(true);
     setFormData({
+      ...formData,
+      ...address,
       username: address.username || userData?.username,
       phone: address.phone || userData?.phone_number,
-      city: address.city,
-      area: address.area,
-      street: address.street,
-      detailed_address: address.detailed_address || "", // 使用 detailed_address
-      isDefault: address.isDefault,
-      address_id: address.address_id,
-      deliveryMethod: address.deliveryMethod || "homeDelivery",
-      storeType: address.storeType || "",
-      storeName: address.storeName || "",
     });
-    document.getElementById("my_modal_1").showModal();
+    openModal();
   };
 
   const handleDelete = async (addressId) => {
     setIsLoading(true);
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `http://localhost:3005/api/shipment/addresses/${addressId}`,
         {
           method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${getToken()}`,
-          },
-          credentials: "include",
         }
       );
       if (!response.ok) throw new Error("Failed to delete address");
@@ -160,14 +134,10 @@ export default function ShippingAddress() {
 
   const handleSetDefault = async (addressId) => {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `http://localhost:3005/api/shipment/addresses/${addressId}/default`,
         {
           method: "PUT",
-          headers: {
-            Authorization: `Bearer ${getToken()}`,
-          },
-          credentials: "include",
         }
       );
       if (!response.ok) throw new Error("Failed to set default address");
@@ -185,66 +155,24 @@ export default function ShippingAddress() {
   };
 
   const resetForm = () => {
-    setFormData({
-      username: userData?.username || "",
-      phone: userData?.phone_number || "",
-      city: "",
-      area: "",
-      street: "",
-      detailed_address: "", // 使用 detailed_address
-      isDefault: false,
-      id: null,
-      deliveryMethod: "homeDelivery",
-      storeType: "",
-      storeName: "",
-    });
+    setFormData(initialFormData(userData));
     setIsEditing(false);
   };
 
-  const openModal = () => {
-    if (!isEditing) {
-      resetForm(); // 只在新增時重置表單
-    }
-    document.getElementById("my_modal_1").showModal();
-  };
-
-  const closeModal = () => {
-    document.getElementById("my_modal_1").close();
-  };
-
-  const fetchAddresses = async () => {
-    try {
-      const response = await fetch(
-        "http://localhost:3005/api/shipment/addresses",
-        {
-          headers: {
-            Authorization: `Bearer ${getToken()}`,
-          },
-          credentials: "include",
-        }
-      );
-      if (!response.ok) throw new Error("Failed to fetch addresses");
-
-      const data = await response.json();
-      setAddresses(data.data);
-    } catch (error) {
-      console.error("Error fetching addresses:", error);
-      setErrorMessage("無法加載地址數據");
-    }
-  };
+  const openModal = () => document.getElementById("my_modal_1").showModal();
+  const closeModal = () => document.getElementById("my_modal_1").close();
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
       <div className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
         <div className="px-6 py-4">
           <Breadcrumbs />
-
           <h2 className="text-lg font-semibold text-gray-700 capitalize dark:text-white mb-4">
             我的地址
           </h2>
 
           <section className="max-w-4xl mx-auto grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
-            {addresses && addresses.length > 0 ? (
+            {addresses.length > 0 ? (
               <TransitionGroup component={null}>
                 {addresses.map((address) => (
                   <CSSTransition
@@ -268,17 +196,10 @@ export default function ShippingAddress() {
                 <p>您目前沒有地址，請新增地址。</p>
               </div>
             )}
-
             <div className="card bg-base-100 shadow-xl">
               <div className="card-body flex justify-between">
                 <h2 className="card-title">新增地址</h2>
-                <button
-                  className="btn btn-primary"
-                  onClick={() => {
-                    setIsEditing(false);
-                    openModal();
-                  }}
-                >
+                <button className="btn btn-primary" onClick={openModal}>
                   新增
                 </button>
               </div>
@@ -286,30 +207,38 @@ export default function ShippingAddress() {
           </section>
         </div>
 
-        <TransitionGroup>
-          <CSSTransition timeout={300} classNames="fade">
-            <dialog id="my_modal_1" className="modal">
-              <div className="modal-box">
-                <AddressForm
-                  formData={formData}
-                  handleChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      [e.target.name]: e.target.value,
-                    })
-                  }
-                  handleSubmit={handleSubmit}
-                  isEditing={isEditing}
-                  isLoading={isLoading}
-                  errorMessage={errorMessage}
-                  closeModal={closeModal}
-                />
-              </div>
-            </dialog>
-          </CSSTransition>
-        </TransitionGroup>
+        <dialog id="my_modal_1" className="modal">
+          <div className="modal-box">
+            <AddressForm
+              formData={formData}
+              handleChange={(e) =>
+                setFormData({ ...formData, [e.target.name]: e.target.value })
+              }
+              handleSubmit={handleSubmit}
+              isEditing={isEditing}
+              isLoading={isLoading}
+              errorMessage={errorMessage}
+              closeModal={closeModal}
+            />
+          </div>
+        </dialog>
       </div>
       <Footer />
     </div>
   );
 }
+
+// Initial form data function
+const initialFormData = (userData = {}) => ({
+  username: userData.username || "",
+  phone: userData.phone_number || "",
+  city: "",
+  area: "",
+  street: "",
+  detailed_address: "",
+  isDefault: false,
+  address_id: null,
+  deliveryMethod: "homeDelivery",
+  storeType: "",
+  storeName: "",
+});

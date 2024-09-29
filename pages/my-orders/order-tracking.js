@@ -13,6 +13,19 @@ export default function OrderTracking() {
   const itemsPerPage = 10; // 每頁顯示 10 筆訂單
   const [currentData, setCurrentData] = useState([]); // 用來存儲當前顯示的訂單數據
 
+  // 獲取存取令牌
+  const getToken = () => localStorage.getItem("token");
+
+  // 封裝的 fetch 函數，確保 token 被附加
+  const fetchWithToken = async (url, options = {}) => {
+    const token = getToken();
+    const headers = {
+      ...options.headers,
+      Authorization: `Bearer ${token}`, // 將 token 附加到 Authorization header
+    };
+    return fetch(url, { ...options, headers, credentials: "include" });
+  };
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -22,10 +35,8 @@ export default function OrderTracking() {
       // 根據當前 activeTab 來生成 API 的端點
       const endpoint = `http://localhost:3005/api/orders/${activeTab}?page=${currentPage}&limit=${itemsPerPage}`;
       try {
-        const response = await fetch(endpoint, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+        const response = await fetchWithToken(endpoint, {
+          method: "GET",
         });
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);

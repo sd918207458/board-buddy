@@ -21,6 +21,18 @@ const InputField = ({ label, type, id, placeholder, value, onChange }) => (
   </div>
 );
 
+// Toast 組件
+const Toast = ({ message, onClose }) => {
+  return (
+    <div className="fixed top-4 right-4 bg-red-500 text-white p-4 rounded shadow-lg z-50">
+      {message}
+      <button onClick={onClose} className="ml-4 font-bold">
+        &times;
+      </button>
+    </div>
+  );
+};
+
 export default function Register() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -28,7 +40,7 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [toastMessage, setToastMessage] = useState(""); // Toast 狀態
   const [termsAccepted, setTermsAccepted] = useState(false);
   const router = useRouter();
 
@@ -55,11 +67,11 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setErrorMessage("");
+    setToastMessage(""); // 清除之前的錯誤訊息
 
     const validationError = validateForm();
     if (validationError) {
-      setErrorMessage(validationError);
+      setToastMessage(validationError); // 使用 Toast 顯示錯誤
       setIsLoading(false);
       return;
     }
@@ -82,11 +94,11 @@ export default function Register() {
         alert("註冊成功");
         router.push("/member/login");
       } else {
-        setErrorMessage(data.message || "註冊失敗");
+        setToastMessage(data.message || "註冊失敗"); // 顯示伺服器錯誤訊息
       }
     } catch (error) {
       console.error("錯誤:", error);
-      setErrorMessage("伺服器錯誤，請稍後再試");
+      setToastMessage("伺服器錯誤，請稍後再試");
     } finally {
       setIsLoading(false);
     }
@@ -108,18 +120,6 @@ export default function Register() {
             <h2 className="text-center text-2xl font-bold text-gray-700 dark:text-gray-200 mt-4">
               註冊
             </h2>
-
-            {/* 錯誤提示動畫 */}
-            <CSSTransition
-              in={!!errorMessage}
-              timeout={300}
-              classNames="fade"
-              unmountOnExit
-            >
-              <div className="text-red-500 text-center mt-4">
-                {errorMessage}
-              </div>
-            </CSSTransition>
 
             <form onSubmit={handleSubmit}>
               {/* 使用者名稱輸入欄 */}
@@ -218,6 +218,14 @@ export default function Register() {
           </div>
         </div>
       </div>
+
+      {/* Toast 彈出通知 */}
+      {toastMessage && (
+        <Toast
+          message={toastMessage}
+          onClose={() => setToastMessage("")} // 點擊時關閉通知
+        />
+      )}
 
       <Footer />
     </>

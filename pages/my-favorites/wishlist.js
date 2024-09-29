@@ -13,6 +13,19 @@ export default function OrderTracking() {
   const productRefs = useRef([]); // 儲存所有商品的 refs
   const storeRefs = useRef([]); // 儲存所有店家的 refs
 
+  // 獲取存取令牌
+  const getToken = () => localStorage.getItem("token");
+
+  // 封裝帶有 token 的 fetch 請求
+  const fetchWithToken = async (url, options = {}) => {
+    const token = getToken();
+    const headers = {
+      ...options.headers,
+      Authorization: `Bearer ${token}`, // 附加 token 到 Authorization header
+    };
+    return fetch(url, { ...options, headers, credentials: "include" });
+  };
+
   // 頁面掛載後加載數據
   useEffect(() => {
     setIsMounted(true);
@@ -30,11 +43,7 @@ export default function OrderTracking() {
         endpoint = "http://localhost:3005/api/favorites/stores";
       }
 
-      const response = await fetch(endpoint, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const response = await fetchWithToken(endpoint);
 
       const data = await response.json();
       if (data.status === "success") {

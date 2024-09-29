@@ -47,19 +47,34 @@ export default function Request() {
   const [submitMessage, setSubmitMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
+  // 獲取存取令牌
+  const getToken = () => localStorage.getItem("token");
+
+  // 使用封裝的請求函數，自動添加 token
+  const fetchWithToken = async (url, options = {}) => {
+    const token = getToken();
+    const headers = {
+      ...options.headers,
+      Authorization: `Bearer ${token}`, // 將 token 附加到 Authorization header
+    };
+    return fetch(url, { ...options, headers, credentials: "include" });
+  };
+
   useEffect(() => {
     setIsMounted(true);
 
     // 獲取使用者的訂單資料
     const fetchOrders = async () => {
       try {
-        const response = await fetch("http://localhost:3005/api/orders", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // 假設使用 JWT 驗證
-          },
-        });
+        const response = await fetchWithToken(
+          "http://localhost:3005/api/orders",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
         const result = await response.json();
         if (response.ok) {
           setOrders(result.data);
@@ -120,21 +135,24 @@ export default function Request() {
     }
 
     try {
-      const response = await fetch("http://localhost:3005/api/request/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          order_id: formData.orderNumber,
-          member_id: 1, // 假設會員ID為1，實際應根據用戶狀態動態設置
-          order_date: formData.orderDate,
-          product_name: formData.productName,
-          product_model: formData.productModel,
-          product_quantity: formData.productQuantity,
-          reason: formData.returnReason,
-        }),
-      });
+      const response = await fetchWithToken(
+        "http://localhost:3005/api/request/create",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            order_id: formData.orderNumber,
+            member_id: 1, // 假設會員ID為1，實際應根據用戶狀態動態設置
+            order_date: formData.orderDate,
+            product_name: formData.productName,
+            product_model: formData.productModel,
+            product_quantity: formData.productQuantity,
+            reason: formData.returnReason,
+          }),
+        }
+      );
 
       const result = await response.json();
 

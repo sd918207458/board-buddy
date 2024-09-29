@@ -19,12 +19,42 @@ export default function PersonalInfo() {
     last_name: "",
     birthday: "",
     gender: "",
+    favorite_games: "", // 新增欄位
+    preferred_play_times: "", // 新增欄位
   });
 
   const [avatarUrl, setAvatarUrl] = useState(""); // 用來顯示頭像
   const [submitMessage, setSubmitMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const gameOptions = [
+    "策略遊戲",
+    "合作遊戲",
+    "派對遊戲",
+    "冒險遊戲",
+    "推理解謎遊戲",
+    "卡牌遊戲",
+    "經濟遊戲",
+    "區域控制遊戲",
+    "建設遊戲",
+    "骰子遊戲",
+    "劇本殺/推理遊戲",
+    "家庭遊戲",
+    "輕策略遊戲",
+    "重策略遊戲",
+  ];
+
+  const playTimeOptions = [
+    "早上 (6 AM - 12 PM)",
+    "下午 (12 PM - 4 PM)",
+    "傍晚 (4 PM - 6 PM)",
+    "晚上 (6 PM - 9 PM)",
+    "深夜 (9 PM - 12 AM)",
+    "凌晨 (12 AM - 3 AM)",
+    "周末白天 (Sat & Sun, 10 AM - 6 PM)",
+    "周末晚上 (Sat & Sun, 6 PM - 12 AM)",
+  ];
 
   // 初次加載時取得用戶數據
   useEffect(() => {
@@ -51,6 +81,8 @@ export default function PersonalInfo() {
             last_name: user.last_name || "",
             birthday: user.date_of_birth || "",
             gender: user.gender || "",
+            favorite_games: user.favorite_games || "", // 填入喜歡的遊戲類型
+            preferred_play_times: user.preferred_play_times || "", // 填入常玩時段
           });
           setAvatarUrl(user.avatar || "");
         }
@@ -168,6 +200,51 @@ export default function PersonalInfo() {
                     </option>
                     <option value="male">男</option>
                     <option value="female">女</option>
+                  </select>
+                </div>
+                {/* 喜歡的遊戲類型 */}
+                <div className="form-control">
+                  <label className="label" htmlFor="favorite_games">
+                    喜歡的遊戲類型
+                  </label>
+                  <select
+                    id="favorite_games"
+                    name="favorite_games"
+                    value={formData.favorite_games}
+                    onChange={handleChange}
+                    className="select select-bordered w-full"
+                  >
+                    <option value="" disabled>
+                      請選擇
+                    </option>
+                    {gameOptions.map((game, index) => (
+                      <option key={index} value={game}>
+                        {game}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 常玩時段 */}
+                <div className="form-control">
+                  <label className="label" htmlFor="preferred_play_times">
+                    常玩時段
+                  </label>
+                  <select
+                    id="preferred_play_times"
+                    name="preferred_play_times"
+                    value={formData.preferred_play_times}
+                    onChange={handleChange}
+                    className="select select-bordered w-full"
+                  >
+                    <option value="" disabled>
+                      請選擇
+                    </option>
+                    {playTimeOptions.map((time, index) => (
+                      <option key={index} value={time}>
+                        {time}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
