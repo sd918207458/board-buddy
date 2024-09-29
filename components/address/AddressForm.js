@@ -9,11 +9,9 @@ const AddressForm = ({
   isLoading,
   closeModal,
 }) => {
-  // 提取城市列表
   const cities = taiwanDistricts.map((city) => city.name);
   const [areas, setAreas] = useState([]);
 
-  // 當選擇城市變更時，更新區域列表
   useEffect(() => {
     const selectedCity = taiwanDistricts.find(
       (city) => city.name === formData.city
@@ -28,10 +26,9 @@ const AddressForm = ({
       </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* 收貨方式選擇 */}
         <div className="form-control">
           <label className="label">
-            <span className="label-text ">收貨方式</span>
+            <span className="label-text">收貨方式</span>
           </label>
           <select
             name="deliveryMethod"
@@ -45,12 +42,43 @@ const AddressForm = ({
           </select>
         </div>
 
-        {/* 如果選擇「宅配到府」，顯示地址欄位 */}
         {formData.deliveryMethod === "homeDelivery" && (
           <>
             <div className="form-control">
+              <label className="label" htmlFor="username">
+                <span className="label-text">收件人姓名</span>
+              </label>
+              <input
+                id="username"
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                placeholder="請輸入收件人姓名"
+                className="input input-bordered w-full text-black"
+                required
+              />
+            </div>
+
+            <div className="form-control">
+              <label className="label" htmlFor="phone">
+                <span className="label-text">聯絡電話</span>
+              </label>
+              <input
+                id="phone"
+                type="text"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                placeholder="請輸入聯絡電話"
+                className="input input-bordered w-full text-black"
+                required
+              />
+            </div>
+
+            <div className="form-control">
               <label className="label" htmlFor="city">
-                <span className="label-text ">城市</span>
+                <span className="label-text">城市</span>
               </label>
               <select
                 name="city"
@@ -60,8 +88,8 @@ const AddressForm = ({
                 required
               >
                 <option value="">請選擇城市</option>
-                {cities.map((city) => (
-                  <option key={city} value={city}>
+                {cities.map((city, index) => (
+                  <option key={index} value={city}>
                     {city}
                   </option>
                 ))}
@@ -70,7 +98,7 @@ const AddressForm = ({
 
             <div className="form-control">
               <label className="label" htmlFor="area">
-                <span className="label-text ">區域</span>
+                <span className="label-text">區域</span>
               </label>
               <select
                 name="area"
@@ -91,7 +119,7 @@ const AddressForm = ({
 
             <div className="form-control">
               <label className="label" htmlFor="street">
-                <span className="label-text ">街道</span>
+                <span className="label-text">街道</span>
               </label>
               <input
                 id="street"
@@ -106,14 +134,14 @@ const AddressForm = ({
             </div>
 
             <div className="form-control">
-              <label className="label" htmlFor="detailedAddress">
-                <span className="label-text ">詳細地址</span>
+              <label className="label" htmlFor="detailed_address">
+                <span className="label-text">詳細地址</span>
               </label>
               <input
-                id="detailedAddress"
+                id="detailed_address"
                 type="text"
-                name="detailedAddress"
-                value={formData.detailedAddress}
+                name="detailed_address" // 使用 detailed_address，而不是 detailedAddress
+                value={formData.detailed_address} // 確保表單資料中的名稱一致
                 onChange={handleChange}
                 placeholder="請輸入詳細地址"
                 className="input input-bordered w-full text-black"
@@ -123,12 +151,11 @@ const AddressForm = ({
           </>
         )}
 
-        {/* 如果選擇「超商取貨」，顯示選擇超商與店鋪資訊 */}
         {formData.deliveryMethod === "convenienceStore" && (
           <>
             <div className="form-control">
               <label className="label">
-                <span className="label-text ">選擇超商</span>
+                <span className="label-text">選擇超商</span>
               </label>
               <select
                 name="storeType"
@@ -145,7 +172,7 @@ const AddressForm = ({
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text ">店鋪代碼/名稱</span>
+                <span className="label-text">店鋪代碼/名稱</span>
               </label>
               <input
                 type="text"
@@ -161,7 +188,6 @@ const AddressForm = ({
         )}
       </div>
 
-      {/* 預設地址選擇 */}
       <div className="form-control">
         <label className="cursor-pointer flex items-center">
           <input
@@ -179,7 +205,6 @@ const AddressForm = ({
         </label>
       </div>
 
-      {/* 操作按鈕 */}
       <div className="modal-action mt-4">
         <button
           type="submit"

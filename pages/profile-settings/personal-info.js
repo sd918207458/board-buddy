@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { AuthProvider } from "@/hooks/use-auth";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import InputField from "@/components/personal-info/InputField";
 import AvatarUpload from "@/components/personal-info/upload_avatar";
-
-// 開發期間使用的 userId，可以從 useAuth 中得到
-const userId = 1;
 
 // 動態導入日期選擇器，避免 SSR 問題
 const DatePicker1 = dynamic(() => import("@/components/datepicker"), {
@@ -23,8 +19,6 @@ export default function PersonalInfo() {
     last_name: "",
     birthday: "",
     gender: "",
-    gameType: "",
-    playTime: "",
   });
 
   const [avatarUrl, setAvatarUrl] = useState(""); // 用來顯示頭像
@@ -36,36 +30,18 @@ export default function PersonalInfo() {
   useEffect(() => {
     const fetchMemberData = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          throw new Error("未找到有效的 token");
-        }
+        const response = await fetch("http://localhost:3005/api/users/check", {
+          method: "GET",
+          credentials: "include", // 攜帶 httpOnly cookie
+        });
 
-        const parsedToken = parseJwt(token);
-        if (!parsedToken || !parsedToken.id) {
-          throw new Error("無效的存取令牌");
-        }
-
-        const userId = parsedToken.id;
-
-        const userInfoRes = await fetch(
-          `http://localhost:3005/api/users/${userId}`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!userInfoRes.ok) {
-          const error = await userInfoRes.json();
+        if (!response.ok) {
+          const error = await response.json();
           throw new Error(error.message || "獲取用戶資料失敗");
         }
 
-        const userInfoData = await userInfoRes.json();
-
-        if (userInfoData && userInfoData.status === "success") {
+        const userInfoData = await response.json();
+        if (userInfoData.status === "success") {
           const user = userInfoData.data.user || {};
           setFormData({
             username: user.username || "",
@@ -75,58 +51,21 @@ export default function PersonalInfo() {
             last_name: user.last_name || "",
             birthday: user.date_of_birth || "",
             gender: user.gender || "",
-            gameType: user.favorite_games || "",
-            playTime: user.preferred_play_times || "",
           });
           setAvatarUrl(user.avatar || "");
         }
       } catch (error) {
         console.error("Failed to load data:", error.message);
+        setErrorMessage("無法加載會員資料，請重試。");
       }
     };
 
     fetchMemberData();
   }, []);
 
-  const parseJwt = (token) => {
-    try {
-      const base64Url = token.split(".")[1];
-      if (!base64Url) throw new Error("無效的 JWT 格式");
-
-      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split("")
-          .map(function (c) {
-            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-          })
-          .join("")
-      );
-      return JSON.parse(jsonPayload);
-    } catch (error) {
-      console.error("JWT 解析錯誤:", error.message);
-      return null; // 如果出現錯誤，返回 null
-    }
-  };
-
   // 更新表單的資料
   const handleChange = ({ target: { name, value } }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // 表單驗證
-  const validateForm = () => {
-    const { username, phone, emailAddress } = formData;
-    if (!username || !phone || !emailAddress) {
-      return "所有欄位都是必填的";
-    }
-    if (!/\S+@\S+\.\S+/.test(emailAddress)) {
-      return "請輸入有效的電子郵件地址";
-    }
-    if (!/^\d{10}$/.test(phone)) {
-      return "請輸入有效的手機號碼";
-    }
-    return "";
   };
 
   // 表單提交處理
@@ -134,21 +73,14 @@ export default function PersonalInfo() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const validationError = validateForm();
-    if (validationError) {
-      setErrorMessage(validationError);
-      setIsSubmitting(false);
-      return;
-    }
-
     try {
       const completeFormData = { ...formData, avatar: avatarUrl };
       const response = await fetch("http://localhost:3005/api/users/update", {
         method: "PUT", // 使用 PUT 方法進行更新
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
+        credentials: "include", // 攜帶 cookie
         body: JSON.stringify(completeFormData),
       });
 
@@ -174,13 +106,13 @@ export default function PersonalInfo() {
             <h2 className="text-2xl font-semibold text-[#003E52] text-center">
               個人資料設定
             </h2>
-            <AvatarUpload onUpload={setAvatarUrl} /> {/* 用來上傳頭像 */}
+            <AvatarUpload onUpload={setAvatarUrl} avatarUrl={avatarUrl} />
             <form onSubmit={handleSubmit}>
               <div className="max-w-4xl mx-auto grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
                 <InputField
                   label="使用者名稱"
-                  name="username" // name 必須對應狀態中的屬性
-                  value={formData.username} // 傳入相應的狀態值
+                  name="username"
+                  value={formData.username}
                   onChange={handleChange}
                   required
                 />

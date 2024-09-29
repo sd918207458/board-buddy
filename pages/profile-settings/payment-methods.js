@@ -21,11 +21,13 @@ export default function PaymentMethods() {
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // 初始獲取付款方式
   useEffect(() => {
     fetchPaymentMethods();
     fetchDefaultPaymentMethod();
   }, []);
 
+  // 獲取所有付款方式
   const fetchPaymentMethods = async () => {
     try {
       const response = await fetch(
@@ -46,6 +48,7 @@ export default function PaymentMethods() {
     }
   };
 
+  // 獲取預設付款方式
   const fetchDefaultPaymentMethod = async () => {
     try {
       const response = await fetch(
@@ -66,6 +69,7 @@ export default function PaymentMethods() {
     }
   };
 
+  // 套用優惠券
   const applyCoupon = (couponCode) => {
     return new Promise((resolve, reject) => {
       if (couponCode === "DISCOUNT10") {
@@ -77,6 +81,7 @@ export default function PaymentMethods() {
     });
   };
 
+  // 處理表單變更
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setCurrentMethod((prev) => ({
@@ -85,6 +90,7 @@ export default function PaymentMethods() {
     }));
   };
 
+  // 編輯付款方式
   const handleEdit = (method) => {
     setIsEditing(true);
     setCurrentMethod({
@@ -99,34 +105,11 @@ export default function PaymentMethods() {
     openModal();
   };
 
+  // 提交付款方式
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      let paymentData;
-      if (currentMethod.type === "creditCard") {
-        paymentData = {
-          member_id: localStorage.getItem("member_id"),
-          card_number: currentMethod.cardNumber.replace(/\s/g, "").slice(-4),
-          card_type: currentMethod.cardType,
-          expiration_date: currentMethod.expiryDate,
-          cardholder_name: currentMethod.cardholderName,
-          is_default: currentMethod.isDefault,
-        };
-      } else if (currentMethod.type === "onlinePayment") {
-        paymentData = {
-          member_id: localStorage.getItem("member_id"),
-          payment_type: "onlinePayment",
-          online_payment_service: currentMethod.onlinePaymentService,
-          is_default: currentMethod.isDefault,
-        };
-      } else {
-        paymentData = {
-          member_id: localStorage.getItem("member_id"),
-          payment_type: "cash",
-          is_default: currentMethod.isDefault,
-        };
-      }
-
+      const paymentData = buildPaymentData();
       const method = currentMethod.id ? "PUT" : "POST";
       const url = currentMethod.id
         ? `http://localhost:3005/api/payment-methods/${currentMethod.id}`
@@ -147,17 +130,43 @@ export default function PaymentMethods() {
         fetchPaymentMethods();
         closeModal();
       } else {
-        console.error("提交失敗:", result.message);
         alert("提交失敗，請重試");
       }
     } catch (error) {
-      console.error("提交失敗:", error.message);
       alert("伺服器錯誤，請稍後再試");
     } finally {
       setIsLoading(false);
     }
   };
 
+  // 建立付款資料
+  const buildPaymentData = () => {
+    if (currentMethod.type === "creditCard") {
+      return {
+        member_id: localStorage.getItem("member_id"),
+        card_number: currentMethod.cardNumber.replace(/\s/g, "").slice(-4),
+        card_type: currentMethod.cardType,
+        expiration_date: currentMethod.expiryDate,
+        cardholder_name: currentMethod.cardholderName,
+        is_default: currentMethod.isDefault,
+      };
+    } else if (currentMethod.type === "onlinePayment") {
+      return {
+        member_id: localStorage.getItem("member_id"),
+        payment_type: "onlinePayment",
+        online_payment_service: currentMethod.onlinePaymentService,
+        is_default: currentMethod.isDefault,
+      };
+    } else {
+      return {
+        member_id: localStorage.getItem("member_id"),
+        payment_type: "cash",
+        is_default: currentMethod.isDefault,
+      };
+    }
+  };
+
+  // 設置預設付款方式
   const handleSetDefault = async (id) => {
     try {
       const response = await fetch(
@@ -178,11 +187,11 @@ export default function PaymentMethods() {
         alert("設置預設付款方式失敗");
       }
     } catch (error) {
-      console.error("設置預設付款方式失敗:", error);
       alert("伺服器錯誤，請稍後再試");
     }
   };
 
+  // 刪除付款方式
   const handleDelete = async (id) => {
     try {
       const response = await fetch(
@@ -200,17 +209,17 @@ export default function PaymentMethods() {
         alert("刪除失敗");
       }
     } catch (error) {
-      console.error("刪除失敗:", error);
       alert("伺服器錯誤，請稍後再試");
     }
   };
 
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
+  const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
     setIsModalOpen(false);
+    resetForm();
+  };
+
+  const resetForm = () => {
     setCurrentMethod({
       id: null,
       type: "cash",

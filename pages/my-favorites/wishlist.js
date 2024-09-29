@@ -1,28 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 
 export default function OrderTracking() {
-  const [isMounted, setIsMounted] = useState(false); // 判斷是否在客戶端
-  const [activeTab, setActiveTab] = useState("all"); // 管理當前選擇的 Tab
-  const [loading, setLoading] = useState(true); // 加入 loading 狀態
-  const [hasError, setHasError] = useState(false); // 用來追踪錯誤
-  const [currentPage, setCurrentPage] = useState(1); // 用於處理分頁的狀態
-  const totalPages = 10; // 模擬總頁數
-  const [favoriteProducts, setFavoriteProducts] = useState([]); // 收藏的商品
-  const [favoriteStores, setFavoriteStores] = useState([]); // 收藏的店家
+  const [isMounted, setIsMounted] = useState(false);
+  const [activeTab, setActiveTab] = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  const [favoriteProducts, setFavoriteProducts] = useState([]);
+  const [favoriteStores, setFavoriteStores] = useState([]);
+  const productRefs = useRef([]); // 儲存所有商品的 refs
+  const storeRefs = useRef([]); // 儲存所有店家的 refs
 
+  // 頁面掛載後加載數據
   useEffect(() => {
-    try {
-      setIsMounted(true);
-      fetchFavorites(activeTab); // 加載收藏
-    } catch (error) {
-      console.error("Error mounting component: ", error);
-      setHasError(true);
-    }
+    setIsMounted(true);
+    fetchFavorites(activeTab);
   }, [activeTab]);
 
+  // 加載收藏的商品和店家
   const fetchFavorites = async (tab) => {
     setLoading(true);
     try {
@@ -43,8 +40,10 @@ export default function OrderTracking() {
       if (data.status === "success") {
         if (tab === "all") {
           setFavoriteProducts(data.favorites || []);
+          productRefs.current = data.favorites.map(() => React.createRef());
         } else if (tab === "pending") {
           setFavoriteStores(data.favorites || []);
+          storeRefs.current = data.favorites.map(() => React.createRef());
         }
       } else {
         setHasError(true);
@@ -57,6 +56,7 @@ export default function OrderTracking() {
     }
   };
 
+  // 渲染商品和店家列表
   const renderTable = () => {
     if (loading) {
       return (
@@ -78,64 +78,78 @@ export default function OrderTracking() {
       if (activeTab === "all") {
         return (
           <section className="max-w-4xl mx-auto grid grid-cols-2 gap-6 mt-4 sm:grid-cols-2">
-            {favoriteProducts.map((product) => (
-              <div
+            {favoriteProducts.map((product, index) => (
+              <CSSTransition
                 key={product.id}
-                className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105"
+                nodeRef={productRefs.current[index]}
+                timeout={300}
+                classNames="fade"
               >
-                <figure>
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="rounded-t-lg h-48 w-full object-cover"
-                  />
-                </figure>
-                <div className="card-body">
-                  <h2 className="card-title">{product.name}</h2>
-                  <p>{product.description}</p>
-                  <div className="card-actions justify-end">
-                    <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
-                      立即購買
-                    </button>
+                <div
+                  ref={productRefs.current[index]}
+                  className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105"
+                >
+                  <figure>
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="rounded-t-lg h-48 w-full object-cover"
+                    />
+                  </figure>
+                  <div className="card-body">
+                    <h2 className="card-title">{product.name}</h2>
+                    <p>{product.description}</p>
+                    <div className="card-actions justify-end">
+                      <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
+                        立即購買
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </CSSTransition>
             ))}
           </section>
         );
       } else if (activeTab === "pending") {
         return (
           <section className="max-w-4xl mx-auto grid grid-cols-2 gap-6 mt-4 sm:grid-cols-2">
-            {favoriteStores.map((store) => (
-              <div
+            {favoriteStores.map((store, index) => (
+              <CSSTransition
                 key={store.id}
-                className="card bg-white w-96 shadow-lg hover:shadow-2xl transition-shadow duration-300 rounded-lg"
+                nodeRef={storeRefs.current[index]}
+                timeout={300}
+                classNames="fade"
               >
-                <figure className="relative">
-                  <img
-                    src={store.image}
-                    alt={store.name}
-                    className="h-48 w-full object-cover"
-                  />
-                </figure>
-                <div className="card-body">
-                  <h2 className="card-title text-lg font-bold text-gray-800 dark:text-white">
-                    {store.name}
-                    <span className="badge badge-secondary ml-2">熱門</span>
-                  </h2>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    {store.description}
-                  </p>
-                  <div className="flex justify-between items-center mt-4">
-                    <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
-                      瀏覽店家
-                    </button>
-                    <span className="text-gray-500 dark:text-gray-400 text-sm">
-                      {store.location}
-                    </span>
+                <div
+                  ref={storeRefs.current[index]}
+                  className="card bg-white w-96 shadow-lg hover:shadow-2xl transition-shadow duration-300 rounded-lg"
+                >
+                  <figure className="relative">
+                    <img
+                      src={store.image}
+                      alt={store.name}
+                      className="h-48 w-full object-cover"
+                    />
+                  </figure>
+                  <div className="card-body">
+                    <h2 className="card-title text-lg font-bold text-gray-800 dark:text-white">
+                      {store.name}
+                      <span className="badge badge-secondary ml-2">熱門</span>
+                    </h2>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      {store.description}
+                    </p>
+                    <div className="flex justify-between items-center mt-4">
+                      <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
+                        瀏覽店家
+                      </button>
+                      <span className="text-gray-500 dark:text-gray-400 text-sm">
+                        {store.location}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </CSSTransition>
             ))}
           </section>
         );
