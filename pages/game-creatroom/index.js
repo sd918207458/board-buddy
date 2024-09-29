@@ -30,7 +30,15 @@ export default function Createroom() {
   };
 
   const handleFileChange = (e) => {
-    setFormData({ ...formData, img: e.target.files[0] }); // 只取第一个文件
+
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, img: reader.result }); // 将文件转换为 Base64 字符串
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleChange = (e) => {
@@ -55,22 +63,29 @@ export default function Createroom() {
       return;
     }
 
-    const formDataToSend = new FormData();
 
-    // 先将基本数据添加到 FormData
-    Object.entries(formData).forEach(([key, value]) => {
-      formDataToSend.append(key, value);
-    });
+    const jsonData = {
+      room_name: formData.room_name,
+      room_intro: formData.room_intro,
+      minperson: parseInt(formData.minperson),
+      maxperson: parseInt(formData.maxperson),
+      event_date: formData.event_date,
+      location: formData.location,
+      img: formData.img, // Base64 格式的图片
+      roomrule: formData.roomrule,
+      games: gameTitles, // 游戏标题数组
+    };
 
-    // 添加游戏标题到 FormData
-    gameTitles.forEach((title, index) => {
-      formDataToSend.append(`game${index + 1}`, title);
-    });
 
     try {
       const response = await fetch(`http://localhost:3005/api/gamecreat`, {
         method: "POST",
-        body: formDataToSend,
+
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(jsonData),
+
       });
 
       if (response.ok) {
@@ -210,9 +225,9 @@ export default function Createroom() {
                   onChange={handleChange}
                 ></textarea>
               </div>
-              <button type="submit" className="mt-4 p-2 bg-green-500 text-white rounded-lg" disabled={isLoading}>
-                {isLoading ? "创建中..." : "创建房间"}
-              </button>
+
+              <button type="submit" className="mt-4 px-4 py-2 text-white bg-blue-600 rounded">创建房间</button>
+              {isLoading && <p>加载中...</p>}
             </form>
           </div>
         </div>
