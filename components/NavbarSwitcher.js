@@ -11,31 +11,38 @@ const NavbarSwitcher = () => {
   const router = useRouter();
 
   useEffect(() => {
-    // 檢查 token 的有效性，發送 API 請求到後端
-    fetch("http://localhost:3005/api/auth/check", {
-      method: "GET",
-      credentials: "include", // 確保 cookies 被自動發送
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.status !== "success") {
-          // 如果 token 無效，清理 localStorage 並登出
-          localStorage.removeItem("token");
+    // 檢查是否存在 token
+    const token = localStorage.getItem("token");
+    if (token) {
+      // 有 token，進行驗證
+      fetch("http://localhost:3005/api/auth/check", {
+        method: "GET",
+        credentials: "include", // 確保 cookies 被自動發送
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status === "success") {
+            setIsLoggedIn(true);
+            setAvatarUrl(data.data.user.avatar); // 設置初始頭像
+            setUsername(data.data.user.username); // 設置初始使用者名稱
+          } else {
+            // 如果 token 無效，清理 localStorage
+            localStorage.removeItem("token");
+            setIsLoggedIn(false);
+          }
+        })
+        .catch((error) => {
+          console.error("檢查 token 發生錯誤", error);
           setIsLoggedIn(false);
-          console.error("Token 無效，登出", data);
-        } else {
-          setIsLoggedIn(true);
-          setAvatarUrl(data.data.user.avatar); // 設置初始頭像
-          setUsername(data.data.user.username); // 設置初始使用者名稱
-        }
-      })
-      .catch((error) => {
-        console.error("檢查 token 發生錯誤", error);
-        setIsLoggedIn(false);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    } else {
+      // 沒有 token，直接設定為未登入狀態
+      setIsLoggedIn(false);
+      setIsLoading(false);
+    }
   }, [router]);
 
   const handleAvatarUpdate = (newAvatarUrl) => {
@@ -43,7 +50,7 @@ const NavbarSwitcher = () => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div>Loading...</div>; // 顯示載入狀態
   }
 
   return isLoggedIn ? (

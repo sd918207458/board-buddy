@@ -3,7 +3,7 @@ import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Link from "next/link";
 import { Transition } from "react-transition-group";
-import card_data from "../../components/UI.json/card_data.json";
+import card_data from "../../components/UI/card_data.json";
 
 const cardData = card_data;
 

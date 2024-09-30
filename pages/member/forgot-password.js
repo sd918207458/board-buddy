@@ -110,16 +110,18 @@ export default function ForgotPassword() {
       const result = await response.json();
       if (result.status === "success") {
         alert("密碼重置成功！");
-        setEmail(""); // 重置表單
+        setEmail("");
         setVerificationCode("");
         setNewPassword("");
         setConfirmPassword("");
         setShowNewPasswordFields(false);
       } else {
+        console.error("重置密碼失敗:", result);
         setErrorMessage(result.message || "重置密碼失敗，請重試！");
       }
     } catch (error) {
-      setErrorMessage("伺服器錯誤，請稍後再試。");
+      console.error("伺服器錯誤:", error);
+      setErrorMessage(`${error.message || "伺服器錯誤"} - 請稍後再試。`);
     } finally {
       setIsLoading(false);
     }
