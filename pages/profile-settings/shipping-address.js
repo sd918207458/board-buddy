@@ -58,7 +58,7 @@ export default function ShippingAddress() {
         "http://localhost:3005/api/shipment/addresses"
       );
       const data = await response.json();
-      setAddresses(data.data);
+      setAddresses(data.data || []); // 修正錯誤處理
     } catch (error) {
       console.error("Error fetching addresses:", error);
       setErrorMessage("無法加載地址數據");

@@ -27,14 +27,14 @@ const AddressCard = ({
           </button>
           <button
             className="btn btn-error"
-            onClick={() => handleDelete(address.id)}
+            onClick={() => handleDelete(address.address_id)}
           >
             刪除
           </button>
           {!address.isDefault && (
             <button
               className="btn btn-outline"
-              onClick={() => handleSetDefault(address.id)}
+              onClick={() => handleSetDefault(address.address_id)}
             >
               設為預設
             </button>

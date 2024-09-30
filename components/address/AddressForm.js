@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import taiwanDistricts from "@/public/taiwan_districts.json";
-import { useShip711StoreCallback } from "@/hooks/use-ship-711-store"; // 引入回傳勾子
+import {
+  useShip711StoreCallback,
+  useShip711StoreOpener,
+} from "@/hooks/use-ship-711-store"; // 引入7-11運送商店的回傳和開啟勾子
 
 const AddressForm = ({
   formData,
@@ -12,6 +15,12 @@ const AddressForm = ({
 }) => {
   const cities = taiwanDistricts.map((city) => city.name);
   const [areas, setAreas] = useState([]);
+
+  // useShip711StoreOpener的使用
+  const { store711, openWindow, closeWindow } = useShip711StoreOpener(
+    "http://localhost:3005/api/shipment/711", // 使用你在伺服器設置的 callback URL
+    { autoCloseMins: 3 }
+  );
 
   // 回傳門市資訊的勾子，處理選擇 7-11 門市後的資料
   useShip711StoreCallback((storeInfo) => {
@@ -194,30 +203,43 @@ const AddressForm = ({
               <>
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text">店鋪名稱</span>
+                    <span className="label-text">選擇7-11門市</span>
                   </label>
-                  <input
-                    type="text"
-                    name="storeName"
-                    value={formData.storeName}
-                    placeholder="請選擇店鋪"
-                    className="input input-bordered w-full text-black"
-                    readOnly
-                  />
-                </div>
+                  <button
+                    type="button"
+                    onClick={() => openWindow()}
+                    className="btn btn-primary w-full"
+                  >
+                    選擇門市
+                  </button>
 
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">店鋪地址</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="storeAddress"
-                    value={formData.storeAddress}
-                    placeholder="請選擇店鋪"
-                    className="input input-bordered w-full text-black"
-                    readOnly
-                  />
+                  <div className="form-control mt-4">
+                    <label className="label">
+                      <span className="label-text">門市名稱</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="storeName"
+                      value={store711.storeName || formData.storeName}
+                      placeholder="請選擇店鋪"
+                      className="input input-bordered w-full text-black"
+                      readOnly
+                    />
+                  </div>
+
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">門市地址</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="storeAddress"
+                      value={store711.storeAddress || formData.storeAddress}
+                      placeholder="請選擇店鋪"
+                      className="input input-bordered w-full text-black"
+                      readOnly
+                    />
+                  </div>
                 </div>
               </>
             )}
