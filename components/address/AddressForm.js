@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import taiwanDistricts from "@/public/taiwan_districts.json";
+import { useShip711StoreCallback } from "@/hooks/use-ship-711-store"; // 引入回傳勾子
 
 const AddressForm = ({
   formData,
@@ -12,6 +13,25 @@ const AddressForm = ({
   const cities = taiwanDistricts.map((city) => city.name);
   const [areas, setAreas] = useState([]);
 
+  // 回傳門市資訊的勾子，處理選擇 7-11 門市後的資料
+  useShip711StoreCallback((storeInfo) => {
+    if (storeInfo) {
+      handleChange({
+        target: {
+          name: "storeName",
+          value: storeInfo.storeName,
+        },
+      });
+      handleChange({
+        target: {
+          name: "storeAddress",
+          value: storeInfo.storeAddress,
+        },
+      });
+    }
+  });
+
+  // 更新區域選項根據城市
   useEffect(() => {
     const selectedCity = taiwanDistricts.find(
       (city) => city.name === formData.city
@@ -140,8 +160,8 @@ const AddressForm = ({
               <input
                 id="detailed_address"
                 type="text"
-                name="detailed_address" // 使用 detailed_address，而不是 detailedAddress
-                value={formData.detailed_address} // 確保表單資料中的名稱一致
+                name="detailed_address"
+                value={formData.detailed_address}
                 onChange={handleChange}
                 placeholder="請輸入詳細地址"
                 className="input input-bordered w-full text-black"
@@ -170,20 +190,37 @@ const AddressForm = ({
               </select>
             </div>
 
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">店鋪代碼/名稱</span>
-              </label>
-              <input
-                type="text"
-                name="storeName"
-                value={formData.storeName}
-                onChange={handleChange}
-                placeholder="請輸入超商店鋪名稱或代碼"
-                className="input input-bordered w-full text-black"
-                required
-              />
-            </div>
+            {formData.storeType === "7-11" && (
+              <>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">店鋪名稱</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="storeName"
+                    value={formData.storeName}
+                    placeholder="請選擇店鋪"
+                    className="input input-bordered w-full text-black"
+                    readOnly
+                  />
+                </div>
+
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">店鋪地址</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="storeAddress"
+                    value={formData.storeAddress}
+                    placeholder="請選擇店鋪"
+                    className="input input-bordered w-full text-black"
+                    readOnly
+                  />
+                </div>
+              </>
+            )}
           </>
         )}
       </div>
