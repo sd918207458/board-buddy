@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Footer from "@/components/footer";
 import { CSSTransition } from "react-transition-group";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
+import { useRouter } from "next/router"; // 引入 useRouter
 
 // 可重用的輸入欄位組件
 const InputField = ({ label, type, id, placeholder, value, onChange }) => (
@@ -21,6 +22,7 @@ const InputField = ({ label, type, id, placeholder, value, onChange }) => (
 );
 
 export default function ForgotPassword() {
+  const router = useRouter(); // 初始化 useRouter
   const [showVerificationCode, setShowVerificationCode] = useState(false);
   const [showNewPasswordFields, setShowNewPasswordFields] = useState(false);
   const [email, setEmail] = useState("");
@@ -110,11 +112,16 @@ export default function ForgotPassword() {
       const result = await response.json();
       if (result.status === "success") {
         alert("密碼重置成功！");
+
+        // 清除表單資料
         setEmail("");
         setVerificationCode("");
         setNewPassword("");
         setConfirmPassword("");
         setShowNewPasswordFields(false);
+
+        // 跳轉到登入頁面
+        router.push("/member/login");
       } else {
         console.error("重置密碼失敗:", result);
         setErrorMessage(result.message || "重置密碼失敗，請重試！");
