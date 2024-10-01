@@ -96,6 +96,22 @@ export default function PaymentMethods() {
     }
   };
 
+  // 設置為預設付款方式
+  const setDefaultPaymentMethod = async (id) => {
+    try {
+      const result = await sendData(
+        `http://localhost:3005/api/payment-methods/set-default/${id}`,
+        "PUT"
+      );
+      if (result.status === "success") {
+        showToast("已設置為預設付款方式", "success");
+        fetchPaymentMethods(); // 重新加載付款方式列表
+      }
+    } catch (error) {
+      showToast("設置預設付款方式失敗", "error");
+    }
+  };
+
   // 定義 applyCoupon 函數處理優惠券邏輯
   const applyCoupon = (couponCode) => {
     if (couponCode === "DISCOUNT10") {
@@ -188,12 +204,8 @@ export default function PaymentMethods() {
     try {
       const result = await sendData(url, method, paymentData);
       if (result.status === "success") {
-        showToast(
-          isEditing ? "付款方式已更新" : "付款方式已成功保存",
-          "success"
-        );
-        fetchPaymentMethods(); // 重新獲取所有付款方式以顯示新添加或更新的卡片
-        resetForm(); // 清空表單，準備下一次新增
+        showToast("付款方式已成功保存", "success");
+        fetchPaymentMethods(); // 重新加載付款方式列表
         setIsModalOpen(false);
       }
     } catch (error) {
@@ -285,6 +297,15 @@ export default function PaymentMethods() {
                             onClick={() => handleDelete(method.payment_id)}
                           >
                             刪除
+                          </button>
+                          <button
+                            className="btn btn-secondary"
+                            onClick={() =>
+                              setDefaultPaymentMethod(method.payment_id)
+                            }
+                            disabled={method.is_default}
+                          >
+                            設為預設
                           </button>
                         </div>
                       </div>
