@@ -188,8 +188,12 @@ export default function PaymentMethods() {
     try {
       const result = await sendData(url, method, paymentData);
       if (result.status === "success") {
-        showToast("付款方式已成功保存", "success");
-        fetchPaymentMethods();
+        showToast(
+          isEditing ? "付款方式已更新" : "付款方式已成功保存",
+          "success"
+        );
+        fetchPaymentMethods(); // 重新獲取所有付款方式以顯示新添加或更新的卡片
+        resetForm(); // 清空表單，準備下一次新增
         setIsModalOpen(false);
       }
     } catch (error) {
