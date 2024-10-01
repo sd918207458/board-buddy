@@ -24,6 +24,7 @@ const AddressForm = ({
 
   // 回傳門市資訊的勾子，處理選擇 7-11 門市後的資料
   useShip711StoreCallback((storeInfo) => {
+    console.log("7-11 門市資訊：", storeInfo); // 查看回傳的門市資訊
     if (storeInfo) {
       handleChange({
         target: {
@@ -61,7 +62,7 @@ const AddressForm = ({
           </label>
           <select
             name="deliveryMethod"
-            value={formData.deliveryMethod}
+            value={formData.deliveryMethod || ""}
             onChange={handleChange}
             className="select select-bordered w-full text-black"
             required
@@ -81,7 +82,7 @@ const AddressForm = ({
                 id="username"
                 type="text"
                 name="username"
-                value={formData.username}
+                value={formData.username || ""}
                 onChange={handleChange}
                 placeholder="請輸入收件人姓名"
                 className="input input-bordered w-full text-black"
@@ -97,7 +98,7 @@ const AddressForm = ({
                 id="phone"
                 type="text"
                 name="phone"
-                value={formData.phone}
+                value={formData.phone || ""}
                 onChange={handleChange}
                 placeholder="請輸入聯絡電話"
                 className="input input-bordered w-full text-black"
@@ -111,7 +112,7 @@ const AddressForm = ({
               </label>
               <select
                 name="city"
-                value={formData.city}
+                value={formData.city || ""}
                 onChange={handleChange}
                 className="select select-bordered w-full text-black"
                 required
@@ -131,7 +132,7 @@ const AddressForm = ({
               </label>
               <select
                 name="area"
-                value={formData.area}
+                value={formData.area || ""}
                 onChange={handleChange}
                 className="select select-bordered w-full text-black"
                 required
@@ -154,7 +155,7 @@ const AddressForm = ({
                 id="street"
                 type="text"
                 name="street"
-                value={formData.street}
+                value={formData.street || ""}
                 onChange={handleChange}
                 placeholder="請輸入街道"
                 className="input input-bordered w-full text-black"
@@ -170,7 +171,7 @@ const AddressForm = ({
                 id="detailed_address"
                 type="text"
                 name="detailed_address"
-                value={formData.detailed_address}
+                value={formData.detailed_address || ""}
                 onChange={handleChange}
                 placeholder="請輸入詳細地址"
                 className="input input-bordered w-full text-black"
@@ -188,7 +189,7 @@ const AddressForm = ({
               </label>
               <select
                 name="storeType"
-                value={formData.storeType}
+                value={formData.storeType || ""}
                 onChange={handleChange}
                 className="select select-bordered w-full text-black"
                 required
@@ -220,7 +221,7 @@ const AddressForm = ({
                     <input
                       type="text"
                       name="storeName"
-                      value={store711.storeName || formData.storeName}
+                      value={store711.storeName || formData.storeName || ""}
                       placeholder="請選擇店鋪"
                       className="input input-bordered w-full text-black"
                       readOnly
@@ -234,7 +235,9 @@ const AddressForm = ({
                     <input
                       type="text"
                       name="storeAddress"
-                      value={store711.storeAddress || formData.storeAddress}
+                      value={
+                        store711.storeAddress || formData.storeAddress || ""
+                      }
                       placeholder="請選擇店鋪"
                       className="input input-bordered w-full text-black"
                       readOnly
@@ -252,7 +255,7 @@ const AddressForm = ({
           <input
             type="checkbox"
             name="isDefault"
-            checked={formData.isDefault}
+            checked={formData.isDefault || false}
             onChange={(e) =>
               handleChange({
                 target: { name: "isDefault", value: e.target.checked },

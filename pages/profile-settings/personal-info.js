@@ -27,6 +27,7 @@ export default function PersonalInfo() {
   const [submitMessage, setSubmitMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showMessage, setShowMessage] = useState(false); // 控制提示訊息顯示
 
   const gameOptions = [
     "策略遊戲",
@@ -89,6 +90,7 @@ export default function PersonalInfo() {
       } catch (error) {
         console.error("Failed to load data:", error.message);
         setErrorMessage("無法加載會員資料，請重試。");
+        setShowMessage(true);
       }
     };
 
@@ -98,6 +100,13 @@ export default function PersonalInfo() {
   // 更新表單的資料
   const handleChange = ({ target: { name, value } }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // 自動隱藏提示訊息
+  const hideMessage = () => {
+    setTimeout(() => {
+      setShowMessage(false);
+    }, 3000); // 3 秒後隱藏提示訊息
   };
 
   // 表單提交處理
@@ -119,11 +128,17 @@ export default function PersonalInfo() {
       const result = await response.json();
       if (result.status === "success") {
         setSubmitMessage("提交成功！資料已儲存。");
+        setShowMessage(true);
+        hideMessage(); // 設定提示訊息自動消失
       } else {
         setErrorMessage(result.message || "提交失敗，請重試！");
+        setShowMessage(true);
+        hideMessage();
       }
     } catch (error) {
       setErrorMessage("提交失敗，請重試！");
+      setShowMessage(true);
+      hideMessage();
     } finally {
       setIsSubmitting(false);
     }
@@ -131,7 +146,20 @@ export default function PersonalInfo() {
 
   return (
     <>
-      <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52]">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] relative">
+        {/* 提示訊息區塊 */}
+        {showMessage && (
+          <div
+            className={`fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-md shadow-md transition-transform duration-300 ${
+              submitMessage
+                ? "bg-green-500 text-white border border-green-700"
+                : "bg-red-500 text-white border border-red-700"
+            }`}
+          >
+            {submitMessage ? submitMessage : errorMessage}
+          </div>
+        )}
+
         <div className="card w-full max-w-lg mx-auto bg-white shadow-lg lg:max-w-4xl rounded-lg">
           <section className="p-6">
             <Breadcrumbs />
@@ -258,11 +286,15 @@ export default function PersonalInfo() {
                 {isSubmitting ? "提交中..." : "保存修改"}
               </button>
 
-              {errorMessage && (
-                <p className="text-red-500 mt-4">{errorMessage}</p>
-              )}
-              {submitMessage && (
-                <p className="text-green-500 mt-4">{submitMessage}</p>
+              {showMessage && (
+                <div className="mt-4">
+                  {submitMessage && (
+                    <p className="text-green-500">{submitMessage}</p>
+                  )}
+                  {errorMessage && (
+                    <p className="text-red-500">{errorMessage}</p>
+                  )}
+                </div>
               )}
             </form>
           </section>

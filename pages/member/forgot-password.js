@@ -8,7 +8,7 @@ import { useRouter } from "next/router"; // 引入 useRouter
 const InputField = ({ label, type, id, placeholder, value, onChange }) => (
   <div className="form-control mt-4">
     <label htmlFor={id} className="label">
-      <span className="label-text">{label}</span>
+      <span className="label-text text-[#003E52]">{label}</span>
     </label>
     <input
       id={id}
@@ -16,7 +16,7 @@ const InputField = ({ label, type, id, placeholder, value, onChange }) => (
       placeholder={placeholder}
       value={value}
       onChange={onChange}
-      className="input input-bordered w-full"
+      className="input input-bordered w-full border-gray-300 focus:border-[#003E52] focus:ring-[#003E52] text-black"
     />
   </div>
 );
@@ -137,7 +137,7 @@ export default function ForgotPassword() {
   return (
     <>
       <div className="flex items-center justify-center min-h-screen bg-[#003E52]">
-        <div className="card max-w-sm lg:max-w-4xl bg-base-100 shadow-xl">
+        <div className="card max-w-sm lg:max-w-4xl bg-white shadow-xl">
           <div className="card-body w-full px-6 py-8">
             <div className="flex justify-center">
               <img
@@ -147,7 +147,7 @@ export default function ForgotPassword() {
               />
             </div>
 
-            <h2 className="text-center text-2xl font-bold text-gray-700 dark:text-gray-200 mt-4">
+            <h2 className="text-center text-2xl font-bold text-[#003E52] mt-4">
               忘記密碼
             </h2>
 
@@ -167,9 +167,9 @@ export default function ForgotPassword() {
             />
             <div className="mt-4 flex items-center">
               <button
-                className={`btn btn-neutral bg-[#003E52] ${
+                className={`btn btn-neutral bg-[#003E52] text-white ${
                   isLoading ? "loading" : ""
-                }`}
+                } hover:bg-[#004d63] focus:bg-[#002f42]`}
                 onClick={handleGetVerificationCode}
                 disabled={isLoading}
               >
@@ -184,7 +184,10 @@ export default function ForgotPassword() {
               unmountOnExit
             >
               <div className="form-control mt-4">
-                <label htmlFor="VerificationCode" className="label">
+                <label
+                  htmlFor="VerificationCode"
+                  className="label text-[#003E52]"
+                >
                   <span className="label-text">驗證碼</span>
                 </label>
                 <div className="flex items-center gap-3">
@@ -194,10 +197,10 @@ export default function ForgotPassword() {
                     placeholder="6位數驗證碼"
                     value={verificationCode}
                     onChange={(e) => setVerificationCode(e.target.value)}
-                    className="input input-bordered w-1/2"
+                    className="input input-bordered w-1/2 border-gray-300 focus:border-[#003E52] focus:ring-[#003E52] text-black"
                   />
                   <button
-                    className="btn btn-neutral w-1/4"
+                    className="btn btn-neutral w-1/4 bg-[#003E52] text-white hover:bg-[#004d63] focus:bg-[#002f42]"
                     onClick={handleSubmitVerificationCode}
                   >
                     送出驗證碼
@@ -214,7 +217,7 @@ export default function ForgotPassword() {
             >
               <>
                 <div className="form-control mt-4">
-                  <label htmlFor="NewPassword" className="label">
+                  <label htmlFor="NewPassword" className="label text-[#003E52]">
                     <span className="label-text">新密碼</span>
                   </label>
                   <div className="relative">
@@ -224,7 +227,7 @@ export default function ForgotPassword() {
                       placeholder="********"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="input input-bordered w-full"
+                      className="input input-bordered w-full border-gray-300 focus:border-[#003E52] focus:ring-[#003E52] text-black"
                     />
                     <button
                       type="button"
@@ -237,7 +240,10 @@ export default function ForgotPassword() {
                 </div>
 
                 <div className="form-control mt-4">
-                  <label htmlFor="ConfirmNewPassword" className="label">
+                  <label
+                    htmlFor="ConfirmNewPassword"
+                    className="label text-[#003E52]"
+                  >
                     <span className="label-text">確認新密碼</span>
                   </label>
                   <input
@@ -246,7 +252,7 @@ export default function ForgotPassword() {
                     placeholder="********"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="input input-bordered w-full"
+                    className="input input-bordered w-full border-gray-300 focus:border-[#003E52] focus:ring-[#003E52] text-black"
                   />
                 </div>
               </>
@@ -260,9 +266,9 @@ export default function ForgotPassword() {
             >
               <div className="mt-6">
                 <button
-                  className={`btn btn-neutral btn-block bg-[#003E52] ${
+                  className={`btn btn-neutral btn-block bg-[#003E52] text-white ${
                     isLoading ? "loading" : ""
-                  }`}
+                  } hover:bg-[#004d63] focus:bg-[#002f42]`}
                   onClick={handleSubmitNewPassword}
                   disabled={isLoading}
                 >
@@ -273,7 +279,7 @@ export default function ForgotPassword() {
 
             <div className="mt-4 text-center">
               想起密碼了?{" "}
-              <a href="login" className="link">
+              <a href="login" className="link text-[#003E52]">
                 登入
               </a>{" "}
               吧!

@@ -5,23 +5,21 @@ import { CSSTransition, TransitionGroup } from "react-transition-group";
 import Coupon from "@/components/payment/Coupon";
 
 // Toast 通知組件
-const Toast = ({ message, type, onClose }) => {
-  return (
-    <div
-      className={`fixed top-4 right-4 z-50 flex items-center p-4 space-x-4 text-white rounded-lg shadow-lg ${
-        type === "success" ? "bg-green-500" : "bg-red-500"
-      }`}
+const Toast = ({ message, type, onClose }) => (
+  <div
+    className={`fixed top-4 right-4 z-50 flex items-center p-4 space-x-4 text-white rounded-lg shadow-lg ${
+      type === "success" ? "bg-green-500" : "bg-red-500"
+    }`}
+  >
+    <span>{message}</span>
+    <button
+      className="text-white font-bold focus:outline-none"
+      onClick={onClose}
     >
-      <span>{message}</span>
-      <button
-        className="text-white font-bold focus:outline-none"
-        onClick={onClose}
-      >
-        &times;
-      </button>
-    </div>
-  );
-};
+      &times;
+    </button>
+  </div>
+);
 
 // Helper function to get token from localStorage
 const getToken = () => localStorage.getItem("token");
@@ -58,6 +56,7 @@ const initialMethodState = {
   cardholderName: "",
   cardNumber: "",
   expiryDate: "",
+  cardType: "",
   onlinePaymentService: "",
 };
 
@@ -68,8 +67,8 @@ export default function PaymentMethods() {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(null);
   const [toast, setToast] = useState(null); // 用於顯示通知
+  const [errors, setErrors] = useState({}); // 儲存表單錯誤訊息
 
   useEffect(() => {
     fetchPaymentMethods();
@@ -93,54 +92,94 @@ export default function PaymentMethods() {
         setPaymentMethods(result.data);
       }
     } catch (error) {
-      setErrorMessage(error.message);
+      showToast(error.message, "error");
     }
   };
 
-  // Apply a coupon
+  // 定義 applyCoupon 函數處理優惠券邏輯
   const applyCoupon = (couponCode) => {
     if (couponCode === "DISCOUNT10") {
-      setDiscount(10);
+      setDiscount(10); // 設置折扣
       showToast("優惠券已成功應用！", "success");
     } else {
       showToast("無效的優惠券代碼", "error");
     }
   };
 
+  // 即時驗證表單欄位
+  const validateField = (name, value) => {
+    let error = "";
+    if (name === "cardNumber" && value.length < 16) {
+      error = "信用卡號必須為16位數字";
+    } else if (
+      name === "expiryDate" &&
+      !/^(0[1-9]|1[0-2])\/\d{2}$/.test(value)
+    ) {
+      error = "到期日格式錯誤，請按照 MM/YY 格式";
+    }
+    setErrors((prev) => ({ ...prev, [name]: error }));
+  };
+
   // Handle form input changes
   const handleChange = (e) => {
-    const { name, value, type } = e.target;
+    const { name, value } = e.target;
     setCurrentMethod((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? e.target.checked : value,
+      [name]: value,
     }));
+    validateField(name, value);
   };
 
-  // Handle edit button click
-  const handleEdit = (method) => {
-    setIsEditing(true);
-    setCurrentMethod({
-      id: method.payment_id,
-      type: method.payment_type,
-      cardholderName: method.cardholder_name || "",
-      cardNumber: method.card_number || "",
-      expiryDate: method.expiration_date || "",
-      onlinePaymentService: method.online_payment_service || "",
-    });
-    setIsModalOpen(true);
+  // 表單提交前的數據驗證
+  const validateForm = () => {
+    const newErrors = {};
+    if (currentMethod.type === "creditCard") {
+      if (!currentMethod.cardNumber || currentMethod.cardNumber.length !== 16) {
+        newErrors.cardNumber = "信用卡卡號格式錯誤，請輸入16位數字";
+      }
+      if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(currentMethod.expiryDate)) {
+        newErrors.expiryDate = "到期日格式錯誤，請按照MM/YY格式";
+      }
+    }
+    if (
+      currentMethod.type === "onlinePayment" &&
+      !currentMethod.onlinePaymentService
+    ) {
+      newErrors.onlinePaymentService = "請選擇線上支付服務";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  // Submit the form (for both adding and updating payment methods)
   const handleSubmit = async () => {
+    if (!validateForm()) return;
+
     setIsLoading(true);
-    const paymentData = {
-      type: currentMethod.type,
-      card_number: currentMethod.cardNumber,
-      card_type: currentMethod.cardType,
-      expiration_date: currentMethod.expiryDate,
-      cardholder_name: currentMethod.cardholderName,
-      online_payment_service: currentMethod.onlinePaymentService,
-    };
+
+    let paymentData;
+    if (currentMethod.type === "creditCard") {
+      paymentData = {
+        type: currentMethod.type,
+        card_number: currentMethod.cardNumber,
+        card_type: currentMethod.cardType,
+        expiration_date: currentMethod.expiryDate,
+        cardholder_name: currentMethod.cardholderName || "",
+        is_default: currentMethod.isDefault || false,
+      };
+    } else if (currentMethod.type === "onlinePayment") {
+      paymentData = {
+        type: currentMethod.type,
+        online_payment_service: currentMethod.onlinePaymentService,
+        is_default: currentMethod.isDefault || false,
+      };
+    } else if (currentMethod.type === "cash") {
+      paymentData = {
+        type: currentMethod.type,
+        is_default: currentMethod.isDefault || false,
+      };
+    }
+
     const method = currentMethod.id ? "PUT" : "POST";
     const url = currentMethod.id
       ? `http://localhost:3005/api/payment-methods/${currentMethod.id}`
@@ -158,6 +197,20 @@ export default function PaymentMethods() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleEdit = (method) => {
+    setIsEditing(true);
+    setCurrentMethod({
+      id: method.payment_id,
+      type: method.payment_type,
+      cardholderName: method.cardholder_name || "",
+      cardNumber: method.card_number || "",
+      cardType: method.card_type || "",
+      expiryDate: method.expiration_date || "",
+      onlinePaymentService: method.online_payment_service || "",
+    });
+    setIsModalOpen(true);
   };
 
   // Delete a payment method
@@ -295,12 +348,17 @@ export default function PaymentMethods() {
                         onChange={handleChange}
                         placeholder="0000 0000 0000 0000"
                         className="input input-bordered"
+                        maxLength="16" // 限制卡號長度
+                        required
                       />
+                      {errors.cardNumber && (
+                        <p className="text-red-500">{errors.cardNumber}</p>
+                      )}
                     </div>
 
                     <div className="form-control mt-4">
                       <label className="label">
-                        <span className="label-text">到期日</span>
+                        <span className="label-text">到期日 (MM/YY)</span>
                       </label>
                       <input
                         type="text"
@@ -309,7 +367,30 @@ export default function PaymentMethods() {
                         onChange={handleChange}
                         placeholder="MM/YY"
                         className="input input-bordered"
+                        pattern="\d{2}/\d{2}" // 正則表達式驗證格式
+                        required
                       />
+                      {errors.expiryDate && (
+                        <p className="text-red-500">{errors.expiryDate}</p>
+                      )}
+                    </div>
+
+                    <div className="form-control mt-4">
+                      <label className="label">
+                        <span className="label-text">卡片類型</span>
+                      </label>
+                      <select
+                        name="cardType"
+                        value={currentMethod.cardType}
+                        onChange={handleChange}
+                        className="select select-bordered"
+                        required
+                      >
+                        <option value="">選擇卡片類型</option>
+                        <option value="Visa">Visa</option>
+                        <option value="MasterCard">MasterCard</option>
+                        <option value="Amex">Amex</option>
+                      </select>
                     </div>
                   </>
                 )}
@@ -328,6 +409,11 @@ export default function PaymentMethods() {
                       <option value="Line Pay">Line Pay</option>
                       <option value="ECPay">ECPay</option>
                     </select>
+                    {errors.onlinePaymentService && (
+                      <p className="text-red-500">
+                        {errors.onlinePaymentService}
+                      </p>
+                    )}
                   </div>
                 )}
 

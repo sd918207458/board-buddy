@@ -15,8 +15,19 @@ const AddressCard = ({
 
         {address.isDefault && <span className="badge badge-primary">預設</span>}
 
-        <p>{`${address.city} ${address.area} ${address.street} ${address.detailed_address}`}</p>
-        <p>手機號碼: {address.phone}</p>
+        {/* 根據 deliveryMethod 和 storeType 顯示不同的地址信息 */}
+        {address.deliveryMethod === "convenienceStore" &&
+        address.storeType === "7-11" ? (
+          <>
+            <p>7-11 門市名稱: {address.storeName}</p>
+            <p>7-11 門市地址: {address.storeAddress}</p>
+          </>
+        ) : (
+          <>
+            <p>{`${address.city} ${address.area} ${address.street} ${address.detailed_address}`}</p>
+            <p>手機號碼: {address.phone}</p>
+          </>
+        )}
 
         <div className="flex justify-between">
           <button
