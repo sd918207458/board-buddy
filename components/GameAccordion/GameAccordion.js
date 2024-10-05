@@ -97,7 +97,9 @@ const GameAccordion = () => {
                   ) : error ? (
                     <p className="text-red-500">{error}</p> // 錯誤信息
                   ) : games.length > 0 ? (
-                    <ul>
+                    <ul className="text-center">
+                      {" "}
+                      {/* 添加 text-center 讓遊戲名稱置中 */}
                       {games.map((game, index) => (
                         <li key={index}>{game}</li>
                       ))}
