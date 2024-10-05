@@ -1,6 +1,5 @@
 import React from "react";
-import Sidebar from "@/components/sidebar/sidebar.js";
-import ProductCard from "@/components/productcard/productcard";
+import GameAccordion from "@/components/GameAccordion/GameAccordion.js";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Pagination from "@/components/pagination/Pagination";
@@ -14,7 +13,7 @@ const ProductListPage = () => {
         {/* Sidebar on the left */}
         <aside className="w-70">
           <Breadcrumbs />
-          <Sidebar />
+          <GameAccordion />
         </aside>
 
         {/* Main content on the right */}
