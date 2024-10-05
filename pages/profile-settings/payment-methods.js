@@ -53,7 +53,6 @@ const sendData = (url, method, data) =>
 const initialMethodState = {
   id: null,
   type: "cash",
-  cardholderName: "",
   cardNumber: "",
   expiryDate: "",
   cardType: "",
@@ -67,22 +66,20 @@ export default function PaymentMethods() {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [toast, setToast] = useState(null); // 用於顯示通知
-  const [errors, setErrors] = useState({}); // 儲存表單錯誤訊息
+  const [toast, setToast] = useState(null);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetchPaymentMethods();
   }, []);
 
-  // 顯示通知
   const showToast = (message, type) => {
     setToast({ message, type });
     setTimeout(() => {
-      setToast(null); // 5秒後自動關閉
+      setToast(null);
     }, 3000);
   };
 
-  // Fetch all payment methods for the user
   const fetchPaymentMethods = async () => {
     try {
       const result = await fetchData(
@@ -96,7 +93,6 @@ export default function PaymentMethods() {
     }
   };
 
-  // 設置為預設付款方式
   const setDefaultPaymentMethod = async (id) => {
     try {
       const result = await sendData(
@@ -105,24 +101,22 @@ export default function PaymentMethods() {
       );
       if (result.status === "success") {
         showToast("已設置為預設付款方式", "success");
-        fetchPaymentMethods(); // 重新加載付款方式列表
+        fetchPaymentMethods();
       }
     } catch (error) {
       showToast("設置預設付款方式失敗", "error");
     }
   };
 
-  // 定義 applyCoupon 函數處理優惠券邏輯
   const applyCoupon = (couponCode) => {
     if (couponCode === "DISCOUNT10") {
-      setDiscount(10); // 設置折扣
+      setDiscount(10);
       showToast("優惠券已成功應用！", "success");
     } else {
       showToast("無效的優惠券代碼", "error");
     }
   };
 
-  // 即時驗證表單欄位
   const validateField = (name, value) => {
     let error = "";
     if (name === "cardNumber" && value.length < 16) {
@@ -136,7 +130,6 @@ export default function PaymentMethods() {
     setErrors((prev) => ({ ...prev, [name]: error }));
   };
 
-  // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCurrentMethod((prev) => ({
@@ -146,7 +139,6 @@ export default function PaymentMethods() {
     validateField(name, value);
   };
 
-  // 表單提交前的數據驗證
   const validateForm = () => {
     const newErrors = {};
     if (currentMethod.type === "creditCard") {
@@ -163,7 +155,6 @@ export default function PaymentMethods() {
     ) {
       newErrors.onlinePaymentService = "請選擇線上支付服務";
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -175,15 +166,26 @@ export default function PaymentMethods() {
 
     let paymentData;
     if (currentMethod.type === "creditCard") {
+      if (!/^\d{16}$/.test(currentMethod.cardNumber)) {
+        showToast("信用卡號碼格式錯誤，請輸入16位數字", "error");
+        setIsLoading(false);
+        return;
+      }
+
       paymentData = {
         type: currentMethod.type,
         card_number: currentMethod.cardNumber,
         card_type: currentMethod.cardType,
         expiration_date: currentMethod.expiryDate,
-        cardholder_name: currentMethod.cardholderName || "",
         is_default: currentMethod.isDefault || false,
       };
     } else if (currentMethod.type === "onlinePayment") {
+      if (!currentMethod.onlinePaymentService) {
+        showToast("請選擇線上支付服務", "error");
+        setIsLoading(false);
+        return;
+      }
+
       paymentData = {
         type: currentMethod.type,
         online_payment_service: currentMethod.onlinePaymentService,
@@ -205,8 +207,9 @@ export default function PaymentMethods() {
       const result = await sendData(url, method, paymentData);
       if (result.status === "success") {
         showToast("付款方式已成功保存", "success");
-        fetchPaymentMethods(); // 重新加載付款方式列表
+        fetchPaymentMethods();
         setIsModalOpen(false);
+        resetForm();
       }
     } catch (error) {
       showToast("伺服器錯誤，請稍後再試", "error");
@@ -220,7 +223,6 @@ export default function PaymentMethods() {
     setCurrentMethod({
       id: method.payment_id,
       type: method.payment_type,
-      cardholderName: method.cardholder_name || "",
       cardNumber: method.card_number || "",
       cardType: method.card_type || "",
       expiryDate: method.expiration_date || "",
@@ -229,7 +231,6 @@ export default function PaymentMethods() {
     setIsModalOpen(true);
   };
 
-  // Delete a payment method
   const handleDelete = async (id) => {
     try {
       const result = await sendData(
@@ -373,7 +374,7 @@ export default function PaymentMethods() {
                         onChange={handleChange}
                         placeholder="0000 0000 0000 0000"
                         className="input input-bordered"
-                        maxLength="16" // 限制卡號長度
+                        maxLength="16"
                         required
                       />
                       {errors.cardNumber && (
@@ -392,7 +393,7 @@ export default function PaymentMethods() {
                         onChange={handleChange}
                         placeholder="MM/YY"
                         className="input input-bordered"
-                        pattern="\d{2}/\d{2}" // 正則表達式驗證格式
+                        pattern="\d{2}/\d{2}"
                         required
                       />
                       {errors.expiryDate && (
@@ -467,7 +468,6 @@ export default function PaymentMethods() {
           onClose={() => setToast(null)}
         />
       )}
-
       <Footer />
     </>
   );
