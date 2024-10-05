@@ -152,9 +152,12 @@ export default function Favorites() {
   }, [hasMore, loading]);
 
   const renderSortAndFilter = () => (
-    <div className="flex justify-between items-center p-4">
+    <div className="flex justify-between items-center p-4 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md">
       <div className="form-control">
-        <label htmlFor="sort" className="label">
+        <label
+          htmlFor="sort"
+          className="label font-semibold text-gray-700 dark:text-white"
+        >
           排序方式
         </label>
         <select
@@ -165,12 +168,15 @@ export default function Favorites() {
         >
           <option value="date">依收藏日期</option>
           <option value="price">依價格</option>
-          <option value="name">依名稱排序</option> {/* 新增按名稱排序 */}
-          <option value="popularity">依人氣排序</option> {/* 新增按人氣排序 */}
+          <option value="name">依名稱排序</option>
+          <option value="popularity">依人氣排序</option>
         </select>
       </div>
       <div className="form-control">
-        <label htmlFor="filter" className="label">
+        <label
+          htmlFor="filter"
+          className="label font-semibold text-gray-700 dark:text-white"
+        >
           篩選分類
         </label>
         <select
@@ -211,8 +217,8 @@ export default function Favorites() {
         <section className="max-w-4xl mx-auto grid grid-cols-2 gap-6 mt-4 sm:grid-cols-2">
           {favoriteProducts.map((product, index) => (
             <div
-              key={product.id ? `product-${product.id}` : `product-${index}`} // 保證 key 唯一
-              className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105"
+              key={product.id ? `product-${product.id}` : `product-${index}`}
+              className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105 hover:shadow-lg"
             >
               <figure>
                 <img
@@ -239,7 +245,7 @@ export default function Favorites() {
         <section className="max-w-4xl mx-auto grid grid-cols-2 gap-6 mt-4 sm:grid-cols-2">
           {favoriteStores.map((store, index) => (
             <div
-              key={store.id ? `store-${store.id}` : `store-${index}`} // 保證 key 唯一
+              key={store.id ? `store-${store.id}` : `store-${index}`}
               className="card bg-white w-96 shadow-lg hover:shadow-2xl transition-shadow duration-300 rounded-lg"
             >
               <figure className="relative">

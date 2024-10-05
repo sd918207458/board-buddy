@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import { CSSTransition, TransitionGroup } from "react-transition-group";
-import Coupon from "@/components/payment/Coupon";
+import CouponSelector from "@/components/payment/Coupon"; // 引入 CouponSelector 組件
 
 // Toast 通知組件
 const Toast = ({ message, type, onClose }) => (
@@ -61,7 +60,7 @@ const initialMethodState = {
 
 export default function PaymentMethods() {
   const [paymentMethods, setPaymentMethods] = useState([]);
-  const [discount, setDiscount] = useState(0);
+  const [appliedCoupon, setAppliedCoupon] = useState(null); // 用來追蹤應用的優惠券
   const [currentMethod, setCurrentMethod] = useState(initialMethodState);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -108,13 +107,17 @@ export default function PaymentMethods() {
     }
   };
 
-  const applyCoupon = (couponCode) => {
-    if (couponCode === "DISCOUNT10") {
-      setDiscount(10);
-      showToast("優惠券已成功應用！", "success");
-    } else {
-      showToast("無效的優惠券代碼", "error");
-    }
+  // 優惠券應用邏輯
+  const applyCoupon = (coupon) => {
+    setAppliedCoupon(coupon);
+    showToast(
+      `優惠券已成功應用: ${
+        coupon.discount_type === "percent"
+          ? `${coupon.discount_value}% 折扣`
+          : `NT$${coupon.discount_value} 折抵`
+      }`,
+      "success"
+    );
   };
 
   const validateField = (name, value) => {
@@ -231,6 +234,12 @@ export default function PaymentMethods() {
     setIsModalOpen(true);
   };
 
+  const handleAddNew = () => {
+    setIsEditing(false);
+    setCurrentMethod(initialMethodState); // 重置為空表單
+    setIsModalOpen(true);
+  };
+
   const handleDelete = async (id) => {
     try {
       const result = await sendData(
@@ -253,6 +262,22 @@ export default function PaymentMethods() {
     setIsEditing(false);
   };
 
+  // 模擬的可用優惠券
+  const availableCoupons = [
+    {
+      coupon_id: 1,
+      discount_type: "percent",
+      discount_value: 10, // 10% 折扣
+      expiry_date: "2024-12-31",
+    },
+    {
+      coupon_id: 2,
+      discount_type: "amount",
+      discount_value: 100, // NT$100 折抵
+      expiry_date: "2024-11-30",
+    },
+  ];
+
   return (
     <>
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
@@ -269,72 +294,64 @@ export default function PaymentMethods() {
               常用錢包
             </h3>
             <section className="max-w-4xl mx-auto grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
-              <TransitionGroup component={null}>
-                {paymentMethods.map((method) => (
-                  <CSSTransition
-                    key={method.payment_id}
-                    timeout={300}
-                    classNames="fade"
-                  >
-                    <div className="card bg-base-100 shadow-xl mb-4">
-                      <div className="card-body">
-                        <h2 className="card-title">付款方式</h2>
-                        <p>付款方式: {method.payment_type}</p>
-                        {method.card_number && (
-                          <p>卡號: {method.card_number}</p>
-                        )}
-                        {method.expiration_date && (
-                          <p>到期日: {method.expiration_date}</p>
-                        )}
-                        <div className="flex justify-between">
-                          <button
-                            className="btn btn-primary"
-                            onClick={() => handleEdit(method)}
-                          >
-                            編輯
-                          </button>
-                          <button
-                            className="btn btn-error"
-                            onClick={() => handleDelete(method.payment_id)}
-                          >
-                            刪除
-                          </button>
-                          <button
-                            className="btn btn-secondary"
-                            onClick={() =>
-                              setDefaultPaymentMethod(method.payment_id)
-                            }
-                            disabled={method.is_default}
-                          >
-                            設為預設
-                          </button>
-                        </div>
-                      </div>
+              {paymentMethods.map((method) => (
+                <div
+                  key={method.payment_id}
+                  className="card bg-base-100 shadow-xl mb-4"
+                >
+                  <div className="card-body">
+                    <h2 className="card-title">付款方式</h2>
+                    <p>付款方式: {method.payment_type}</p>
+                    {method.card_number && <p>卡號: {method.card_number}</p>}
+                    {method.expiration_date && (
+                      <p>到期日: {method.expiration_date}</p>
+                    )}
+                    <div className="flex justify-between">
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => handleEdit(method)}
+                      >
+                        編輯
+                      </button>
+                      <button
+                        className="btn btn-error"
+                        onClick={() => handleDelete(method.payment_id)}
+                      >
+                        刪除
+                      </button>
+                      <button
+                        className="btn btn-secondary"
+                        onClick={() =>
+                          setDefaultPaymentMethod(method.payment_id)
+                        }
+                        disabled={method.is_default}
+                      >
+                        設為預設
+                      </button>
                     </div>
-                  </CSSTransition>
-                ))}
-              </TransitionGroup>
+                  </div>
+                </div>
+              ))}
 
               <div className="card bg-base-100 shadow-xl">
                 <div className="card-body flex justify-between">
                   <h2 className="card-title">新增錢包</h2>
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => setIsModalOpen(true)}
-                  >
+                  <button className="btn btn-primary" onClick={handleAddNew}>
                     新增
                   </button>
                 </div>
               </div>
             </section>
+
+            {/* 優惠券區塊 */}
             <section className="max-w-4xl mx-auto mt-6">
               <h2 className="text-lg font-semibold text-gray-700 capitalize dark:text-white mb-4">
                 我的優惠券
               </h2>
-              <Coupon applyCoupon={applyCoupon} />
-              {discount > 0 && (
-                <p className="text-green-500 mt-4">優惠券折扣: NT${discount}</p>
-              )}
+              <CouponSelector
+                availableCoupons={availableCoupons}
+                applyCoupon={applyCoupon}
+              />
             </section>
           </div>
 
