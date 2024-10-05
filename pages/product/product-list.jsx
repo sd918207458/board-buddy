@@ -5,7 +5,7 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Pagination from "@/components/pagination/Pagination";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import Cardtest from "@/components/cardtest/Cardtest";
+import Card from "@/components/card/Card";
 const ProductListPage = () => {
   return (
     <>
@@ -21,7 +21,7 @@ const ProductListPage = () => {
         <main className="flex-1 p-4">
           {/* Product Card and other components */}
           <div>
-            <Cardtest />
+            <Card />
             {/* <ProductCard /> */}
             <Pagination />
           </div>
