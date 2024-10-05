@@ -137,6 +137,10 @@ const Card = () => {
                     <h1 className="text-xl font-bold mb-4 text-white">
                       {product.product_name}
                     </h1>
+                    {/* 新增的價格部分 */}
+                    <p className="text-lg font-semibold mb-4 text-white">
+                      ${product.price}
+                    </p>
                     <div className="flex space-x-2">
                       <a
                         href="#"
