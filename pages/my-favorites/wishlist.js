@@ -6,56 +6,62 @@ import { TransitionGroup, CSSTransition } from "react-transition-group";
 export default function OrderTracking() {
   const [isMounted, setIsMounted] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // 模擬資料時不需 loading 狀態
   const [hasError, setHasError] = useState(false);
   const [favoriteProducts, setFavoriteProducts] = useState([]);
   const [favoriteStores, setFavoriteStores] = useState([]);
-  const productRefs = useRef([]); // 儲存所有商品的 refs
-  const storeRefs = useRef([]); // 儲存所有店家的 refs
+  const productRefs = useRef([]);
+  const storeRefs = useRef([]);
 
-  // 獲取存取令牌
-  const getToken = () => localStorage.getItem("token");
-
-  // 封裝帶有 token 的 fetch 請求
-  const fetchWithToken = async (url, options = {}) => {
-    const token = getToken();
-    const headers = {
-      ...options.headers,
-      Authorization: `Bearer ${token}`, // 附加 token 到 Authorization header
-    };
-    return fetch(url, { ...options, headers, credentials: "include" });
-  };
-
-  // 頁面掛載後加載數據
+  // 頁面掛載後模擬數據加載
   useEffect(() => {
     setIsMounted(true);
     fetchFavorites(activeTab);
   }, [activeTab]);
 
-  // 加載收藏的商品和店家
+  // 模擬收藏商品和店家數據
   const fetchFavorites = async (tab) => {
     setLoading(true);
     try {
-      let endpoint;
+      // 模擬商品資料
       if (tab === "all") {
-        endpoint = "http://localhost:3005/api/favorites/products";
-      } else if (tab === "pending") {
-        endpoint = "http://localhost:3005/api/favorites/stores";
+        const mockProducts = [
+          {
+            id: 1,
+            name: "桌遊1",
+            description: "經典策略遊戲，適合全家一起玩。",
+            image: "/home_assets/商品01.jpg", // 請使用實際的圖片
+          },
+          {
+            id: 2,
+            name: "桌遊2",
+            description: "快速節奏遊戲，挑戰你的反應速度。",
+            image: "/home_assets/商品03.jpg",
+          },
+        ];
+        setFavoriteProducts(mockProducts);
+        productRefs.current = mockProducts.map(() => React.createRef());
       }
-
-      const response = await fetchWithToken(endpoint);
-
-      const data = await response.json();
-      if (data.status === "success") {
-        if (tab === "all") {
-          setFavoriteProducts(data.favorites || []);
-          productRefs.current = data.favorites.map(() => React.createRef());
-        } else if (tab === "pending") {
-          setFavoriteStores(data.favorites || []);
-          storeRefs.current = data.favorites.map(() => React.createRef());
-        }
-      } else {
-        setHasError(true);
+      // 模擬店家資料
+      else if (tab === "pending") {
+        const mockStores = [
+          {
+            id: 1,
+            name: "店家A",
+            description: "這是一家專門出售桌遊的店鋪。",
+            image: "/home_assets/桌遊店01.jpg",
+            location: "台北市",
+          },
+          {
+            id: 2,
+            name: "店家B",
+            description: "桌遊玩家的天堂，各種策略遊戲應有盡有。",
+            image: "/home_assets/桌遊店02.jfif",
+            location: "台中市",
+          },
+        ];
+        setFavoriteStores(mockStores);
+        storeRefs.current = mockStores.map(() => React.createRef());
       }
     } catch (error) {
       console.error("Error fetching favorites: ", error);
@@ -65,7 +71,6 @@ export default function OrderTracking() {
     }
   };
 
-  // 渲染商品和店家列表
   const renderTable = () => {
     if (loading) {
       return (

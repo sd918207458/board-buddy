@@ -46,6 +46,7 @@ export default function Request() {
   const [orders, setOrders] = useState([]); // 存儲使用者的訂單資料
   const [submitMessage, setSubmitMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [loadingOrders, setLoadingOrders] = useState(true);
 
   // 獲取存取令牌
   const getToken = () => localStorage.getItem("token");
@@ -66,6 +67,7 @@ export default function Request() {
     // 獲取使用者的訂單資料
     const fetchOrders = async () => {
       try {
+        setLoadingOrders(true); // 訂單加載狀態
         const response = await fetchWithToken(
           "http://localhost:3005/api/orders",
           {
@@ -84,11 +86,26 @@ export default function Request() {
       } catch (error) {
         console.error("獲取訂單失敗:", error);
         setErrorMessage("無法載入訂單資料");
+      } finally {
+        setLoadingOrders(false);
       }
     };
 
     fetchOrders();
   }, []);
+
+  // 當選擇訂單時，自動填充訂單日期和商品名稱等
+  const handleOrderChange = (e) => {
+    const selectedOrder = orders.find(
+      (order) => order.order_id === Number(e.target.value)
+    );
+    setFormData({
+      ...formData,
+      orderNumber: selectedOrder.order_id,
+      orderDate: selectedOrder.order_date,
+      productName: selectedOrder.product_name,
+    });
+  };
 
   // 表單驗證邏輯
   const validateForm = () => {
@@ -179,7 +196,7 @@ export default function Request() {
     }
   };
 
-  if (!isMounted) return null;
+  if (!isMounted || loadingOrders) return <div>載入訂單資料中...</div>;
 
   return (
     <>
@@ -246,12 +263,7 @@ export default function Request() {
                   id="orderNumber"
                   name="orderNumber"
                   value={formData.orderNumber}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      [e.target.name]: e.target.value,
-                    })
-                  }
+                  onChange={handleOrderChange}
                   className="select select-bordered border-[#036672] focus:border-[#024c52]"
                   required
                 >
