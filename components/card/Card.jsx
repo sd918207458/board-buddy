@@ -63,16 +63,18 @@ const Card = () => {
 
                 {/* 篩選器下拉選單 */}
                 {showFilter && (
-                  <div className="absolute left-0 mt-2 bg-white shadow-lg rounded-lg p-4 flex">
-                    <ul className="inline-flex space-x-6">
-                      <li className="px-4 hover:bg-gray-200 cursor-pointer">
-                        篩選條件1
+                  <div className="absolute left-[-80px] mt-2 bg-white shadow-lg rounded-lg p-4 w-48">
+                    <ul className="space-y-2">
+                      {" "}
+                      {/* 垂直排列每個選項 */}
+                      <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">
+                        依照熱門程度高低
                       </li>
-                      <li className="px-4 hover:bg-gray-200 cursor-pointer">
-                        篩選條件2
+                      <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">
+                        依照價錢由高到低
                       </li>
-                      <li className="px-4 hover:bg-gray-200 cursor-pointer">
-                        篩選條件3
+                      <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">
+                        依照價錢由低到高
                       </li>
                     </ul>
                   </div>
