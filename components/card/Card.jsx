@@ -6,6 +6,12 @@ const Card = () => {
   const [favorites, setFavorites] = useState({}); // 保存每個產品的收藏狀態
   const [showFilter, setShowFilter] = useState(false); // 控制篩選器的狀態
   const [showSearch, setShowSearch] = useState(false); // 控制搜尋欄的狀態
+  const [filteredProducts, setFilteredProducts] = useState([]); // 存儲篩選後的產品
+
+  // 監聽 filteredProducts 狀態的變化
+  useEffect(() => {
+    console.log("目前的篩選後產品:", filteredProducts);
+  }, [filteredProducts]);
 
   // Fetch 商品数据
   useEffect(() => {
@@ -14,13 +20,14 @@ const Card = () => {
         const response = await fetch("http://localhost:3005/api/productsGame");
         const data = await response.json();
         console.log("API Data:", data); // 打印 API 返回的數據
-        setProducts(data.data || []); // 如果數據在 data 屬性中
+        setProducts(data.data || []); // 初始化 products
+        setFilteredProducts(data.data || []); // 初始化 filteredProducts，與 products 保持一致
       } catch (error) {
         console.error("Failed to fetch products:", error);
       }
     };
     fetchProducts();
-  }, []);
+  }, []); // 這裡的空陣列表示只在組件首次加載時執行
 
   // 切換收藏狀態
   const toggleFavorite = (productId) => {
@@ -28,6 +35,49 @@ const Card = () => {
       ...prevFavorites,
       [productId]: !prevFavorites[productId], // 切換收藏狀態
     }));
+  };
+
+  // 篩選產品
+  const filterProducts = (filterType) => {
+    let sortedProducts = [...products];
+
+    const cleanPrice = (price) => {
+      // 去掉價格中的逗號，然後轉換為數字
+      return parseFloat(price.replace(/,/g, ""));
+    };
+
+    if (filterType === "popular") {
+      // 根據庫存（stock）高低排序，庫存多的在前面
+      sortedProducts.sort((a, b) => b.stock - a.stock);
+    } else if (filterType === "priceHigh") {
+      // 根據價錢由高到低排序，將字串轉為數字
+      sortedProducts.sort((a, b) => {
+        const priceA = cleanPrice(a.price);
+        const priceB = cleanPrice(b.price);
+
+        if (isNaN(priceA) || isNaN(priceB)) {
+          return 0; // 如果價格無效，不進行排序
+        }
+
+        return priceB - priceA;
+      });
+    } else if (filterType === "priceLow") {
+      // 根據價錢由低到高排序，將字串轉為數字
+      sortedProducts.sort((a, b) => {
+        const priceA = cleanPrice(a.price);
+        const priceB = cleanPrice(b.price);
+
+        if (isNaN(priceA) || isNaN(priceB)) {
+          return 0; // 如果價格無效，不進行排序
+        }
+
+        return priceA - priceB;
+      });
+    }
+    console.log("篩選條件已應用，更新 filteredProducts：", sortedProducts);
+    console.log("Initial products:", products);
+    console.log("Filtered products:", filteredProducts);
+    setFilteredProducts([...sortedProducts]); // 使用擴展運算符來確保生成新的物件引用
   };
 
   return (
@@ -65,15 +115,25 @@ const Card = () => {
                 {showFilter && (
                   <div className="absolute left-[-80px] mt-2 bg-white shadow-lg rounded-lg p-4 w-48">
                     <ul className="space-y-2">
-                      {" "}
-                      {/* 垂直排列每個選項 */}
-                      <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">
-                        依照熱門程度高低
+                      <li
+                        className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+                        onClick={() => {
+                          console.log("篩選條件：熱門程度");
+                          filterProducts("popular");
+                        }}
+                      >
+                        依照熱門程度
                       </li>
-                      <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">
+                      <li
+                        className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+                        onClick={() => filterProducts("priceHigh")}
+                      >
                         依照價錢由高到低
                       </li>
-                      <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">
+                      <li
+                        className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+                        onClick={() => filterProducts("priceLow")}
+                      >
                         依照價錢由低到高
                       </li>
                     </ul>
@@ -116,8 +176,8 @@ const Card = () => {
 
         <div className="w-full md:w-3/4 mx-auto p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {Array.isArray(products) &&
-              products.map((product) => (
+            {Array.isArray(filteredProducts) && filteredProducts.length > 0 ? (
+              filteredProducts.map((product) => (
                 <a
                   key={product.product_id}
                   href="#"
@@ -181,7 +241,10 @@ const Card = () => {
                     ${product.price}
                   </p>
                 </a>
-              ))}
+              ))
+            ) : (
+              <p>沒有可顯示的產品</p> // 如果沒有產品，顯示一個提示
+            )}
           </div>
         </div>
       </div>
