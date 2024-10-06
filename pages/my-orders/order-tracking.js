@@ -177,8 +177,6 @@ export default function OrderTracking() {
     setFilteredData(sorted);
   };
 
-<<<<<<< HEAD
-=======
   // 搜尋框輸入處理
   const handleSearch = (e) => {
     const search = e.target.value;
@@ -233,7 +231,6 @@ export default function OrderTracking() {
     ) : (
       <div className="text-center p-4">目前沒有訂單。</div>
     );
->>>>>>> Login
 
   return (
     <>
@@ -290,42 +287,6 @@ export default function OrderTracking() {
                 篩選
               </button>
             </div>
-<<<<<<< HEAD
-          )}
-
-          {/* 使用 React Transition Group 來處理表格切換的動畫效果 */}
-          {isMounted && (
-            <TransitionGroup className="p-6">
-              <CSSTransition key={activeTab} timeout={300} classNames="fade">
-                <div>{renderTable()}</div>
-              </CSSTransition>
-            </TransitionGroup>
-          )}
-
-          {/* 分頁按鈕 */}
-          <div className="join items-center justify-center mt-4 mb-6 w-full">
-            <button
-              className="join-item btn"
-              disabled={currentPage === 1}
-              onClick={() =>
-                setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
-              }
-            >
-              «
-            </button>
-            {renderPagination()}
-            <button
-              className="join-item btn"
-              disabled={currentPage === totalPages}
-              onClick={() =>
-                setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages))
-              }
-            >
-              »
-            </button>
-
-=======
->>>>>>> Login
           </div>
 
           {/* 排序方式 */}

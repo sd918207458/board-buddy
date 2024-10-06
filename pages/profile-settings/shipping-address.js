@@ -6,8 +6,6 @@ import AddressCard from "@/components/address/AddressCard";
 import AddressForm from "@/components/address/AddressForm";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 
-<<<<<<< HEAD
-=======
 // Helper function to get token
 const getToken = () => localStorage.getItem("token");
 
@@ -20,7 +18,6 @@ const fetchWithAuth = async (url, options = {}) => {
   };
   return fetch(url, { ...options, headers, credentials: "include" });
 };
->>>>>>> Login
 
 export default function ShippingAddress() {
   const [addresses, setAddresses] = useState([]);
@@ -31,10 +28,6 @@ export default function ShippingAddress() {
 
   const [errorMessage, setErrorMessage] = useState("");
 
-<<<<<<< HEAD
-
-  const handleSubmit = (e) => {
-=======
   // Load user info and addresses on component mount
   useEffect(() => {
     fetchUserInfo();
@@ -75,7 +68,6 @@ export default function ShippingAddress() {
   };
 
   const handleSubmit = async (e) => {
->>>>>>> Login
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage("");
@@ -84,26 +76,6 @@ export default function ShippingAddress() {
       ? `http://localhost:3005/api/shipment/addresses/${formData.address_id}`
       : "http://localhost:3005/api/shipment/addresses";
 
-<<<<<<< HEAD
-
-    if (!formData.username || !formData.phone || !formData.city) {
-      setErrorMessage("請填寫所有必填欄位");
-      setIsLoading(false);
-      return;
-    }
-
-
-    setTimeout(() => {
-      if (isEditing) {
-        setAddresses((prev) =>
-          prev.map((addr) => (addr.id === formData.id ? formData : addr))
-        );
-      } else {
-        setAddresses((prev) => [...prev, { ...formData, id: Date.now() }]);
-      }
-
-      setIsLoading(false);
-=======
     try {
       const response = await fetchWithAuth(url, {
         method,
@@ -119,7 +91,6 @@ export default function ShippingAddress() {
             )
           : [...prevAddresses, result.data]
       );
->>>>>>> Login
       resetForm();
 
       closeModal();
@@ -131,23 +102,6 @@ export default function ShippingAddress() {
     }
   };
 
-<<<<<<< HEAD
-
-
-  const handleDelete = (id) => {
-    setAddresses((prev) => prev.filter((addr) => addr.id !== id));
-  };
-
-
-
-  const handleSetDefault = (id) => {
-    setAddresses((prev) =>
-      prev.map((addr) => ({
-        ...addr,
-        isDefault: addr.id === id,
-      }))
-    );
-=======
   const handleEdit = (address) => {
     setIsEditing(true);
     setFormData({
@@ -201,49 +155,15 @@ export default function ShippingAddress() {
       console.error("Error setting default address:", error);
       setErrorMessage("設定預設地址失敗");
     }
->>>>>>> Login
   };
 
 
   const resetForm = () => {
-<<<<<<< HEAD
-
-    setFormData({
-      username: "",
-      phone: "",
-      city: "",
-      area: "",
-      street: "",
-      detailedAddress: "",
-      isDefault: false,
-      id: null,
-    });
-=======
     setFormData(initialFormData(userData));
->>>>>>> Login
     setIsEditing(false);
 
   };
 
-<<<<<<< HEAD
-  const openModal = () => {
-    document.getElementById("my_modal_1").showModal();
-  };
-
-  const closeModal = () => {
-    document.getElementById("my_modal_1").close();
-
-  };
-
-  return (
-    <>
-      <Navbar />
-
-      <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
-        <div className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-          <div className="px-6 py-4">
-            <Breadcrumbs />
-=======
   const openModal = () => document.getElementById("my_modal_1").showModal();
   const closeModal = () => document.getElementById("my_modal_1").close();
 
@@ -255,7 +175,6 @@ export default function ShippingAddress() {
           <h2 className="text-lg font-semibold text-gray-700 capitalize dark:text-white mb-4">
             我的地址
           </h2>
->>>>>>> Login
 
           <section className="max-w-4xl mx-auto grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
             {addresses.length > 0 ? (
@@ -274,14 +193,6 @@ export default function ShippingAddress() {
                         handleSetDefault(address.address_id)
                       }
                     />
-<<<<<<< HEAD
-                  </div>
-                </dialog>
-              </CSSTransition>
-            }
-          </TransitionGroup>
-
-=======
                   </CSSTransition>
                 ))}
               </TransitionGroup>
@@ -299,7 +210,6 @@ export default function ShippingAddress() {
               </div>
             </div>
           </section>
->>>>>>> Login
         </div>
 
         <dialog id="my_modal_1" className="modal">

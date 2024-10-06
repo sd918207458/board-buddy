@@ -1,21 +1,9 @@
-<<<<<<< HEAD
-
-import React, { useState } from "react";
-import Navbar from "@/components/LoggedInNavbar";
-import Footer from "@/components/footer";
-import Breadcrumbs from "@/components/Breadcrumbs";
-import Link from "next/link";
-import { CSSTransition } from "react-transition-group";
-
-import card_data from "../../components/UI.json/card_data.json";
-=======
 import React, { useState, useRef } from "react";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Link from "next/link";
 import { Transition } from "react-transition-group";
 import card_data from "../../components/UI/card_data.json";
->>>>>>> Login
 
 const cardData = card_data;
 

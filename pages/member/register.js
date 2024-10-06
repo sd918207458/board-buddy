@@ -124,20 +124,6 @@ export default function Register() {
             <h2 className="text-center text-2xl font-bold text-gray-700 dark:text-gray-200 mt-4">
               註冊
             </h2>
-<<<<<<< HEAD
-            {/* 錯誤提示動畫 */}
-            <CSSTransition
-              in={!!errorMessage}
-              timeout={300}
-              classNames="fade"
-              unmountOnExit
-            >
-              <div className="text-red-500 text-center mt-4">
-                {errorMessage}
-              </div>
-            </CSSTransition>
-=======
->>>>>>> Login
 
             <form onSubmit={handleSubmit}>
               {/* 使用者名稱輸入欄 */}

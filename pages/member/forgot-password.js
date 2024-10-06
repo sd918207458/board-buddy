@@ -1,9 +1,4 @@
 import React, { useState } from "react";
-<<<<<<< HEAD
-
-import Navbar from "@/components/LoggedInNavbar";
-=======
->>>>>>> Login
 import Footer from "@/components/footer";
 import { CSSTransition } from "react-transition-group";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
@@ -77,13 +72,7 @@ export default function ForgotPassword() {
       setErrorMessage("伺服器錯誤，請稍後再試。");
     } finally {
       setIsLoading(false);
-<<<<<<< HEAD
-      setShowVerificationCode(true);
-    }, 1500);
-
-=======
     }
->>>>>>> Login
   };
 
   const handleSubmitVerificationCode = () => {
@@ -165,11 +154,6 @@ export default function ForgotPassword() {
               忘記密碼
             </h2>
 
-<<<<<<< HEAD
-
-            {/* 錯誤提示 */}
-=======
->>>>>>> Login
             {errorMessage && (
               <div className="text-red-500 text-center mt-4">
                 {errorMessage}

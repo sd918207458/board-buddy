@@ -280,28 +280,6 @@ export default function Favorites() {
     }
   };
 
-<<<<<<< HEAD
-  if (hasError) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-red-100">
-        <div className="p-6 bg-white shadow-md rounded-lg">
-          <h2 className="text-2xl font-bold text-red-600">
-            發生錯誤，請稍後再試。
-          </h2>
-          <button
-            className="btn btn-primary mt-4"
-            onClick={() => window.location.reload()}
-          >
-            重新加載
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-
-=======
->>>>>>> Login
   return (
     <>
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
@@ -342,52 +320,7 @@ export default function Favorites() {
           )}
 
           {/* 渲染表格 */}
-<<<<<<< HEAD
-          {isMounted && (
-            <TransitionGroup component={null}>
-              <CSSTransition
-                key={activeTab}
-                timeout={300}
-                classNames="fade"
-                unmountOnExit
-              >
-                <div className="p-6">{renderTable()}</div>
-              </CSSTransition>
-            </TransitionGroup>
-          )}
-
-          {/* 分頁按鈕 */}
-          <div className="join items-center justify-center mt-4 mb-6 w-full">
-            <button
-              className="join-item btn"
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(currentPage - 1)}
-            >
-              «
-            </button>
-            {Array.from({ length: totalPages }, (_, i) => (
-              <button
-                key={i + 1}
-                className={`join-item btn ${
-                  currentPage === i + 1 ? "btn-active" : ""
-                }`}
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                Page {i + 1}
-              </button>
-            ))}
-            <button
-              className="join-item btn"
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage(currentPage + 1)}
-            >
-              »
-            </button>
-
-          </div>
-=======
           {isMounted && <div className="p-6">{renderTable()}</div>}
->>>>>>> Login
         </div>
       </div>
       <Footer />
