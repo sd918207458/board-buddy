@@ -1,12 +1,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-<<<<<<< HEAD
-import Navbar from "@/components/LoggedInNavbar";
-
-=======
 import { useAuth } from "@/hooks/use-auth";
->>>>>>> Login
 import Footer from "@/components/footer";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { CSSTransition } from "react-transition-group";
@@ -121,11 +116,6 @@ export default function Login() {
 
   return (
     <>
-<<<<<<< HEAD
-      <Navbar />
-
-=======
->>>>>>> Login
       <div className="flex items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
 
         <div className="flex w-full max-w-sm mx-auto overflow-hidden bg-white rounded-lg shadow-lg dark:bg-gray-800 lg:max-w-4xl">
@@ -262,8 +252,6 @@ export default function Login() {
         </div>
       </div>
 
-<<<<<<< HEAD
-=======
       {/* Toast 彈出通知 */}
       {toast && (
         <Toast
@@ -273,7 +261,6 @@ export default function Login() {
         />
       )}
 
->>>>>>> Login
       <Footer />
     </>
   );

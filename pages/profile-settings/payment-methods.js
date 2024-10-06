@@ -61,34 +61,9 @@ const initialMethodState = {
 
 
 export default function PaymentMethods() {
-<<<<<<< HEAD
-  const [paymentMethods, setPaymentMethods] = useState([
-    {
-      id: 1,
-      cardholderName: "王大明",
-      cardNumber: "0000 0000 0000 0000",
-      expiryDate: "12/24",
-      isDefault: true,
-    },
-  ]);
-
-
-  const [isMounted, setIsMounted] = useState(false);
-
-  const [currentMethod, setCurrentMethod] = useState({
-    id: null,
-    cardholderName: "",
-    cardNumber: "",
-    expiryDate: "",
-    cvv: "",
-    isDefault: false,
-  });
-
-=======
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [appliedCoupon, setAppliedCoupon] = useState(null); // 用來追蹤應用的優惠券
   const [currentMethod, setCurrentMethod] = useState(initialMethodState);
->>>>>>> Login
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -99,64 +74,11 @@ export default function PaymentMethods() {
     fetchPaymentMethods();
   }, []);
 
-<<<<<<< HEAD
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setCurrentMethod((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
-
-
-  const handleSubmit = () => {
-    if (!validateCardNumber(currentMethod.cardNumber)) {
-      alert("信用卡號格式錯誤，請輸入16位數字");
-      return;
-    }
-    if (!validateExpiryDate(currentMethod.expiryDate)) {
-      alert("到期日格式錯誤，請使用 MM/YY 格式");
-      return;
-    }
-
-    setIsLoading(true);
-
-    setTimeout(() => {
-      if (isEditing) {
-        setPaymentMethods((prev) =>
-          prev.map((method) =>
-            method.id === currentMethod.id ? currentMethod : method
-          )
-        );
-      } else {
-        setPaymentMethods((prev) => [
-          ...prev,
-          { ...currentMethod, id: Date.now() },
-        ]);
-      }
-
-      if (currentMethod.isDefault) {
-        setPaymentMethods((prev) =>
-          prev.map((method) =>
-            method.id === currentMethod.id
-              ? { ...method, isDefault: true }
-              : { ...method, isDefault: false }
-          )
-        );
-      }
-
-      setIsLoading(false);
-      closeModal();
-    }, 1000);
-
-=======
   const showToast = (message, type) => {
     setToast({ message, type });
     setTimeout(() => {
       setToast(null);
     }, 3000);
->>>>>>> Login
   };
 
   const fetchPaymentMethods = async () => {
@@ -303,31 +225,6 @@ export default function PaymentMethods() {
 
   const handleEdit = (method) => {
     setIsEditing(true);
-<<<<<<< HEAD
-    openModal();
-  };
-
-  const handleDelete = (id) => {
-    setPaymentMethods((prev) => prev.filter((method) => method.id !== id));
-  };
-
-  const openModal = () => {
-
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-
-    setCurrentMethod({
-      id: null,
-      cardholderName: "",
-      cardNumber: "",
-      expiryDate: "",
-      cvv: "",
-      isDefault: false,
-    });
-=======
     setCurrentMethod({
       id: method.payment_id,
       type: method.payment_type,
@@ -364,7 +261,6 @@ export default function PaymentMethods() {
 
   const resetForm = () => {
     setCurrentMethod(initialMethodState);
->>>>>>> Login
     setIsEditing(false);
   };
 
@@ -440,11 +336,6 @@ export default function PaymentMethods() {
                 </div>
               ))}
 
-<<<<<<< HEAD
-
-              {/* 新增付款方式卡片 */}
-=======
->>>>>>> Login
               <div className="card bg-base-100 shadow-xl">
                 <div className="card-body flex justify-between">
                   <h2 className="card-title">新增錢包</h2>
@@ -467,11 +358,6 @@ export default function PaymentMethods() {
             </section>
           </div>
 
-<<<<<<< HEAD
-          {/* Modal for Editing/Adding Payment Method */}
-
-=======
->>>>>>> Login
           {isModalOpen && (
             <dialog open className="modal">
               <div className="modal-box">
