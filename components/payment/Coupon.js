@@ -47,7 +47,7 @@ export default function CouponSelector({ availableCoupons = [], applyCoupon }) {
               key={coupon.coupon_id}
               className={`relative p-6 cursor-pointer rounded-lg shadow-lg transition-transform transform hover:scale-105 hover:shadow-xl ticket-style ${
                 selectedCoupon && selectedCoupon.coupon_id === coupon.coupon_id
-                  ? "border-4 border-primary bg-primary text-white"
+                  ? "border-4 border-[#003E52] bg-[#003E52] text-white"
                   : `${getCouponBackgroundColor(coupon)} border border-gray-300`
               }`}
               onClick={() => handleSelectCoupon(coupon)}
@@ -100,7 +100,7 @@ export default function CouponSelector({ availableCoupons = [], applyCoupon }) {
           onClick={handleApplyCoupon}
           disabled={!selectedCoupon}
         >
-          {selectedCoupon ? "使用優惠券" : "請選擇優惠券"}
+          {selectedCoupon ? "去使用" : "請選擇優惠券"}
         </button>
       </div>
 
