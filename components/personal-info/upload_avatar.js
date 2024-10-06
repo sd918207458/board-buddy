@@ -1,71 +1,92 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
-const AvatarUpload = () => {
-  const [imageSrc, setImageSrc] = useState(
-    "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-  );
-  const [selectedFile, setSelectedFile] = useState(null);
+export default function UploadAvatar({ onUpload }) {
+  const [file, setFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [uploadStatus, setUploadStatus] = useState("");
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
+  const handleFileChange = ({ target: { files } }) => {
+    const selectedFile = files[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      setPreviewUrl(URL.createObjectURL(selectedFile));
     }
   };
 
-  const handleUpload = async () => {
-    if (!selectedFile) return;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!file) {
+      setUploadStatus("請選擇一張圖片上傳");
+      return;
+    }
 
     const formData = new FormData();
-    formData.append("file", selectedFile);
+    formData.append("avatar", file);
 
     try {
-      const response = await fetch("/api/upload-avatar", {
-        method: "POST",
-        body: formData,
-      });
-      const result = await response.json();
+      const response = await fetch(
+        "http://localhost:3005/api/users/upload-avatar",
+        {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
+      const result = await response.json();
       if (result.status === "success") {
-        setImageSrc(result.profile_picture_url); // Update displayed avatar
-        setSelectedFile(null); // Clear selected file after upload
+        const avatarUrl = result.data.avatar;
+        setUploadStatus("上傳成功！");
+        onUpload(avatarUrl); // 更新頭像 URL
+        setFile(null); // 清除選擇的檔案
+        setPreviewUrl(""); // 清除預覽
+      } else if (result.message) {
+        setUploadStatus(`上傳失敗: ${result.message}`);
       } else {
-        console.error("Upload failed", result.message);
-        alert(result.message); // Show error to user
+        setUploadStatus("上傳失敗，請重試。");
       }
     } catch (error) {
-      console.error("Upload error:", error);
-      alert("上傳過程中發生錯誤，請稍後再試。"); // Show error to user
+      setUploadStatus("上傳失敗，請檢查網絡連線。");
     }
   };
 
   return (
-    <div className="form-control my-4 items-center">
-      <label className="label text-gray-700 dark:text-gray-300">上傳頭像</label>
-      <div className="flex items-center space-x-4">
-        <div className="avatar">
-          <div className="w-24 rounded-full ring ring-[#036672] ring-offset-base-100 ring-offset-2">
-            <img src={imageSrc} alt="頭像" />
+    <div className="flex flex-col items-center justify-center">
+      <h1 className="text-xl font-semibold mt-6 text-[#003E52]">上傳頭像</h1>
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col items-center space-y-4"
+      >
+        {previewUrl && (
+          <div className="avatar mt-4">
+            <div className="ring-primary ring-[#003E52] ring-offset-base-100 w-24 rounded-full ring ring-offset-2">
+              <img
+                src={previewUrl}
+                alt="圖片預覽"
+                className="w-full h-full object-cover rounded-full"
+              />
+            </div>
           </div>
-        </div>
-        <label htmlFor="file" className="flex items-center">
-          <input
-            type="file"
-            id="file"
-            className="hidden"
-            onChange={handleFileChange}
-          />
-          <button
-            type="button"
-            className="btn btn-outline btn-neutral bg-[#036672] border-none text-white hover:bg-[#024c52]"
-            onClick={handleUpload}
-          >
-            上傳 & 移除
-          </button>
-        </label>
-      </div>
+        )}
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="file-input file-input-bordered file-input-primary w-full max-w-xs "
+        />
+        <button
+          type="submit"
+          className="btn btn-primary w-full max-w-xs bg-[#003E52]"
+        >
+          上傳
+        </button>
+      </form>
+      {uploadStatus && (
+        <p className="mt-4 text-red-500 text-center ">{uploadStatus}</p>
+      )}
     </div>
   );
-};
-
-export default AvatarUpload;
+}

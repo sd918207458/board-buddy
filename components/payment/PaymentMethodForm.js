@@ -28,10 +28,62 @@ const PaymentMethodForm = ({
     return true;
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
+
+    // 確定卡片類型
+    const getCardType = (cardNumber) => {
+      const firstDigit = cardNumber.charAt(0);
+      if (firstDigit === "4") return "Visa";
+      if (firstDigit === "5") return "MasterCard";
+      if (firstDigit === "3") return "Amex";
+      return "Unknown";
+    };
+
+    // 格式化到期日（將 MM/YY 轉換為 date 格式）
+    const convertToDate = (expiryDate) => {
+      const [month, year] = expiryDate.split("/");
+      if (!month || !year) return null; // 檢查是否有效
+      return new Date(`20${year}-${month}-01`); // 格式化為 YYYY-MM-DD
+    };
+
+    // 表單驗證邏輯
     if (validateForm()) {
-      handleSubmit();
+      setIsLoading(true);
+
+      try {
+        const paymentData = {
+          member_id: localStorage.getItem("member_id"), // 確保 localStorage 中存儲了正確的 member_id
+          card_number: currentMethod.cardNumber.replace(/\s/g, "").slice(-4), // 處理卡號
+          card_type: getCardType(currentMethod.cardNumber), // 卡片類型
+          expiration_date: convertToDate(currentMethod.expiryDate), // 到期日轉換
+          cardholder_name: currentMethod.cardholderName, // 持卡人姓名
+        };
+
+        const response = await fetch(
+          "http://localhost:3005/api/payment-methods",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(paymentData),
+          }
+        );
+
+        const result = await response.json();
+        if (result.status === "success") {
+          alert("付款方式已成功添加");
+          closeModal();
+        } else {
+          alert("提交失敗，請重試");
+        }
+      } catch (error) {
+        console.error("提交失敗", error);
+        alert("伺服器錯誤，請稍後再試");
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 

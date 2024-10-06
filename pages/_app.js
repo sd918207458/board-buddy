@@ -6,8 +6,13 @@ import "@/styles/member.css";
 import "@/styles/payment.css";
 import "@/styles/address.css";
 import NavbarSwitcher from "@/components/NavbarSwitcher"; // 引入 NavbarSwitcher 組件
+import { AuthProvider } from "@/hooks/use-auth";
 
 export default function App({ Component, pageProps }) {
-  <NavbarSwitcher />;
-  return <Component {...pageProps} />;
+  return (
+    <AuthProvider>
+      <NavbarSwitcher />
+      <Component {...pageProps} />
+    </AuthProvider>
+  );
 }

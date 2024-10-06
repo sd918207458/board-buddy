@@ -1,23 +1,67 @@
-import React, { useState, useEffect } from "react";
-import LoggedInNavbar from "./LoggedInNavbar"; // 已登入時的 Navbar
-import LoggedOutNavbar from "./LoggedOutNavbar"; // 未登入時的 Navbar
+import React, { useEffect, useState } from "react";
+import LoggedInNavbar from "@/components/LoggedInNavbar";
+import LoggedOutNavbar from "@/components/LoggedOutNavbar";
+import { useRouter } from "next/router";
 
-export default function NavbarSwitcher() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // 假設 false 為未登入狀態
+const NavbarSwitcher = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // 控制載入狀態
+  const [avatarUrl, setAvatarUrl] = useState(""); // 用來管理頭像 URL
+  const [username, setUsername] = useState(""); // 用來管理使用者名稱
+  const router = useRouter();
 
   useEffect(() => {
-    // 這裡可以使用 fetch API 從後端驗證用戶是否已登入
-    const checkLoginStatus = async () => {
-      try {
-        const response = await fetch("/api/check-auth"); // 假設有一個 API 檢查認證狀態
-        const data = await response.json();
-        setIsLoggedIn(data.isAuthenticated);
-      } catch (error) {
-        console.error("Error checking login status", error);
-      }
-    };
-    checkLoginStatus();
-  }, []);
+    // 檢查是否存在 token
+    const token = localStorage.getItem("token");
+    if (token) {
+      // 有 token，進行驗證
+      fetch("http://localhost:3005/api/auth/check", {
+        method: "GET",
+        credentials: "include", // 確保 cookies 被自動發送
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status === "success") {
+            setIsLoggedIn(true);
+            setAvatarUrl(data.data.user.avatar); // 設置初始頭像
+            setUsername(data.data.user.username); // 設置初始使用者名稱
+          } else {
+            // 如果 token 無效，清理 localStorage
+            localStorage.removeItem("token");
+            setIsLoggedIn(false);
+          }
+        })
+        .catch((error) => {
+          console.error("檢查 token 發生錯誤", error);
+          setIsLoggedIn(false);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    } else {
+      // 沒有 token，直接設定為未登入狀態
+      setIsLoggedIn(false);
+      setIsLoading(false);
+    }
+  }, [router]);
 
-  return isLoggedIn ? <LoggedInNavbar /> : <LoggedOutNavbar />;
-}
+  const handleAvatarUpdate = (newAvatarUrl) => {
+    setAvatarUrl(newAvatarUrl); // 更新頭像
+  };
+
+  if (isLoading) {
+    return <div>Loading...</div>; // 顯示載入狀態
+  }
+
+  return isLoggedIn ? (
+    <LoggedInNavbar
+      avatarUrl={avatarUrl}
+      username={username}
+      onAvatarUpdate={handleAvatarUpdate}
+    />
+  ) : (
+    <LoggedOutNavbar />
+  );
+};
+
+export default NavbarSwitcher;

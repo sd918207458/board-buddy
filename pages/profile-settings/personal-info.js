@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import AvatarUpload from "@/components/personal-info/upload_avatar";
 import InputField from "@/components/personal-info/InputField";
+import AvatarUpload from "@/components/personal-info/upload_avatar";
 
+// 動態導入日期選擇器，避免 SSR 問題
 const DatePicker1 = dynamic(() => import("@/components/datepicker"), {
   ssr: false,
 });
@@ -16,140 +16,136 @@ export default function PersonalInfo() {
     username: "",
     phone: "",
     emailAddress: "",
-    password: "",
     first_name: "",
     last_name: "",
     birthday: "",
     gender: "",
-    gameType: "",
-    playTime: "",
+    favorite_games: "", // 新增欄位
+    preferred_play_times: "", // 新增欄位
   });
 
-  const [gameTypes, setGameTypes] = useState([]);
-  const [playTimes, setPlayTimes] = useState([]);
-  const [avatarUrl, setAvatarUrl] = useState(""); // Track avatar upload URL
+  const [avatarUrl, setAvatarUrl] = useState(""); // 用來顯示頭像
   const [submitMessage, setSubmitMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
-  const [loading, setLoading] = useState(true); // 新增加載狀態
+  const [showMessage, setShowMessage] = useState(false); // 控制提示訊息顯示
 
-  // Fetch game types and play times on mount
+  const gameOptions = [
+    "策略遊戲",
+    "合作遊戲",
+    "派對遊戲",
+    "冒險遊戲",
+    "推理解謎遊戲",
+    "卡牌遊戲",
+    "經濟遊戲",
+    "區域控制遊戲",
+    "建設遊戲",
+    "骰子遊戲",
+    "劇本殺/推理遊戲",
+    "家庭遊戲",
+    "輕策略遊戲",
+    "重策略遊戲",
+  ];
+
+  const playTimeOptions = [
+    "早上 (6 AM - 12 PM)",
+    "下午 (12 PM - 4 PM)",
+    "傍晚 (4 PM - 6 PM)",
+    "晚上 (6 PM - 9 PM)",
+    "深夜 (9 PM - 12 AM)",
+    "凌晨 (12 AM - 3 AM)",
+    "周末白天 (Sat & Sun, 10 AM - 6 PM)",
+    "周末晚上 (Sat & Sun, 6 PM - 12 AM)",
+  ];
+
+  // 初次加載時取得用戶數據
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchMemberData = async () => {
       try {
-        const [gameTypesRes, playTimesRes] = await Promise.all([
-          fetch("/api/game-types"),
-          fetch("/api/play-times"),
-        ]);
+        const response = await fetch("http://localhost:3005/api/users/check", {
+          method: "GET",
+          credentials: "include", // 攜帶 httpOnly cookie
+        });
 
-        const gameTypesData = await gameTypesRes.json();
-        const playTimesData = await playTimesRes.json();
-        setGameTypes(gameTypesData || []);
-        setPlayTimes(playTimesData || []);
-        setLoading(false); // 加載完成
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || "獲取用戶資料失敗");
+        }
+
+        const userInfoData = await response.json();
+        if (userInfoData.status === "success") {
+          const user = userInfoData.data.user || {};
+          setFormData({
+            username: user.username || "",
+            phone: user.phone_number || "",
+            emailAddress: user.email || "",
+            first_name: user.first_name || "",
+            last_name: user.last_name || "",
+            birthday: user.date_of_birth || "",
+            gender: user.gender || "",
+            favorite_games: user.favorite_games || "", // 填入喜歡的遊戲類型
+            preferred_play_times: user.preferred_play_times || "", // 填入常玩時段
+          });
+          setAvatarUrl(user.avatar || "");
+        }
       } catch (error) {
-        console.error("Failed to load data", error);
-        setLoading(false);
+        console.error("Failed to load data:", error.message);
+        setErrorMessage("無法加載會員資料，請重試。");
+        setShowMessage(true);
       }
     };
 
-    fetchData();
-    setIsMounted(true);
+    fetchMemberData();
   }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  // 更新表單的資料
+  const handleChange = ({ target: { name, value } }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle avatar upload result
-  const handleAvatarUpload = (url) => {
-    setAvatarUrl(url); // Store uploaded avatar URL
+  // 自動隱藏提示訊息
+  const hideMessage = () => {
+    setTimeout(() => {
+      setShowMessage(false);
+    }, 3000); // 3 秒後隱藏提示訊息
   };
 
-  const validateForm = () => {
-    const {
-      username,
-      phone,
-      emailAddress,
-      password,
-      birthday,
-      gender,
-      gameType,
-      playTime,
-    } = formData;
-    if (
-      !username ||
-      !phone ||
-      !emailAddress ||
-      !password ||
-      !birthday ||
-      !gender ||
-      !gameType ||
-      !playTime
-    ) {
-      return "所有欄位都是必填的";
-    }
-    if (!/\S+@\S+\.\S+/.test(emailAddress)) {
-      return "請輸入有效的電子郵件地址";
-    }
-    if (!/^\d{10}$/.test(phone)) {
-      return "請輸入有效的手機號碼";
-    }
-    return "";
-  };
-
+  // 表單提交處理
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // 表單驗證
-    const validationError = validateForm();
-    if (validationError) {
-      setErrorMessage(validationError);
-      setIsSubmitting(false);
-      return;
-    }
-
     try {
-      const completeFormData = { ...formData, avatarUrl };
-
-      const response = await fetch("/api/save-personal-info", {
-        method: "POST",
+      const completeFormData = { ...formData, avatar: avatarUrl };
+      const response = await fetch("http://localhost:3005/api/users/update", {
+        method: "PUT", // 使用 PUT 方法進行更新
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include", // 攜帶 cookie
         body: JSON.stringify(completeFormData),
       });
 
       const result = await response.json();
-
-      if (result.success) {
+      if (result.status === "success") {
         setSubmitMessage("提交成功！資料已儲存。");
-        setFormData({
-          username: "",
-          phone: "",
-          emailAddress: "",
-          password: "",
-          first_name: "",
-          last_name: "",
-          birthday: "",
-          gender: "",
-          gameType: "",
-          playTime: "",
-        });
-        setAvatarUrl(""); // 清除上傳的頭像
+        setShowMessage(true);
+        hideMessage(); // 設定提示訊息自動消失
       } else {
         setErrorMessage(result.message || "提交失敗，請重試！");
+        setShowMessage(true);
+        hideMessage();
       }
     } catch (error) {
       setErrorMessage("提交失敗，請重試！");
+      setShowMessage(true);
+      hideMessage();
     } finally {
       setIsSubmitting(false);
     }
   };
 
+<<<<<<< HEAD
   if (!isMounted || loading) {
     return <div>加載中...</div>; // 加載中的提示
   }
@@ -159,6 +155,23 @@ export default function PersonalInfo() {
     <>
       <Navbar />
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52]">
+=======
+  return (
+    <>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] relative">
+        {/* 提示訊息區塊 */}
+        {showMessage && (
+          <div
+            className={`fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-md shadow-md transition-transform duration-300 ${
+              submitMessage
+                ? "bg-green-500 text-white border border-green-700"
+                : "bg-red-500 text-white border border-red-700"
+            }`}
+          >
+            {submitMessage ? submitMessage : errorMessage}
+          </div>
+        )}
+>>>>>>> Login
 
         <div className="card w-full max-w-lg mx-auto bg-white shadow-lg lg:max-w-4xl rounded-lg">
           <section className="p-6">
@@ -166,12 +179,9 @@ export default function PersonalInfo() {
             <h2 className="text-2xl font-semibold text-[#003E52] text-center">
               個人資料設定
             </h2>
-
+            <AvatarUpload onUpload={setAvatarUrl} avatarUrl={avatarUrl} />
             <form onSubmit={handleSubmit}>
-              {/* Avatar Upload */}
-              <AvatarUpload onUpload={handleAvatarUpload} />
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="max-w-4xl mx-auto grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
                 <InputField
                   label="使用者名稱"
                   name="username"
@@ -195,14 +205,6 @@ export default function PersonalInfo() {
                   required
                 />
                 <InputField
-                  label="密碼"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  type="password"
-                  required
-                />
-                <InputField
                   label="名字"
                   name="first_name"
                   value={formData.first_name}
@@ -222,8 +224,6 @@ export default function PersonalInfo() {
                   type="date"
                   required
                 />
-
-                {/* 性別 */}
                 <div className="form-control">
                   <label className="label" htmlFor="gender">
                     性別
@@ -243,26 +243,24 @@ export default function PersonalInfo() {
                     <option value="female">女</option>
                   </select>
                 </div>
-
-                {/* 遊戲類型 */}
+                {/* 喜歡的遊戲類型 */}
                 <div className="form-control">
-                  <label className="label" htmlFor="gameType">
-                    最喜歡的遊戲類型
+                  <label className="label" htmlFor="favorite_games">
+                    喜歡的遊戲類型
                   </label>
                   <select
-                    id="gameType"
-                    name="gameType"
-                    value={formData.gameType}
+                    id="favorite_games"
+                    name="favorite_games"
+                    value={formData.favorite_games}
                     onChange={handleChange}
                     className="select select-bordered w-full"
-                    required
                   >
                     <option value="" disabled>
                       請選擇
                     </option>
-                    {gameTypes.map((type) => (
-                      <option key={type.id} value={type.id}>
-                        {type.name}
+                    {gameOptions.map((game, index) => (
+                      <option key={index} value={game}>
+                        {game}
                       </option>
                     ))}
 
@@ -271,31 +269,44 @@ export default function PersonalInfo() {
 
                 {/* 常玩時段 */}
                 <div className="form-control">
+<<<<<<< HEAD
 
                   <label className="label" htmlFor="playTime">
+=======
+                  <label className="label" htmlFor="preferred_play_times">
+>>>>>>> Login
                     常玩時段
                   </label>
                   <select
-                    id="playTime"
-                    name="playTime"
-                    value={formData.playTime}
+                    id="preferred_play_times"
+                    name="preferred_play_times"
+                    value={formData.preferred_play_times}
                     onChange={handleChange}
                     className="select select-bordered w-full"
-                    required
                   >
                     <option value="" disabled>
                       請選擇
                     </option>
-                    {playTimes.map((time) => (
-                      <option key={time.id} value={time.id}>
-                        {time.name}
+                    {playTimeOptions.map((time, index) => (
+                      <option key={index} value={time}>
+                        {time}
                       </option>
                     ))}
 
                   </select>
                 </div>
               </div>
+              <button
+                type="submit"
+                className={`btn btn-primary mt-6 w-full bg-[#036672] hover:bg-[#024c52] ${
+                  isSubmitting ? "loading" : ""
+                }`}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "提交中..." : "保存修改"}
+              </button>
 
+<<<<<<< HEAD
 
               {/* 提交按鈕 */}
               <div className="form-control mt-6">
@@ -316,6 +327,17 @@ export default function PersonalInfo() {
               )}
               {submitMessage && (
                 <p className="text-green-500 mt-4">{submitMessage}</p>
+=======
+              {showMessage && (
+                <div className="mt-4">
+                  {submitMessage && (
+                    <p className="text-green-500">{submitMessage}</p>
+                  )}
+                  {errorMessage && (
+                    <p className="text-red-500">{errorMessage}</p>
+                  )}
+                </div>
+>>>>>>> Login
               )}
 
             </form>
