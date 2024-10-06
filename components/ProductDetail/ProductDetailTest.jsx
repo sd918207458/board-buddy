@@ -84,7 +84,11 @@ const ProductDetailTest = () => {
             </div>
             <div className={styles["product-price"]}>${product.price}</div>
             <div className={styles["product-description"]}>
-              <span>| {product.author}</span>
+              <span>
+                {" "}
+                {product.min_player} - {product.max_player} 人
+              </span>
+              <span> | {product.author}</span>
               <span> | </span>
               <span> {product.publisher}</span>
               <br />
@@ -97,7 +101,7 @@ const ProductDetailTest = () => {
                 <div className="sm:order-1">
                   <div className="mx-auto flex h-8 items-stretch text-gray-600">
                     <button
-                      className="flex items-center justify-center rounded-l-md bg-gray-200 px-4 transition hover:bg-black hover:text-white"
+                      className="flex items-center justify-center rounded-l-md bg-gray-200 px-4 transition hover:bg-[#003E52] hover:text-white"
                       onClick={decreaseQuantity}
                     >
                       -
@@ -106,7 +110,7 @@ const ProductDetailTest = () => {
                       {quantity}
                     </div>
                     <button
-                      className="flex items-center justify-center rounded-r-md bg-gray-200 px-4 transition hover:bg-black hover:text-white"
+                      className="flex items-center justify-center rounded-r-md bg-gray-200 px-4 transition hover:bg-[#003E52] hover:text-white"
                       onClick={increaseQuantity}
                     >
                       +
