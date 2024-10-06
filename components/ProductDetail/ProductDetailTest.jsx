@@ -3,10 +3,13 @@ import styles from "./ProductDetail.module.css";
 import Image from "next/image";
 import { CiHeart } from "react-icons/ci"; // 空心愛心
 import { FaHeart } from "react-icons/fa"; // 實心愛心
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ProductDetailTest = () => {
   const [product, setProduct] = useState(null); // 存儲 API 返回的產品數據
   const [liked, setLiked] = useState(false); // 收藏狀態
+  const [quantity, setQuantity] = useState(1); // 數量狀態
   const [loading, setLoading] = useState(true); // 加載狀態
   const [error, setError] = useState(null); // 錯誤狀態
 
@@ -17,8 +20,12 @@ const ProductDetailTest = () => {
         const response = await fetch(
           "http://localhost:3005/api/productsGame/1"
         ); // 替換為實際 API 地址和產品 ID
-        const data = await response.json();
-        setProduct(data); // 設置產品數據
+        const result = await response.json();
+        if (result.status === "success") {
+          setProduct(result.data); // 設置產品數據到正確的資料結構
+        } else {
+          setError("Failed to fetch product data");
+        }
         setLoading(false); // 加載完成
       } catch (err) {
         setError("Failed to fetch product data");
@@ -34,6 +41,23 @@ const ProductDetailTest = () => {
     setLiked(!liked);
   };
 
+  // 增加數量，最多為9
+  const increaseQuantity = () => {
+    if (quantity < 9) {
+      setQuantity((prevQuantity) => prevQuantity + 1);
+    } else {
+      toast.error("數量最多不能超過9"); // 使用 toast.error 顯示錯誤通知
+    }
+  };
+
+  // 減少數量，最少為1
+  const decreaseQuantity = () => {
+    if (quantity > 1) {
+      setQuantity((prevQuantity) => prevQuantity - 1);
+    } else {
+      toast.error("數量不能小於1"); // 使用 toast.error 顯示錯誤通知
+    }
+  };
   if (loading) {
     return <p>Loading...</p>; // 加載中顯示的內容
   }
@@ -72,15 +96,34 @@ const ProductDetailTest = () => {
               <div className={styles["quantity-selector"]}>
                 <div className="sm:order-1">
                   <div className="mx-auto flex h-8 items-stretch text-gray-600">
-                    <button className="flex items-center justify-center rounded-l-md bg-gray-200 px-4 transition hover:bg-black hover:text-white">
+                    <button
+                      className="flex items-center justify-center rounded-l-md bg-gray-200 px-4 transition hover:bg-black hover:text-white"
+                      onClick={decreaseQuantity}
+                    >
                       -
                     </button>
                     <div className="flex w-full items-center justify-center bg-gray-100 px-4 text-xs uppercase transition">
-                      1
+                      {quantity}
                     </div>
-                    <button className="flex items-center justify-center rounded-r-md bg-gray-200 px-4 transition hover:bg-black hover:text-white">
+                    <button
+                      className="flex items-center justify-center rounded-r-md bg-gray-200 px-4 transition hover:bg-black hover:text-white"
+                      onClick={increaseQuantity}
+                    >
                       +
                     </button>
+                    {/* 必須加上 ToastContainer 才能顯示通知 */}
+                    <ToastContainer
+                      position="top-right"
+                      autoClose={2000}
+                      hideProgressBar={false}
+                      newestOnTop={false}
+                      closeOnClick
+                      rtl={false}
+                      pauseOnFocusLoss
+                      draggable
+                      pauseOnHover
+                      theme="light"
+                    />
                   </div>
                 </div>
               </div>
@@ -146,12 +189,12 @@ const ProductDetailTest = () => {
                 <strong>遊戲設計：</strong> {product.author}
               </p>
               <p className={styles.paragraph}>
-                <strong>人數：</strong> {product.min_players} -{" "}
-                {product.max_players} 人
+                <strong>人數：</strong> {product.min_player} -{" "}
+                {product.max_player} 人
               </p>
               <p className={styles.paragraph}>
-                <strong>時間：</strong> {product.min_playtime} -{" "}
-                {product.max_playtime} 分鐘
+                <strong>時間：</strong> {product.mintime} - {product.maxtime}{" "}
+                分鐘
               </p>
               <p className={styles.paragraph}>
                 <strong>年齡：</strong> {product.age} 歲以上
