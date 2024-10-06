@@ -171,6 +171,7 @@ export default function Navbar({ avatarUrl, username, onAvatarUpdate }) {
           </div>
         )}
 
+        {/* 購物車 */}
         <div className="dropdown dropdown-end">
           <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
             <div className="indicator">

@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { GiHouse, GiThreeFriends, GiShoppingBag, GiTalk } from "react-icons/gi";
-
 
 import Link from "next/link";
 import Image from "next/image";
@@ -35,7 +34,6 @@ export default function Navbar() {
   }
 
   return (
-
     <div className="navbar bg-[#003E52] text-white sticky top-0 z-50">
       <div className="flex-1">
         <Link href="/" legacyBehavior>
@@ -71,11 +69,9 @@ export default function Navbar() {
               <GiTalk className="w-6 h-6" />
               <span>討論區</span>
             </a>
-
           </Link>
         </nav>
       </div>
-
 
       <div className="flex items-center space-x-4">
         <div className="dropdown dropdown-hover dropdown-bottom dropdown-end">
@@ -109,7 +105,6 @@ export default function Navbar() {
             </li>
           </ul>
         </div>
-
 
         {/* 購物車 icon*/}
         <div className="dropdown dropdown-end">

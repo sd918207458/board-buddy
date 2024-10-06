@@ -42,20 +42,6 @@ const PageIcon = () => (
 const Breadcrumbs = ({ customCrumbs }) => {
   const router = useRouter();
 
-<<<<<<< HEAD
-  const [pathnames, setPathnames] = useState([]);
-  // 使用 useEffect 來確保只在客戶端處理路徑
-  useEffect(() => {
-    if (router.asPath) {
-      setPathnames(router.asPath.split("/").filter((x) => x));
-    }
-  }, [router.asPath]);
-
-  // 將路徑分割成陣列
-  // const pathnames = router.asPath.split("/").filter((x) => x);
-
-=======
->>>>>>> Login
   // 如果有自定義 breadcrumbs 項，使用自定義的，否則使用當前路徑
   const breadcrumbs = customCrumbs || router.asPath.split("/").filter(Boolean);
 
@@ -82,24 +68,7 @@ const Breadcrumbs = ({ customCrumbs }) => {
 
           <Link href="/" legacyBehavior>
             <a className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800">
-<<<<<<< HEAD
-
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                className="h-4 w-4 stroke-current"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
-                ></path>
-              </svg>
-=======
               <HomeIcon />
->>>>>>> Login
               首頁
 
             </a>
@@ -107,12 +76,7 @@ const Breadcrumbs = ({ customCrumbs }) => {
           </Link>
         </li>
 
-<<<<<<< HEAD
-        {/* 使用分隔符號 */}
-
-=======
         {/* 分隔符號和動態面包屑 */}
->>>>>>> Login
         <TransitionGroup component={null}>
           {breadcrumbs.map((name, index) => {
             const routeTo = `/${breadcrumbs.slice(0, index + 1).join("/")}`;
