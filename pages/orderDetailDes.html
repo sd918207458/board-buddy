@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>遊戲介紹</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #003366;
+        color: white;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: #004080;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+      }
+
+      .flex-nav {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        border: 1px solid white;
+        padding: 10px;
+      }
+      .flex-nav div {
+        flex: 1; /* 平分父層 */
+        display: flex;
+        justify-content: center; /* 文字水平置中 */
+        align-items: center; /* 文字垂直置中 */
+        padding: 10px;
+        transition: background-color 0.3s;
+        border-left: 1px solid white; /* 左側邊框 */
+        border-right: 1px solid white; /* 右側邊框 */
+      }
+      /* 去掉第一個區塊的左邊框 */
+      .flex-nav div:first-child {
+        border-left: none;
+      }
+
+      /* 去掉最後一個區塊的右邊框 */
+      .flex-nav div:last-child {
+        border-right: none;
+      }
+      h1 {
+        font-size: 24px;
+        border-bottom: 2px solid #6699ff;
+        padding-bottom: 10px;
+      }
+
+      h2 {
+        font-size: 20px;
+        margin-top: 20px;
+        border-bottom: 1px solid #6699ff;
+        padding-bottom: 5px;
+      }
+
+      p {
+        line-height: 1.6;
+        margin-bottom: 10px;
+      }
+
+      ul {
+        margin-top: 10px;
+        margin-left: 20px;
+      }
+
+      ul li {
+        margin-bottom: 5px;
+      }
+
+      .section {
+        margin-bottom: 20px;
+      }
+
+      .info {
+        background-color: #0059b3;
+        padding: 15px;
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- 上層的 Flex 排列的導航按鈕 -->
+      <div class="flex-nav">
+        <div>遊戲介紹</div>
+        <div>遊戲規則</div>
+        <div>出版資訊</div>
+      </div>
+
+      <h1>遊戲介紹</h1>
+
+      <div class="section">
+        <h2>遊戲介紹</h2>
+        <p>
+          《妙語說書人》是一款文字冒險遊戲，玩家扮演巧舌如簧的說書人，通過選擇詞語和故事情節來打動聽眾，影響他們的情感與選擇，探索人際互動和故事敘述的藝術。
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>遊戲規則</h2>
+        <p>在《妙語說書人》中，玩家需要遵循以下遊戲規則：</p>
+        <ul>
+          <li>
+            1.
+            遊戲開始時，玩家會根據故事情境卡提出想法，決定要影響的角色情緒和方向。
+          </li>
+          <li>
+            2.
+            根據情境中的選項進行互動，玩家需要選擇能引發角色共鳴的詞語，影響事件中的選擇。
+          </li>
+          <li>
+            3.
+            故事會根據玩家的選擇影響整個劇情的情緒、反應和未來的選擇，需根據情境進行決策。
+          </li>
+          <li>
+            4.
+            目的是通過影響其他角色的反應，創造出最佳的劇情，成功打動聽眾獲得更多分數。
+          </li>
+          <li>
+            5.
+            為使情節生動有趣，玩家的選擇需帶來不可預測的結果，反映說書人的影響力。
+          </li>
+        </ul>
+        <p>玩家會透過語言去說故事，需靈活應變，達成最佳結果。</p>
+      </div>
+
+      <div class="section">
+        <h2>出版資訊</h2>
+        <div class="info">
+          <p><strong>遊戲出版：</strong>新天鵝堡</p>
+          <p><strong>遊戲設計：</strong>Jean-Louis Roubira</p>
+          <p><strong>人數：</strong>3-6人</p>
+          <p><strong>時間：</strong>30分鐘</p>
+          <p><strong>年齡：</strong>8歲以上</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
