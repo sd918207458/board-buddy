@@ -113,7 +113,7 @@ export default function UploadAvatar({ onUpload }) {
                   type="file"
                   accept="image/*"
                   onChange={handleFileChange}
-                  className="file-input file-input-bordered file-input-primary w-full max-w-xs mb-4"
+                  className="file-input file-input-bordered file-input-primary  w-full max-w-xs mb-4"
                 />
               </p>
             </>
@@ -122,7 +122,7 @@ export default function UploadAvatar({ onUpload }) {
 
         <button
           type="submit"
-          className="btn btn-primary w-full bg-[#036672] hover:bg-[#024c52]"
+          className="btn  text-base-300 w-full bg-[#036672] hover:bg-[#024c52]"
         >
           上傳
         </button>

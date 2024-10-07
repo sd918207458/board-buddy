@@ -1,32 +1,37 @@
+/* globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* 定義全局的 CSS 變量 */
 :root {
-  --background: #003E52;
-  --foreground: #171717;
+  --background: #003E52; /* 主背景色 */
+  --foreground: #171717; /* 主前景色 */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0a0a0a; /* 深色模式背景色 */
+    --foreground: #ededed; /* 深色模式前景色 */
   }
 }
 
+/* 設定 body 的全局樣式 */
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--background); /* 使用自定義背景色 */
+  color: var(--foreground); /* 使用自定義前景色 */
+  font-family: Arial, Helvetica, sans-serif; /* 設置字體 */
 }
 
+/* 添加 Tailwind 的自定義實用工具 */
 @layer utilities {
+  /* 自定義文本換行 */
   .text-balance {
     text-wrap: balance;
   }
 }
 
-/* 通用的 fade-in/fade-out 動畫 */
+/* 動畫效果設置 */
 .fade-enter,
 .fade-exit-active {
   opacity: 0;
@@ -38,23 +43,16 @@ body {
   transition: opacity 300ms ease-in-out;
 }
 
-/* 通用的 scale 動畫 */
 .scale-enter {
   transform: scale(1);
 }
 
-.scale-exit-active {
-  transform: scale(1.05);
-
-}
-
-.scale-exi,
+.scale-exit-active,
 .scale-enter-active {
   transform: scale(1.05);
   transition: transform 300ms ease-in-out;
 }
 
-/* 通用的 translateY 動畫 */
 .translate-enter,
 .translate-exit-active {
   transform: translateY(20px);
