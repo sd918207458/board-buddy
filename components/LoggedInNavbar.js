@@ -66,7 +66,7 @@ export default function Navbar({ avatarUrl, username, onAvatarUpdate }) {
               <span>揪團</span>
             </a>
           </Link>
-          <Link href="/shop" legacyBehavior>
+          <Link href="/product-list" legacyBehavior>
             <a className="btn btn-ghost text-white flex flex-col items-center">
               <GiShoppingBag className="w-6 h-6" />
               <span>商城</span>

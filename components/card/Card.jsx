@@ -7,6 +7,8 @@ const Card = () => {
   const [showFilter, setShowFilter] = useState(false); // 控制篩選器的狀態
   const [showSearch, setShowSearch] = useState(false); // 控制搜尋欄的狀態
   const [filteredProducts, setFilteredProducts] = useState([]); // 存儲篩選後的產品
+  // 定義篩選條件狀態
+  const [filterTitle, setFilterTitle] = useState("全部商品"); // 預設為全部商品
 
   // 監聽 filteredProducts 狀態的變化
   useEffect(() => {
@@ -75,9 +77,30 @@ const Card = () => {
       });
     }
     console.log("篩選條件已應用，更新 filteredProducts：", sortedProducts);
-    console.log("Initial products:", products);
-    console.log("Filtered products:", filteredProducts);
     setFilteredProducts([...sortedProducts]); // 使用擴展運算符來確保生成新的物件引用
+  };
+  // 篩選產品的功能
+  const filterProductsTitle = (filterType) => {
+    switch (filterType) {
+      case "popular":
+        setFilterTitle("依照熱門程度");
+        break;
+      case "priceHigh":
+        setFilterTitle("依照價錢由高到低");
+        break;
+      case "priceLow":
+        setFilterTitle("依照價錢由低到高");
+        break;
+      default:
+        setFilterTitle("依照熱門程度");
+    }
+    // 這裡可以加上你篩選邏輯的實現，如向後端請求數據等
+    console.log(`篩選條件：${filterType}`);
+  };
+  // 點擊篩選器時，同時應用篩選並更新標題
+  const handleFilterChange = (filterType) => {
+    filterProducts(filterType); // 應用篩選邏輯
+    filterProductsTitle(filterType); // 更新標題
   };
 
   return (
@@ -85,12 +108,9 @@ const Card = () => {
       <div className="container mx-auto flex items-center flex-wrap pt-4 pb-12">
         <nav id="store" className="w-full z-30 top-0 px-6 py-1">
           <div className="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 px-2 py-3 relative">
-            <a
-              className="uppercase tracking-wide no-underline hover:no-underline font-bold text-white-800 text-xl"
-              href="#"
-            >
-              全部商品
-            </a>
+            <div className="uppercase tracking-wide no-underline hover:no-underline font-bold text-white-800 text-xl">
+              {filterTitle}
+            </div>
 
             <div className="flex items-center" id="store-nav-content">
               {/* 篩選器圖標 */}
@@ -119,20 +139,20 @@ const Card = () => {
                         className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
                         onClick={() => {
                           console.log("篩選條件：熱門程度");
-                          filterProducts("popular");
+                          handleFilterChange("popular");
                         }}
                       >
                         依照熱門程度
                       </li>
                       <li
                         className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
-                        onClick={() => filterProducts("priceHigh")}
+                        onClick={() => handleFilterChange("priceHigh")}
                       >
                         依照價錢由高到低
                       </li>
                       <li
                         className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
-                        onClick={() => filterProducts("priceLow")}
+                        onClick={() => handleFilterChange("priceLow")}
                       >
                         依照價錢由低到高
                       </li>
