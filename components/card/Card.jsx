@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link"; // 引入 Next.js 的 Link 組件
 
 const Card = () => {
   const [products, setProducts] = useState([]);
@@ -198,9 +199,9 @@ const Card = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {Array.isArray(filteredProducts) && filteredProducts.length > 0 ? (
               filteredProducts.map((product) => (
-                <a
+                <Link
                   key={product.product_id}
-                  href="#"
+                  href={`/product/${product.product_id}`} // 使用動態路由
                   className="relative flex flex-col group"
                 >
                   <div className="relative rounded-lg overflow-hidden">
@@ -260,7 +261,7 @@ const Card = () => {
                   <p className="pt-1 text-white-900 font-bold transition-all duration-300 group-hover:blur-md">
                     ${product.price}
                   </p>
-                </a>
+                </Link>
               ))
             ) : (
               <p>沒有可顯示的產品</p> // 如果沒有產品，顯示一個提示
