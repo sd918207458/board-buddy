@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
-import styles from "./ProductDetail.module.css";
+import { useRouter } from "next/router"; // 用來捕獲動態路由參數
+import styles from "../../components/ProductDetail/ProductDetail.module.css";
+
 import Image from "next/image";
 import { CiHeart } from "react-icons/ci"; // 空心愛心
 import { FaHeart } from "react-icons/fa"; // 實心愛心
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useRouter } from "next/router"; // 用來捕獲動態路由參數
 
-const ProductDetailTest = () => {
+const ProductDetail = () => {
   const router = useRouter();
   const { id } = router.query; // 使用 useRouter 獲取 URL 中的 id
 
@@ -17,28 +18,31 @@ const ProductDetailTest = () => {
   const [loading, setLoading] = useState(true); // 加載狀態
   const [error, setError] = useState(null); // 錯誤狀態
 
-  // 模擬 API 請求，根據產品 ID 獲取產品詳情
+  // 根據產品 ID 獲取產品資料
   useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:3005/api/productsGame/${id}` // 動態 API 地址，根據 id 替換
-        );
-        const result = await response.json();
-        if (result.status === "success") {
-          setProduct(result.data); // 設置產品數據到正確的資料結構
-        } else {
+    if (id) {
+      // 當 id 存在時，發送 API 請求
+      const fetchProduct = async () => {
+        try {
+          const response = await fetch(
+            `http://localhost:3005/api/productsGame/${id}` // 動態 API 地址，根據 id 替換
+          );
+          const result = await response.json();
+          if (result.status === "success") {
+            setProduct(result.data); // 設置產品數據到正確的資料結構
+          } else {
+            setError("Failed to fetch product data");
+          }
+          setLoading(false); // 加載完成
+        } catch (err) {
           setError("Failed to fetch product data");
+          setLoading(false); // 加載完成但出現錯誤
         }
-        setLoading(false); // 加載完成
-      } catch (err) {
-        setError("Failed to fetch product data");
-        setLoading(false); // 加載完成但出現錯誤
-      }
-    };
+      };
 
-    fetchProduct();
-  }, [id]);
+      fetchProduct();
+    }
+  }, [id]); // 當 id 改變時，重新發送請求
 
   // 切換收藏狀態
   const toggleLike = () => {
@@ -62,6 +66,7 @@ const ProductDetailTest = () => {
       toast.error("數量不能小於1"); // 使用 toast.error 顯示錯誤通知
     }
   };
+
   if (loading) {
     return <p>Loading...</p>; // 加載中顯示的內容
   }
@@ -76,7 +81,7 @@ const ProductDetailTest = () => {
         <div className={styles["product-container"]}>
           <div className={styles["product-image"]}>
             <Image
-              src="https://i.postimg.cc/MGFg5m5k/4.png" // 這裡可以使用 product.image
+              src={product.image} // 這裡可以使用 product.image
               width={800}
               height={800}
               alt={product.product_name}
@@ -89,12 +94,10 @@ const ProductDetailTest = () => {
             <div className={styles["product-price"]}>${product.price}</div>
             <div className={styles["product-description"]}>
               <span>
-                {" "}
                 {product.min_player} - {product.max_player} 人
               </span>
               <span> | {product.author}</span>
-              <span> | </span>
-              <span> {product.publisher}</span>
+              <span> | {product.publisher}</span>
               <br />
               <br />
               {product.description}
@@ -184,7 +187,7 @@ const ProductDetailTest = () => {
 
           <div id="rules" className={styles.section}>
             <h2 className={styles.subtitle}>遊戲規則</h2>
-            <p className={styles.paragraph}>遊戲規則變數</p>
+            <p className={styles.paragraph}>{product.playrule}</p>
           </div>
 
           <div id="info" className={styles.section}>
@@ -215,4 +218,4 @@ const ProductDetailTest = () => {
   );
 };
 
-export default ProductDetailTest;
+export default ProductDetail;
