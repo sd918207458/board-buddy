@@ -5,6 +5,7 @@ import Footer from "@/components/footer";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import useFirebase from "@/hooks/use-firebase"; // 引入自定義的 useFirebase hook
 
 export default function Login() {
   const [email, setEmail] = useState(""); // 使用 email 而不是 username
@@ -14,31 +15,46 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
   const { setAuth } = useAuth();
+  const { loginGoogle } = useFirebase(); // 使用 Firebase Google 登入方法
 
-  const parseJwt = (token) => {
+  // 將 Firebase 登入結果傳遞到後端
+
+  // Google 登入處理
+  const handleGoogleLogin = async () => {
     try {
-      const base64Url = token.split(".")[1];
-      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split("")
-          .map(function (c) {
-            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-          })
-          .join("")
-      );
-      return JSON.parse(jsonPayload);
+      loginGoogle(async (user) => {
+        const { uid, displayName, email, photoURL } = user;
+
+        const response = await fetch("http://localhost:3005/api/google-login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            providerId: "google.com",
+            uid,
+            displayName,
+            email,
+            photoURL,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          console.log("Google 登入成功:", data);
+          localStorage.setItem("token", data.data.accessToken);
+          router.push("/");
+        } else {
+          toast.error(data.message || "Google 登入失敗");
+        }
+      });
     } catch (error) {
-      console.error("JWT解析錯誤:", error);
-      return null;
+      console.error("Google 登入錯誤:", error);
+      toast.error("Google 登入失敗，請稍後再試");
     }
   };
 
-  const handleGoogleLogin = () => {
-    // 觸發 Google 登入流程，將用戶重定向到後端 Google 認證路由
-    window.open("http://localhost:3005/api/google-login", "_self");
-  };
-
+  // 本地登入邏輯保持不變
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
