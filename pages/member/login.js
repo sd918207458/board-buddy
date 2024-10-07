@@ -3,35 +3,15 @@ import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/use-auth";
 import Footer from "@/components/footer";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
-import { CSSTransition } from "react-transition-group";
-
-// Toast 通知組件
-const Toast = ({ message, type, onClose }) => {
-  return (
-    <div
-      className={`fixed top-4 right-4 z-50 flex items-center p-4 space-x-4 text-white rounded-lg shadow-lg ${
-        type === "success" ? "bg-green-500" : "bg-red-500"
-      }`}
-    >
-      <span>{message}</span>
-      <button
-        className="text-white font-bold focus:outline-none"
-        onClick={onClose}
-      >
-        &times;
-      </button>
-    </div>
-  );
-};
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Login() {
   const [email, setEmail] = useState(""); // 使用 email 而不是 username
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [toast, setToast] = useState(null); // 新增 Toast 狀態管理
   const router = useRouter();
   const { setAuth } = useAuth();
 
@@ -61,7 +41,6 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setErrorMessage("");
     setIsLoading(true);
 
     try {
@@ -91,25 +70,17 @@ export default function Login() {
 
           router.push("/");
         } else {
-          showToast("無效的存取令牌", "error");
+          toast.error("無效的存取令牌");
         }
       } else {
-        showToast(data.message || "登入失敗", "error");
+        toast.error(data.message || "登入失敗");
       }
     } catch (error) {
       console.error("錯誤:", error);
-      showToast("登入失敗，請稍後再試", "error");
+      toast.error("登入失敗，請稍後再試");
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // 顯示 Toast 通知
-  const showToast = (message, type) => {
-    setToast({ message, type });
-    setTimeout(() => {
-      setToast(null); // 5秒後自動關閉
-    }, 5000);
   };
 
   return (
@@ -238,15 +209,8 @@ export default function Login() {
         </div>
       </div>
 
-      {/* Toast 彈出通知 */}
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
-
+      {/* ToastContainer for react-toastify notifications */}
+      <ToastContainer />
       <Footer />
     </>
   );
