@@ -81,10 +81,17 @@ const ProductDetail = () => {
         <div className={styles["product-container"]}>
           <div className={styles["product-image"]}>
             <Image
-              src={product.image} // 這裡可以使用 product.image
+              src={
+                product.image
+                  ? product.image
+                  : "https://i.postimg.cc/5tTJJ4ST/33.png"
+              } // 如果 product.image 存在則顯示，否則顯示預設圖片
               width={800}
               height={800}
               alt={product.product_name}
+              onError={(e) =>
+                (e.target.src = "https://i.postimg.cc/5tTJJ4ST/33.png")
+              } // 如果圖片加載失敗，顯示預設圖片
             />
           </div>
           <div className={styles["product-details"]}>

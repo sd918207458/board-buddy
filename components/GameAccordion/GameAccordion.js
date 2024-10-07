@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Link from "next/link"; // 引入 Next.js 的 Link 組件
 
 const GameAccordion = () => {
   const [gameTypes, setGameTypes] = useState([]); // 存儲遊戲類型
@@ -41,6 +42,7 @@ const GameAccordion = () => {
       )
         .then((response) => response.json())
         .then((data) => {
+          console.log(data); // 檢查返回的數據結構
           if (data.status === "success") {
             setGames(data.data[selectedType] || []); // 更新遊戲數據
           } else {
@@ -101,7 +103,11 @@ const GameAccordion = () => {
                       {" "}
                       {/* 添加 text-center 讓遊戲名稱置中 */}
                       {games.map((game, index) => (
-                        <li key={index}>{game}</li>
+                        <li key={index}>
+                          <Link href={`/product/${game.product_id}`}>
+                            {game.product_name}
+                          </Link>
+                        </li>
                       ))}
                     </ul>
                   ) : (
