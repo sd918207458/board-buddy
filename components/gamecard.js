@@ -12,8 +12,7 @@ const GameCard = ({ game }) => {
                         className="object-cover w-full lg:mx-6 lg:w-1/2 rounded-xl h-48 lg:h-64"
                         src={game.imageUrl || "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"}
                         alt={game.room_name}
-                    />ㄒ
-
+                    />
                     <div className="relative lg:w-1/2 lg:mx-6 rounded-lg">
                         <button
                             className="absolute top-2 right-2 p-1 z-10"
@@ -25,7 +24,9 @@ const GameCard = ({ game }) => {
                             </svg>
                         </button>
 
-                        <p className="text-sm text-blue-500 uppercase">{game.room_type}</p>
+                        <p className="text-sm text-blue-500 uppercase">
+  {game.room_type === 1 ? "Home Game" : game.room_type === 2 ? "桌遊店" : ""}
+</p>
 
                         <a href="#" className="block mt-4 text-2xl font-semibold text-white dark:text-white">
                             {game.room_name}
