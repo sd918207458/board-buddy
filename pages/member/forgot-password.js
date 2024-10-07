@@ -140,11 +140,7 @@ export default function ForgotPassword() {
         <div className="card max-w-sm lg:max-w-4xl bg-white shadow-xl">
           <div className="card-body w-full px-6 py-8">
             <div className="flex justify-center">
-              <img
-                className="w-auto h-8"
-                src="https://merakiui.com/images/logo.svg"
-                alt="Logo"
-              />
+              <img className="w-auto h-8" src="/logo.jfif" alt="Logo" />
             </div>
 
             <h2 className="text-center text-2xl font-bold text-[#003E52] mt-4">

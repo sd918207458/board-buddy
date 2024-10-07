@@ -297,42 +297,53 @@ export default function PaymentMethods() {
               {paymentMethods.map((method) => (
                 <div
                   key={method.payment_id}
-                  className="card bg-base-100 shadow-xl mb-4"
+                  className="card bg-base-100 shadow-xl mb-4 relative"
                 >
                   <div className="card-body">
                     <h2 className="card-title">付款方式</h2>
+                    {method.is_default && (
+                      <span className="badge badge-primary ">預設</span>
+                    )}
                     <p>付款方式: {method.payment_type}</p>
                     {method.card_number && <p>卡號: {method.card_number}</p>}
                     {method.expiration_date && (
                       <p>到期日: {method.expiration_date}</p>
                     )}
-                    <div className="flex justify-between">
-                      <button
-                        className="btn btn-primary"
-                        onClick={() => handleEdit(method)}
-                      >
-                        編輯
-                      </button>
-                      <button
-                        className="btn btn-error"
-                        onClick={() => handleDelete(method.payment_id)}
-                      >
-                        刪除
-                      </button>
-                      <button
-                        className="btn btn-secondary"
-                        onClick={() =>
-                          setDefaultPaymentMethod(method.payment_id)
-                        }
-                        disabled={method.is_default}
-                      >
-                        設為預設
-                      </button>
+
+                    <div className="flex justify-between mt-4">
+                      {/* 編輯與刪除按鈕 */}
+                      <div>
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => handleEdit(method)}
+                        >
+                          編輯
+                        </button>
+                        <button
+                          className="btn btn-error ml-2"
+                          onClick={() => handleDelete(method.payment_id)}
+                        >
+                          刪除
+                        </button>
+                      </div>
+
+                      {/* 設為預設按鈕，如果是預設的卡片，按鈕消失 */}
+                      {!method.is_default && (
+                        <button
+                          className="btn btn-primary ml-auto bg-blue-500"
+                          onClick={() =>
+                            setDefaultPaymentMethod(method.payment_id)
+                          }
+                        >
+                          設為預設
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
               ))}
 
+              {/* 新增付款方式按鈕 */}
               <div className="card bg-base-100 shadow-xl">
                 <div className="card-body flex justify-between">
                   <h2 className="card-title">新增錢包</h2>

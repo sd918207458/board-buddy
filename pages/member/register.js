@@ -110,11 +110,7 @@ export default function Register() {
         <div className="card max-w-sm lg:max-w-4xl bg-base-100 shadow-xl">
           <div className="card-body w-full px-6 py-8">
             <div className="flex justify-center">
-              <img
-                className="w-auto h-8"
-                src="https://merakiui.com/images/logo.svg"
-                alt="Logo"
-              />
+              <img className="w-auto h-8" src="/logo.jfif" alt="Logo" />
             </div>
 
             <h2 className="text-center text-2xl font-bold text-gray-700 dark:text-gray-200 mt-4">

@@ -57,7 +57,7 @@ const NavbarSwitcher = () => {
     <LoggedInNavbar
       avatarUrl={avatarUrl}
       username={username}
-      onAvatarUpdate={handleAvatarUpdate}
+      onAvatarUpdate={handleAvatarUpdate} // 傳遞更新頭像回調函數
     />
   ) : (
     <LoggedOutNavbar />
