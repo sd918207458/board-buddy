@@ -230,7 +230,10 @@ const Card = () => {
                         加入購物車
                       </a>
                       <button
-                        onClick={() => toggleFavorite(product.product_id)}
+                        onClick={(e) => {
+                          e.preventDefault(); // 防止跳轉到商品詳細頁面
+                          toggleFavorite(product.product_id); // 切換收藏狀態
+                        }}
                         className="py-1.5 px-4 text-white border border-white rounded-lg hover:bg-white hover:text-[#003E52] transition-all"
                       >
                         加入收藏
