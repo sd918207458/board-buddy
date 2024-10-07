@@ -4,6 +4,8 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import AddressCard from "@/components/address/AddressCard";
 import AddressForm from "@/components/address/AddressForm";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Helper function to get token
 const getToken = () => localStorage.getItem("token");
@@ -24,7 +26,6 @@ export default function ShippingAddress() {
   const [userData, setUserData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
 
   // Load user info and addresses on component mount
   useEffect(() => {
@@ -48,7 +49,7 @@ export default function ShippingAddress() {
       }
     } catch (error) {
       console.error("無法加載用戶資料:", error);
-      setErrorMessage("無法加載用戶資料");
+      toast.error("無法加載用戶資料");
     }
   };
 
@@ -61,14 +62,13 @@ export default function ShippingAddress() {
       setAddresses(data.data || []); // 修正錯誤處理
     } catch (error) {
       console.error("Error fetching addresses:", error);
-      setErrorMessage("無法加載地址數據");
+      toast.error("無法加載地址數據");
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setErrorMessage("");
     const method = isEditing ? "PUT" : "POST";
     const url = isEditing
       ? `http://localhost:3005/api/shipment/addresses/${formData.address_id}`
@@ -91,9 +91,10 @@ export default function ShippingAddress() {
       );
       resetForm();
       closeModal();
+      toast.success("地址已成功保存！");
     } catch (error) {
       console.error("Error submitting address:", error);
-      setErrorMessage("提交地址失敗");
+      toast.error("提交地址失敗");
     } finally {
       setIsLoading(false);
     }
@@ -124,9 +125,10 @@ export default function ShippingAddress() {
       setAddresses((prevAddresses) =>
         prevAddresses.filter((addr) => addr.address_id !== addressId)
       );
+      toast.success("地址已成功刪除！");
     } catch (error) {
       console.error("Error deleting address:", error);
-      setErrorMessage("刪除地址失敗");
+      toast.error("刪除地址失敗");
     } finally {
       setIsLoading(false);
     }
@@ -148,9 +150,10 @@ export default function ShippingAddress() {
           isDefault: addr.address_id === addressId,
         }))
       );
+      toast.success("預設地址已設定！");
     } catch (error) {
       console.error("Error setting default address:", error);
-      setErrorMessage("設定預設地址失敗");
+      toast.error("設定預設地址失敗");
     }
   };
 
@@ -217,13 +220,14 @@ export default function ShippingAddress() {
               handleSubmit={handleSubmit}
               isEditing={isEditing}
               isLoading={isLoading}
-              errorMessage={errorMessage}
-              closeModal={closeModal}
             />
           </div>
         </dialog>
       </div>
       <Footer />
+
+      {/* ToastContainer for notifications */}
+      <ToastContainer />
     </div>
   );
 }

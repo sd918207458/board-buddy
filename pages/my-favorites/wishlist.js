@@ -145,31 +145,28 @@ export default function Favorites() {
         id: 1,
         name: "桌遊店A",
         description: "專營策略桌遊的店鋪，提供最新和經典的桌遊選擇。",
-        image: "/home_assets/桌遊店A.jpg",
+        image: "/home_assets/桌遊店01.jpg",
         location: "台北市",
         hours: "10:00 AM - 8:00 PM",
         contact: "02-12345678",
-        recommendedProducts: ["桌遊1", "桌遊2"],
       },
       {
         id: 2,
         name: "桌遊店B",
         description: "桌遊玩家的樂園，擁有全台最齊全的合作遊戲。",
-        image: "/home_assets/桌遊店B.jpg",
+        image: "/home_assets/桌遊店02.jfif",
         location: "台中市",
         hours: "9:00 AM - 9:00 PM",
         contact: "04-87654321",
-        recommendedProducts: ["桌遊2", "桌遊3"],
       },
       {
         id: 3,
         name: "桌遊店C",
         description: "這家店專賣卡牌和派對遊戲，適合家庭聚會。",
-        image: "/home_assets/桌遊店C.jpg",
+        image: "/home_assets/桌遊店03.jfif",
         location: "高雄市",
         hours: "10:30 AM - 7:30 PM",
         contact: "07-45678901",
-        recommendedProducts: ["桌遊1", "桌遊3"],
       },
     ];
 
@@ -363,13 +360,6 @@ export default function Favorites() {
                 <p className="text-gray-600">所在地：{store.location}</p>
                 <p className="text-gray-600">營業時間：{store.hours}</p>
                 <p className="text-gray-600">聯絡方式：{store.contact}</p>
-                <p className="text-gray-600">
-                  推薦產品：
-                  {Array.isArray(store.recommendedProducts)
-                    ? store.recommendedProducts.join(", ")
-                    : "無推薦產品"}
-                </p>
-
                 <div className="flex justify-between">
                   <button className="btn btn-primary">瀏覽店家</button>
                   <button className="btn btn-secondary">查看地圖</button>
