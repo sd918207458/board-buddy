@@ -3,17 +3,17 @@ import LoggedInNavbar from "@/components/LoggedInNavbar";
 import LoggedOutNavbar from "@/components/LoggedOutNavbar";
 import { useRouter } from "next/router";
 
-const NavbarSwitcher = ({ cartItems, isCartVisible, updateCartItems }) => {
+const NavbarSwitcher = ({
+  cartItems,
+  isCartVisible,
+  updateCartItems,
+  totalItems,
+}) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // 控制載入狀態
   const [avatarUrl, setAvatarUrl] = useState(""); // 用來管理頭像 URL
   const [username, setUsername] = useState(""); // 用來管理使用者名稱
   const router = useRouter();
-
-  const totalItems = cartItems.reduce(
-    (total, item) => total + item.quantity,
-    0
-  ); // 計算購物車總數量
 
   useEffect(() => {
     // 檢查是否存在 token

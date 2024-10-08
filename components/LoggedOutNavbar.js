@@ -125,6 +125,7 @@ export default function LoggedOutNavbar({
             </ul>
           </div>
         )}
+
         {/* /////////////購物車//////////// */}
         {/* 購物車 icon*/}
         <div className="dropdown dropdown-end">
