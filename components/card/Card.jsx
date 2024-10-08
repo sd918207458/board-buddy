@@ -27,8 +27,9 @@ const Card = ({ product, addToCart, toggleFavorite, isFavorite }) => {
         <div className="flex space-x-2">
           <button
             onClick={(e) => {
+              // e.stopPropagation(); // 阻止事件冒泡，避免觸發鏈接
               e.preventDefault(); // 防止跳轉到商品詳細頁面
-              addToCart(product); // 將商品加入購物車
+              addToCart({ ...product, quantity: 1 }); // 確保傳入 quantity// 將商品加入購物車
             }}
             className="py-1.5 px-4 text-white border border-white rounded-lg
             hover:bg-white hover:text-[#003E52] transition-all"

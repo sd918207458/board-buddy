@@ -6,7 +6,7 @@ import Pagination from "@/components/pagination/Pagination";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ProductSearch from "@/components/ProductSearch/ProductSearch"; // 引入 ProductSearch 組件
 
-const ProductList = () => {
+const ProductList = ({ cartItems, setCartItems }) => {
   const [products, setProducts] = useState([]);
   const [favorites, setFavorites] = useState({}); // 保存每個產品的收藏狀態
   const [filteredProducts, setFilteredProducts] = useState([]); // 存儲篩選後的產品
@@ -14,8 +14,6 @@ const ProductList = () => {
 
   const [showFilter, setShowFilter] = useState(false); // 控制篩選器顯示狀態
   const [showSearch, setShowSearch] = useState(false); // 控制搜尋欄顯示狀態
-  // 購物車狀態：保存所有加入購物車的商品
-  const [cartItems, setCartItems] = useState([]);
 
   // Fetch 商品数据
   useEffect(() => {
@@ -31,6 +29,31 @@ const ProductList = () => {
     };
     fetchProducts();
   }, []); // 這裡的空陣列表示只在組件首次加載時執行
+
+  // 添加商品到購物車的函數
+  const addToCart = (product) => {
+    console.log("Adding product to cart:", product); // 檢查商品數據
+    const existingProduct = cartItems.find(
+      (item) => item.product_id === product.product_id
+    );
+
+    let updatedCart;
+    if (existingProduct) {
+      // 如果商品已經在購物車中，更新數量
+      updatedCart = cartItems.map((item) =>
+        item.product_id === product.product_id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      );
+    } else {
+      // 如果商品不在購物車中，添加新商品
+      updatedCart = [...cartItems, { ...product, quantity: 1 }];
+    }
+
+    setCartItems(updatedCart); // 更新購物車
+    localStorage.setItem("cartItems", JSON.stringify(updatedCart)); // 保存到 localStorage
+    console.log("Cart updated:", updatedCart); // 檢查更新後的購物車數據
+  };
 
   // 切換收藏狀態
   const toggleFavorite = (productId) => {
@@ -67,27 +90,6 @@ const ProductList = () => {
     };
     setFilterTitle(titleMap[filterType] || "依照熱門程度");
     console.log(`篩選條件：${filterType}`); // 用於檢查篩選器是否正常觸發
-  };
-
-  // 添加商品到購物車的函數
-  const addToCart = (product) => {
-    const existingProduct = cartItems.find(
-      (item) => item.product_id === product.product_id
-    );
-
-    if (existingProduct) {
-      // 如果商品已經在購物車中，更新數量
-      setCartItems((prevCartItems) =>
-        prevCartItems.map((item) =>
-          item.product_id === product.product_id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        )
-      );
-    } else {
-      // 如果商品不在購物車中，添加新商品
-      setCartItems([...cartItems, { ...product, quantity: 1 }]);
-    }
   };
 
   return (

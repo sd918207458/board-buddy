@@ -35,13 +35,7 @@ export default function LoggedOutNavbar({
     return total + itemPrice * item.quantity;
   }, 0);
 
-  // 只在組件首次加載時，從 localStorage 加載購物車內容
-  useEffect(() => {
-    const storedCartItems = localStorage.getItem("cartItems");
-    if (storedCartItems) {
-      updateCartItems(JSON.parse(storedCartItems)); // 使用 updateCartItems 更新購物車內容
-    }
-  }, []); // 這裡移除了依賴項 `updateCartItems`，確保這個 effect 只在組件首次加載時運行
+  // 不再從 localStorage 獲取 cartItems，直接使用父層傳遞的值
 
   // 購物車END
 
@@ -157,6 +151,7 @@ export default function LoggedOutNavbar({
               </svg>
               <span className="badge badge-sm indicator-item">
                 {totalItems}
+                {/* 直接使用父層傳下來的 totalItems */}
                 {/* {product.quantity} 顯示從資料庫中獲取的數量 */}
               </span>
             </div>
@@ -170,7 +165,7 @@ export default function LoggedOutNavbar({
             >
               <div className="card-body">
                 {/* 顯示每個購物車商品 */}
-                {cartItems.length > 0 ? (
+                {cartItems && cartItems.length > 0 ? (
                   cartItems.map((product) => (
                     <div
                       key={product.product_id}
@@ -196,11 +191,11 @@ export default function LoggedOutNavbar({
                     </div>
                   ))
                 ) : (
-                  <p>購物車是空的</p>
+                  <p className="text-black">購物車是空的</p>
                 )}
 
                 {/* 小計 */}
-                {cartItems.length > 0 && (
+                {cartItems && cartItems.length > 0 && (
                   <span className="block mt-4 text-black">
                     小計: ${totalPrice}
                   </span>

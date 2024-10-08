@@ -54,13 +54,7 @@ const NavbarSwitcher = ({ cartItems, isCartVisible, updateCartItems }) => {
     setAvatarUrl(newAvatarUrl); // 更新頭像
   };
   // 購物車
-  // 頁面加載時從 localStorage 加載購物車內容
-  useEffect(() => {
-    const storedCartItems = localStorage.getItem("cartItems");
-    if (storedCartItems) {
-      updateCartItems(JSON.parse(storedCartItems)); // 使用 updateCartItems 更新購物車內容
-    }
-  }, []); // 刪除 `updateCartItems` 依賴項，確保只在初次渲染時執行
+  // 移除不必要的購物車初始化邏輯，購物車內容應該來自父層傳遞進來的 `cartItems`
 
   if (isLoading) {
     return <div>Loading...</div>; // 顯示載入狀態

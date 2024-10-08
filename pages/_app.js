@@ -51,14 +51,26 @@ export default function App({ Component, pageProps }) {
     setCartItems(newCartItems);
   };
 
+  const totalItems = cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
+
   return (
     <AuthProvider>
       <NavbarSwitcher
         cartItems={cartItems}
         isCartVisible={isCartVisible}
         updateCartItems={updateCartItems} // 傳遞 updateCartItems 給 Navbar
+        totalItems={totalItems} // 將 totalItems 傳遞下去
+        setCartItems={setCartItems}
       />
-      <Component {...pageProps} cartItems={cartItems} addToCart={addToCart} />
+      <Component
+        {...pageProps}
+        cartItems={cartItems}
+        setCartItems={setCartItems}
+        addToCart={addToCart}
+      />
     </AuthProvider>
   );
 }
