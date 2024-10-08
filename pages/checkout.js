@@ -11,7 +11,6 @@ import AddressFormProduct from "@/components/AddressFormProduct/AddressFormProdu
 export default function CheckoutPage() {
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar />
       <Breadcrumbs />
       <div className="flex justify-center">
         {/* Sidecart 固定在左邊 */}
