@@ -1,11 +1,43 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
+import { useRouter } from 'next/router';
 
 const GameCard = ({ game }) => {
-    const [heartRed, setHeartRed] = useState(false);
+    const router = useRouter();
+
+    // 当点击卡片时跳转到 /game-addroom 页面并传递游戏数据
+    const handleCardClick = () => {
+        router.push({
+            pathname: '/game-addroom',
+            query: { game: JSON.stringify(game) }, // 将 game 对象转换为 JSON 字符串
+        });
+    };
+
+    // 加入最爱时，将游戏数据发送到后端
+    const handleAddToFavorites = async () => {
+        try {
+            const response = await fetch('http://localhost:3005/api/roomheart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(game), // 将游戏数据传递到后端
+            });
+            if (response.ok) {
+                alert('成功加入最爱!');
+            } else {
+                alert('加入最爱失败!');
+            }
+        } catch (error) {
+            console.error('加入最爱时发生错误:', error);
+        }
+    };
 
     return (
-        <section className="bg-[#003E52] dark:bg-gray-900 transition-colors duration-200 hover:bg-[#EFB880] relative w-4/5 mx-auto rounded-lg mb-6">
+        <section 
+            className="bg-[#003E52] dark:bg-gray-900 transition-colors duration-200 hover:bg-[#EFB880] relative w-4/5 mx-auto rounded-lg mb-6 cursor-pointer"
+            onClick={handleCardClick}  // 使整个卡片可以点击
+        >
             <div className="container mx-auto py-10 border-b-2 border-[#EFB880] rounded-lg">
                 <div className="lg:flex lg:items-center">
                     <img
@@ -14,19 +46,9 @@ const GameCard = ({ game }) => {
                         alt={game.room_name}
                     />
                     <div className="relative lg:w-1/2 lg:mx-6 rounded-lg">
-                        <button
-                            className="absolute top-2 right-2 p-1 z-10"
-                            onClick={() => setHeartRed(!heartRed)}
-                            aria-label={heartRed ? "Remove from favorites" : "Add to favorites"}
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${heartRed ? 'text-red-600' : 'text-gray-300'}`} fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                            </svg>
-                        </button>
-
                         <p className="text-sm text-blue-500 uppercase">
-  {game.room_type === 1 ? "Home Game" : game.room_type === 2 ? "桌遊店" : ""}
-</p>
+                            {game.room_type === 1 ? "Home Game" : game.room_type === 2 ? "桌遊店" : ""}
+                        </p>
 
                         <a href="#" className="block mt-4 text-2xl font-semibold text-white dark:text-white">
                             {game.room_name}
@@ -59,7 +81,15 @@ const GameCard = ({ game }) => {
 
                         <div className="absolute bottom-4 right-4 flex flex-col space-y-2">
                             <button className="px-4 py-2 w-32 text-white bg-green-500 rounded hover:bg-green-600">聯絡房主</button>
-                            <button className="px-4 py-2 w-32 text-white bg-blue-500 rounded hover:bg-blue-600">加入揪團</button>
+                            <button 
+                                className="px-4 py-2 w-32 text-white bg-blue-500 rounded hover:bg-blue-600"
+                                onClick={(e) => {
+                                    e.stopPropagation(); // 阻止事件冒泡
+                                    handleAddToFavorites(); // 调用加入最爱处理函数
+                                }}
+                            >
+                                加入最愛
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -71,7 +101,8 @@ const GameCard = ({ game }) => {
 GameCard.propTypes = {
     game: PropTypes.shape({
         imageUrl: PropTypes.string,
-        room_type: PropTypes.string,
+        room_id: PropTypes.string,
+        room_type: PropTypes.number,
         room_name: PropTypes.string,
         room_intro: PropTypes.string,
         hostImage: PropTypes.string,
@@ -81,6 +112,7 @@ GameCard.propTypes = {
         game3: PropTypes.string,
         location: PropTypes.string,
         event_date: PropTypes.string,
+        roomrule: PropTypes.string,
     }).isRequired,
 };
 
@@ -97,7 +129,8 @@ const GameCardList = ({ games = [] }) => {
 GameCardList.propTypes = {
     games: PropTypes.arrayOf(PropTypes.shape({
         imageUrl: PropTypes.string,
-        room_type: PropTypes.string,
+        room_id: PropTypes.string,
+        room_type: PropTypes.number,
         room_name: PropTypes.string,
         room_intro: PropTypes.string,
         hostImage: PropTypes.string,
@@ -107,6 +140,7 @@ GameCardList.propTypes = {
         game3: PropTypes.string,
         location: PropTypes.string,
         event_date: PropTypes.string,
+        roomrule: PropTypes.string,
     })),
 };
 
