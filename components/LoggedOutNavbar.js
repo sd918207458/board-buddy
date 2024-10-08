@@ -204,7 +204,18 @@ export default function LoggedOutNavbar({
 
                 {/* 查看購物車按鈕 */}
                 <div className="card-actions mt-4">
-                  <button className="btn btn-primary bg-[#003E52] btn-block hover:bg-black">
+                  <button
+                    className="btn btn-primary bg-[#003E52] btn-block hover:bg-black"
+                    onClick={() => {
+                      router.push({
+                        pathname: "/checkout",
+                        query: {
+                          cart: JSON.stringify(cartItems),
+                          total: totalPrice,
+                        }, // 傳遞購物車資訊
+                      });
+                    }}
+                  >
                     查看購物車
                   </button>
                 </div>
