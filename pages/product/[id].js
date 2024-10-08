@@ -8,7 +8,7 @@ import { FaHeart } from "react-icons/fa"; // 實心愛心
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const ProductDetail = () => {
+const ProductDetail = ({ addToCart }) => {
   const router = useRouter();
   const { id } = router.query; // 使用 useRouter 獲取 URL 中的 id
 
@@ -67,6 +67,11 @@ const ProductDetail = () => {
     }
   };
 
+  // 添加到購物車的函數
+  const handleAddToCart = () => {
+    addToCart({ ...product, quantity }); // 使用來自 _app.js 的 addToCart 函數
+    toast.success("商品已加入購物車！");
+  };
   if (loading) {
     return <p>Loading...</p>; // 加載中顯示的內容
   }
@@ -147,12 +152,12 @@ const ProductDetail = () => {
               </div>
             </div>
             <div className={styles["button-container"]}>
-              <a
-                href="#"
+              <button
+                onClick={() => addToCart({ ...product, quantity })} // 使用來自 _app.js 的 addToCart 函數
                 className={`${styles["add-to-cart"]} transition-all duration-200 ease-in-out focus:shadow hover:bg-gray-800`}
               >
                 加入購物車
-              </a>
+              </button>
               <a
                 href="#"
                 onClick={toggleLike}

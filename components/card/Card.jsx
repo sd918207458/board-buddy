@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link"; // 引入 Next.js 的 Link 組件
 
-const Card = ({ product, toggleFavorite, isFavorite }) => {
+const Card = ({ product, addToCart, toggleFavorite, isFavorite }) => {
   return (
     <Link
       href={`/product/${product.product_id}`} // 使用動態路由
@@ -25,12 +25,16 @@ const Card = ({ product, toggleFavorite, isFavorite }) => {
           ${product.price}
         </p>
         <div className="flex space-x-2">
-          <a
-            href="#"
-            className="py-1.5 px-4 text-white border border-white rounded-lg hover:bg-white hover:text-[#003E52] transition-all"
+          <button
+            onClick={(e) => {
+              e.preventDefault(); // 防止跳轉到商品詳細頁面
+              addToCart(product); // 將商品加入購物車
+            }}
+            className="py-1.5 px-4 text-white border border-white rounded-lg
+            hover:bg-white hover:text-[#003E52] transition-all"
           >
             加入購物車
-          </a>
+          </button>
           <button
             onClick={(e) => {
               e.preventDefault(); // 防止跳轉到商品詳細頁面

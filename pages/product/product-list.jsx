@@ -14,6 +14,8 @@ const ProductList = () => {
 
   const [showFilter, setShowFilter] = useState(false); // 控制篩選器顯示狀態
   const [showSearch, setShowSearch] = useState(false); // 控制搜尋欄顯示狀態
+  // 購物車狀態：保存所有加入購物車的商品
+  const [cartItems, setCartItems] = useState([]);
 
   // Fetch 商品数据
   useEffect(() => {
@@ -67,6 +69,27 @@ const ProductList = () => {
     console.log(`篩選條件：${filterType}`); // 用於檢查篩選器是否正常觸發
   };
 
+  // 添加商品到購物車的函數
+  const addToCart = (product) => {
+    const existingProduct = cartItems.find(
+      (item) => item.product_id === product.product_id
+    );
+
+    if (existingProduct) {
+      // 如果商品已經在購物車中，更新數量
+      setCartItems((prevCartItems) =>
+        prevCartItems.map((item) =>
+          item.product_id === product.product_id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        )
+      );
+    } else {
+      // 如果商品不在購物車中，添加新商品
+      setCartItems([...cartItems, { ...product, quantity: 1 }]);
+    }
+  };
+
   return (
     <>
       <div className="flex overflow-visible relative overflow-x-hidden">
@@ -95,6 +118,7 @@ const ProductList = () => {
                 product={product}
                 toggleFavorite={toggleFavorite}
                 isFavorite={favorites[product.product_id]}
+                addToCart={addToCart} // 傳遞 addToCart 函數
               />
             ))}
           </div>

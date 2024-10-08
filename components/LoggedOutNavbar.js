@@ -8,8 +8,32 @@ import {
 } from "react-icons/gi";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import Image from "next/image";
 
-export default function LoggedOutNavbar() {
+export default function LoggedOutNavbar({
+  totalItems, // 這個是從 `props` 傳遞進來的購物車商品總數
+  // isCartVisible,
+  cartItems = [],
+}) {
+  // 購物車START
+  // 切換購物車顯示狀態
+  const [cartVisible, setCartVisible] = useState(false); // 初始為 false，表示購物車隱藏
+
+  const toggleCart = () => {
+    console.log("購物車按鈕被點擊"); // 測試是否觸發了此函數
+    console.log(cartItems); // 檢查 cartItems 是否正確傳遞
+    setCartVisible((prevState) => !prevState);
+  };
+
+  const totalPrice = cartItems.reduce((total, item) => {
+    const itemPrice = parseFloat(item.price.replace(/,/g, "")); // 移除價格中的逗號，然後轉換為數字
+    if (isNaN(itemPrice)) {
+      return total; // 如果價格不是數字，跳過該項
+    }
+    return total + itemPrice * item.quantity;
+  }, 0);
+
+  // 購物車END
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
 
@@ -96,8 +120,93 @@ export default function LoggedOutNavbar() {
             </ul>
           </div>
         )}
-
+        {/* /////////////購物車//////////// */}
+        {/* 購物車 icon*/}
         <div className="dropdown dropdown-end">
+          <div
+            tabIndex={0}
+            role="button"
+            className="btn btn-ghost btn-circle"
+            onClick={toggleCart} // 加上事件處理器
+          >
+            <div className="indicator">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+              <span className="badge badge-sm indicator-item">
+                {totalItems}
+                {/* {product.quantity} 顯示從資料庫中獲取的數量 */}
+              </span>
+            </div>
+          </div>
+
+          {/* 購物車內容顯示 */}
+          {cartVisible && (
+            <div
+              tabIndex={0}
+              className="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-52 shadow"
+            >
+              <div className="card-body">
+                {/* 顯示每個購物車商品 */}
+                {cartItems.length > 0 ? (
+                  cartItems.map((product) => (
+                    <div
+                      key={product.product_id}
+                      className="flex items-center space-x-4"
+                    >
+                      {/* 圖片 */}
+                      <Image
+                        src={product.image}
+                        width={50}
+                        height={50}
+                        alt={product.product_name}
+                        className="rounded-lg"
+                      />
+                      {/* 商品名稱和數量 */}
+                      <div>
+                        <span className="block text-lg text-black font-bold">
+                          {product.product_name}
+                        </span>
+                        <span className="block text-lg text-black">
+                          數量: {product.quantity}
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p>購物車是空的</p>
+                )}
+
+                {/* 小計 */}
+                {cartItems.length > 0 && (
+                  <span className="block mt-4 text-black">
+                    小計: ${totalPrice}
+                  </span>
+                )}
+
+                {/* 查看購物車按鈕 */}
+                <div className="card-actions mt-4">
+                  <button className="btn btn-primary bg-[#003E52] btn-block hover:bg-black">
+                    查看購物車
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* <div className="dropdown dropdown-end">
           <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
             <div className="indicator">
               <svg
@@ -131,7 +240,7 @@ export default function LoggedOutNavbar() {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
