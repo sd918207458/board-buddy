@@ -4,12 +4,16 @@ import Card from "@/components/card/Card";
 import Footer from "@/components/footer";
 import Pagination from "@/components/pagination/Pagination";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import ProductSearch from "@/components/ProductSearch/ProductSearch"; // 引入 ProductSearch 組件
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [favorites, setFavorites] = useState({}); // 保存每個產品的收藏狀態
   const [filteredProducts, setFilteredProducts] = useState([]); // 存儲篩選後的產品
   const [filterTitle, setFilterTitle] = useState("全部商品"); // 預設為全部商品
+
+  const [showFilter, setShowFilter] = useState(false); // 控制篩選器顯示狀態
+  const [showSearch, setShowSearch] = useState(false); // 控制搜尋欄顯示狀態
 
   // Fetch 商品数据
   useEffect(() => {
@@ -47,6 +51,7 @@ const ProductList = () => {
       sortedProducts.sort((a, b) => cleanPrice(a.price) - cleanPrice(b.price));
     }
 
+    console.log("已篩選產品：", sortedProducts); // 檢查篩選結果
     setFilteredProducts([...sortedProducts]);
   };
 
@@ -59,20 +64,31 @@ const ProductList = () => {
       priceLow: "依照價錢由低到高",
     };
     setFilterTitle(titleMap[filterType] || "依照熱門程度");
+    console.log(`篩選條件：${filterType}`); // 用於檢查篩選器是否正常觸發
   };
 
   return (
     <>
-      <div className="flex">
+      <div className="flex overflow-visible relative overflow-x-hidden">
         {/* Sidebar on the left */}
         <aside className="w-70">
           <Breadcrumbs />
           <GameAccordion />
         </aside>
         {/* Main content on the right */}
-        <main className="flex-1 p-4">
+        <main className="relative flex flex-col">
+          {/* 引入 ProductSearch 組件 */}
+          <ProductSearch
+            filterTitle={filterTitle}
+            setShowFilter={setShowFilter}
+            showFilter={showFilter}
+            setShowSearch={setShowSearch}
+            showSearch={showSearch}
+            handleFilterChange={handleFilterChange}
+          />
+
           {/* Product Card and other components */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
             {filteredProducts.map((product) => (
               <Card
                 key={product.product_id}
