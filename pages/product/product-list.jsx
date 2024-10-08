@@ -111,7 +111,7 @@ const ProductList = ({ cartItems, setCartItems }) => {
             showSearch={showSearch}
             handleFilterChange={handleFilterChange}
           />
-
+          {console.log("ProductSearch rendered")}
           {/* Product Card and other components */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
             {filteredProducts.map((product) => (
