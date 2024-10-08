@@ -13,9 +13,11 @@ import Image from "next/image";
 export default function LoggedOutNavbar({
   totalItems, // 這個是從 `props` 傳遞進來的購物車商品總數
   // isCartVisible,
-  cartItems = [],
+  cartItems = [], // 從 _app.js 傳入的購物車項目
+  updateCartItems, // 從 _app.js 傳入的更新購物車函數
 }) {
   // 購物車START
+
   // 切換購物車顯示狀態
   const [cartVisible, setCartVisible] = useState(false); // 初始為 false，表示購物車隱藏
 
@@ -33,7 +35,16 @@ export default function LoggedOutNavbar({
     return total + itemPrice * item.quantity;
   }, 0);
 
+  // 只在組件首次加載時，從 localStorage 加載購物車內容
+  useEffect(() => {
+    const storedCartItems = localStorage.getItem("cartItems");
+    if (storedCartItems) {
+      updateCartItems(JSON.parse(storedCartItems)); // 使用 updateCartItems 更新購物車內容
+    }
+  }, []); // 這裡移除了依賴項 `updateCartItems`，確保這個 effect 只在組件首次加載時運行
+
   // 購物車END
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
 

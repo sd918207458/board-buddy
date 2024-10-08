@@ -3,7 +3,7 @@ import LoggedInNavbar from "@/components/LoggedInNavbar";
 import LoggedOutNavbar from "@/components/LoggedOutNavbar";
 import { useRouter } from "next/router";
 
-const NavbarSwitcher = ({ cartItems, isCartVisible }) => {
+const NavbarSwitcher = ({ cartItems, isCartVisible, updateCartItems }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // 控制載入狀態
   const [avatarUrl, setAvatarUrl] = useState(""); // 用來管理頭像 URL
@@ -53,6 +53,14 @@ const NavbarSwitcher = ({ cartItems, isCartVisible }) => {
   const handleAvatarUpdate = (newAvatarUrl) => {
     setAvatarUrl(newAvatarUrl); // 更新頭像
   };
+  // 購物車
+  // 頁面加載時從 localStorage 加載購物車內容
+  useEffect(() => {
+    const storedCartItems = localStorage.getItem("cartItems");
+    if (storedCartItems) {
+      updateCartItems(JSON.parse(storedCartItems)); // 使用 updateCartItems 更新購物車內容
+    }
+  }, []); // 刪除 `updateCartItems` 依賴項，確保只在初次渲染時執行
 
   if (isLoading) {
     return <div>Loading...</div>; // 顯示載入狀態
@@ -65,13 +73,16 @@ const NavbarSwitcher = ({ cartItems, isCartVisible }) => {
       onAvatarUpdate={handleAvatarUpdate}
       cartItems={cartItems} // 傳遞購物車內容
       totalItems={totalItems} // 傳遞購物車商品總數
+      isCartVisible={isCartVisible} // 傳遞購物車顯示狀態
+      updateCartItems={updateCartItems} // 傳遞購物車更新函數
     />
   ) : (
     <LoggedOutNavbar
       cartItems={cartItems}
       totalItems={totalItems}
-      isCartVisible={isCartVisible} // 將購物車顯示狀態傳遞下去
-    /> // 傳遞購物車內容
+      isCartVisible={isCartVisible} // 傳遞購物車顯示狀態
+      updateCartItems={updateCartItems} // 傳遞購物車更新函數
+    />
   );
 };
 

@@ -7,11 +7,24 @@ import "@/styles/payment.css";
 import "@/styles/address.css";
 import NavbarSwitcher from "@/components/NavbarSwitcher"; // 引入 NavbarSwitcher 組件
 import { AuthProvider } from "@/hooks/use-auth";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function App({ Component, pageProps }) {
   const [cartItems, setCartItems] = useState([]); // 全局購物車狀態
   const [isCartVisible, setIsCartVisible] = useState(false); // 控制購物車顯示
+
+  // 從 localStorage 初始化購物車
+  useEffect(() => {
+    const storedCartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+    setCartItems(storedCartItems);
+  }, []); // 僅在頁面初始化時運行
+
+  // 當 cartItems 更新時，保存到 localStorage
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      localStorage.setItem("cartItems", JSON.stringify(cartItems));
+    }
+  }, [cartItems]); // 每當 cartItems 更新時都會保存到 localStorage
 
   // 添加商品到購物車的函數
   const addToCart = (product) => {
@@ -33,9 +46,18 @@ export default function App({ Component, pageProps }) {
     setIsCartVisible(true); // 點擊加入購物車後顯示購物車內容
   };
 
+  // 更新購物車項目函數，供 Navbar 使用
+  const updateCartItems = (newCartItems) => {
+    setCartItems(newCartItems);
+  };
+
   return (
     <AuthProvider>
-      <NavbarSwitcher cartItems={cartItems} isCartVisible={isCartVisible} />
+      <NavbarSwitcher
+        cartItems={cartItems}
+        isCartVisible={isCartVisible}
+        updateCartItems={updateCartItems} // 傳遞 updateCartItems 給 Navbar
+      />
       <Component {...pageProps} cartItems={cartItems} addToCart={addToCart} />
     </AuthProvider>
   );

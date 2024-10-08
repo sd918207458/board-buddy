@@ -67,11 +67,29 @@ const ProductDetail = ({ addToCart }) => {
     }
   };
 
-  // 添加到購物車的函數
   const handleAddToCart = () => {
-    addToCart({ ...product, quantity }); // 使用來自 _app.js 的 addToCart 函數
+    const existingCart = JSON.parse(localStorage.getItem("cartItems")) || [];
+
+    const existingProduct = existingCart.find(
+      (item) => item.product_id === product.product_id
+    );
+
+    let updatedCart;
+    if (existingProduct) {
+      updatedCart = existingCart.map((item) =>
+        item.product_id === product.product_id
+          ? { ...item, quantity: item.quantity + quantity }
+          : item
+      );
+    } else {
+      updatedCart = [...existingCart, { ...product, quantity }];
+    }
+
+    localStorage.setItem("cartItems", JSON.stringify(updatedCart));
+
     toast.success("商品已加入購物車！");
   };
+
   if (loading) {
     return <p>Loading...</p>; // 加載中顯示的內容
   }
