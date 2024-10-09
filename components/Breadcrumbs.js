@@ -1,8 +1,8 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
 
-import { CSSTransition, TransitionGroup } from "react-transition-group";
 
+import { CSSTransition, TransitionGroup } from "react-transition-group";
 
 
 const Breadcrumbs = ({ customCrumbs }) => {
@@ -108,4 +108,6 @@ const Breadcrumbs = ({ customCrumbs }) => {
   );
 };
 
+
 export default Breadcrumbs;
+
