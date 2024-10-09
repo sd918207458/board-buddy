@@ -1,8 +1,23 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import {
+  useShip711StoreCallback,
+  useShip711StoreOpener,
+} from "@/hooks/use-ship-711-store"; // 引入7-11運送商店的回傳和開啟勾子
 
 const AddressFormProduct = () => {
+  // const cities = taiwanDistricts.map((city) => city.name);
+  const [areas, setAreas] = useState([]);
   const [isConvenienceStore, setIsConvenienceStore] = useState(false);
+  const [formData, setFormData] = useState({
+    city: "",
+    storeName: "",
+    storeAddress: "",
+    address: "",
+    cardNumber: "",
+    cardName: "",
+    expiryDate: "",
+    cvc: "",
+  });
 
   const handleOptionChange = (e) => {
     if (e.target.value === "convenience_store") {
@@ -10,6 +25,43 @@ const AddressFormProduct = () => {
     } else {
       setIsConvenienceStore(false);
     }
+  };
+
+  // 使用 7-11 門市選擇 API 鈎子
+  const { store711, openWindow, closeWindow } = useShip711StoreOpener(
+    "http://localhost:3005/api/shipment/711", // 使用你在伺服器設置的 callback URL
+    { autoCloseMins: 3 }
+  );
+
+  // 回傳門市資訊的勾子，處理選擇 7-11 門市後的資料
+  useShip711StoreCallback((storeInfo) => {
+    console.log("7-11 門市資訊：", storeInfo); // 查看回傳的門市資訊
+    if (storeInfo) {
+      handleChange({
+        target: {
+          name: "storeName",
+          value: storeInfo.storeName,
+        },
+      });
+      handleChange({
+        target: {
+          name: "storeAddress",
+          value: storeInfo.storeAddress,
+        },
+      });
+    }
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = () => {
+    console.log("表單資料：", formData); // 提交表單資料的邏輯
   };
 
   return (
@@ -44,7 +96,7 @@ const AddressFormProduct = () => {
                 <span className="ml-2">超商取貨</span>
               </label>
             </div>
-            {/* 如果選擇超商取貨，顯示選擇超商按鈕和取貨門市 */}
+
             {isConvenienceStore && (
               <div className="mt-4">
                 <div className="border p-4">
@@ -65,9 +117,34 @@ const AddressFormProduct = () => {
                   </div>
 
                   <div className="mt-4">
-                    <button className="w-full border border-orange-400 text-orange-400 py-2 px-4 rounded-md">
+                    <button
+                      className="w-full border border-orange-400 text-orange-400 py-2 px-4 rounded-md"
+                      onClick={() => openWindow()}
+                    >
                       請選擇取貨門市
                     </button>
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="block text-gray-700">7-11 門市名稱</label>
+                    <input
+                      type="text"
+                      name="storeName"
+                      value={store711.storeName || formData.storeName}
+                      className="w-full px-4 py-2 mt-2 border rounded-md"
+                      readOnly
+                    />
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="block text-gray-700">7-11 門市地址</label>
+                    <input
+                      type="text"
+                      name="storeAddress"
+                      value={store711.storeAddress || formData.storeAddress}
+                      className="w-full px-4 py-2 mt-2 border rounded-md"
+                      readOnly
+                    />
                   </div>
                 </div>
               </div>
@@ -107,7 +184,10 @@ const AddressFormProduct = () => {
                 <input
                   id="address"
                   type="text"
-                  className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
                   placeholder="請輸入詳細地址"
                 />
               </div>
@@ -122,7 +202,10 @@ const AddressFormProduct = () => {
                 <input
                   id="city"
                   type="text"
-                  className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                  className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
                   placeholder="請輸入縣市"
                 />
               </div>
@@ -137,7 +220,10 @@ const AddressFormProduct = () => {
                 <input
                   id="district"
                   type="text"
-                  className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring"
+                  name="district"
+                  value={formData.district}
+                  onChange={handleChange}
+                  className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
                   placeholder="請輸入鄉鎮市區"
                 />
               </div>
@@ -146,72 +232,85 @@ const AddressFormProduct = () => {
             <h2 className="text-lg font-semibold text-gray-700 capitalize dark:text-white mt-8">
               信用卡資訊
             </h2>
-            <form>
-              <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2 w-full">
-                <div>
-                  <label
-                    className="text-gray-700 dark:text-gray-200"
-                    htmlFor="card_number"
-                  >
-                    信用卡卡號
-                  </label>
-                  <input
-                    id="card_number"
-                    type="text"
-                    className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring"
-                    placeholder="請輸入信用卡卡號"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    className="text-gray-700 dark:text-gray-200"
-                    htmlFor="card_name"
-                  >
-                    持卡人姓名
-                  </label>
-                  <input
-                    id="card_name"
-                    type="text"
-                    className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring"
-                    placeholder="請輸入持卡人姓名"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    className="text-gray-700 dark:text-gray-200"
-                    htmlFor="expiry_date"
-                  >
-                    到期日 (MM/YY)
-                  </label>
-                  <input
-                    id="expiry_date"
-                    type="text"
-                    className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring"
-                    placeholder="MM/YY"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    className="text-gray-700 dark:text-gray-200"
-                    htmlFor="cvc"
-                  >
-                    CVC 安全碼
-                  </label>
-                  <input
-                    id="cvc"
-                    type="text"
-                    className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring"
-                    placeholder="三位數安全碼"
-                  />
-                </div>
+            <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2 w-full">
+              <div>
+                <label
+                  className="text-gray-700 dark:text-gray-200"
+                  htmlFor="card_number"
+                >
+                  信用卡卡號
+                </label>
+                <input
+                  id="card_number"
+                  type="text"
+                  name="cardNumber"
+                  value={formData.cardNumber}
+                  onChange={handleChange}
+                  className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
+                  placeholder="請輸入信用卡卡號"
+                />
               </div>
-            </form>
+
+              <div>
+                <label
+                  className="text-gray-700 dark:text-gray-200"
+                  htmlFor="card_name"
+                >
+                  持卡人姓名
+                </label>
+                <input
+                  id="card_name"
+                  type="text"
+                  name="cardName"
+                  value={formData.cardName}
+                  onChange={handleChange}
+                  className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
+                  placeholder="請輸入持卡人姓名"
+                />
+              </div>
+
+              <div>
+                <label
+                  className="text-gray-700 dark:text-gray-200"
+                  htmlFor="expiry_date"
+                >
+                  到期日 (MM/YY)
+                </label>
+                <input
+                  id="expiry_date"
+                  type="text"
+                  name="expiryDate"
+                  value={formData.expiryDate}
+                  onChange={handleChange}
+                  className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
+                  placeholder="MM/YY"
+                />
+              </div>
+
+              <div>
+                <label
+                  className="text-gray-700 dark:text-gray-200"
+                  htmlFor="cvc"
+                >
+                  CVC 安全碼
+                </label>
+                <input
+                  id="cvc"
+                  type="text"
+                  name="cvc"
+                  value={formData.cvc}
+                  onChange={handleChange}
+                  className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
+                  placeholder="三位數安全碼"
+                />
+              </div>
+            </div>
 
             <div className="flex justify-end mt-6">
-              <button className="px-8 py-2.5 leading-5 text-white transition-colors duration-300 transform bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600">
+              <button
+                className="px-8 py-2.5 leading-5 text-white transition-colors duration-300 transform bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600"
+                onClick={handleSubmit}
+              >
                 送出
               </button>
             </div>
