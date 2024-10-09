@@ -29,67 +29,97 @@ const SearchBar = ({ onSearchResults }) => {
     }
   };
 
-  // 玩家人数筛选逻辑
-  const isPlayerCountMatched = (minperson, maxperson, selectedCounts) => {
-    const playerCountRanges = {
-      '3人': [2, 3],
-      '4-6人': [4, 5, 6],
-      '6-9人': [7, 8, 9],
-      '9人以上': [10]
-    };
-
-    return selectedCounts.length === 0 || selectedCounts.some(count => {
-      const range = playerCountRanges[count];
-      return minperson <= Math.max(...range) && maxperson >= Math.min(...range);
-    });
-  };
-
   // 过滤结果
   const filterResults = () => {
     return allResults.filter(result => {
-      const matchesCity = result.location === selectedCity;
-      const matchesKeyword = result.room_name.includes(searchKeyword);
-      const matchesDate = selectedDate ? result.event_date.split('T')[0] === selectedDate : true;
-      const matchesGameType = !selectedTags.partyTypes.length || selectedTags.partyTypes.includes(result.room_type);
-      const matchesPlayerCount = isPlayerCountMatched(result.minperson, result.maxperson, selectedTags.playerCounts);
-      const matchesTags = !selectedTags.gameTypes.length || 
-        selectedTags.gameTypes.some(tag => 
-          result.type1 === tag || result.type2 === tag || result.type3 === tag
+      // 城市篩選
+      const matchesCity = result.location.includes(selectedCity);
+
+      // 遊戲種類篩選
+      const matchesTags = selectedTags.gameTypes.length === 0 || 
+        [result.type1, result.type2, result.type3].some(type => 
+          selectedTags.gameTypes.includes(type)
         );
 
-      return matchesCity && matchesKeyword && matchesDate && matchesGameType && matchesPlayerCount && matchesTags;
+      // 揪團類型篩選
+      const matchesGameType = selectedTags.partyTypes.length === 0 || 
+        selectedTags.partyTypes.includes(result.room_type === 1 ? "HomeGame" : "桌遊店");
+
+      // 遊戲人數篩選
+      const matchesPlayerCount = selectedTags.playerCounts.length === 0 || 
+        selectedTags.playerCounts.some(count => {
+          if (count === '10人以上') {
+            return result.maxperson >= 10; // 確保 maxperson 大於等於 10
+          }
+
+          const playerCountRanges = {
+            '3人': 3,
+            '4-6人': [4, 5, 6],
+            '7-9人': [7, 8, 9]
+          };
+
+          const range = playerCountRanges[count];
+          return Array.isArray(range)
+            ? result.maxperson >= Math.min(...range) && result.maxperson <= Math.max(...range)
+            : result.maxperson === range; // 直接比較
+        });
+
+      // 活動日期篩選
+      const matchesDate = selectedDate ? result.event_date.split('T')[0] === selectedDate : true;
+
+      // 當標題下的標籤都沒有被選擇時，將該標題的篩選資料包含所有資料
+      const gameTypesMatch = selectedTags.gameTypes.length > 0 ? matchesTags : true;
+      const partyTypesMatch = selectedTags.partyTypes.length > 0 ? matchesGameType : true;
+
+      // 將所有條件組合
+      return matchesCity && gameTypesMatch && partyTypesMatch && matchesPlayerCount && matchesDate;
     });
   };
 
   // 监听输入变化
   useEffect(() => {
+    fetchAllResults(); // 组件首次加载时抓取数据
+  }, []);
+
+  // 監聽標籤變化的效果
+  useEffect(() => {
     const filteredResults = filterResults();
     onSearchResults(filteredResults); // 更新父组件
   }, [searchKeyword, selectedCity, selectedTags, selectedDate, allResults]);
 
-  useEffect(() => {
-    fetchAllResults(); // 组件首次加载时抓取数据
-  }, []);
-
   const handleTagChange = (tag, group) => {
     setSelectedTags(prev => {
+      // 如果選擇的是「不限」，清空該組的所有標籤
+      if (tag === '不限') {
+        return {
+          ...prev,
+          [group]: [], // 清空標籤
+        };
+      }
+
+      // 處理其他標籤的選擇
       const isSelected = prev[group].includes(tag);
-      return {
+      const updatedTags = {
         ...prev,
         [group]: isSelected 
           ? prev[group].filter(t => t !== tag) 
           : [...prev[group], tag]
       };
+      
+      // 每次更改標籤後立刻更新結果
+      const filteredResults = filterResults();
+      onSearchResults(filteredResults);
+
+      return updatedTags;
     });
   };
 
   const handleDateChange = (event) => {
     setSelectedDate(event.target.value);
-  };
-
-  const handleSearch = () => {
+    
+    // 每次選擇日期後立刻更新結果
     const filteredResults = filterResults();
-    onSearchResults(filteredResults); // 点击搜索按钮时更新父组件
+    onSearchResults(filteredResults);
   };
 
   return (
@@ -113,7 +143,7 @@ const SearchBar = ({ onSearchResults }) => {
           className="input input-bordered w-64 mr-2 bg-transparent text-white text-lg transition duration-200 focus:outline-none focus:border-2 focus:border-transparent hover:border-[#EFB880] hover:border-2"
           style={{ fontSize: '22px' }}
         />
-        <button onClick={handleSearch} className="btn btn-primary ml-2">搜尋</button>
+        <button onClick={() => { /* 可以在這裡觸發搜尋邏輯 */ }} className="btn btn-primary ml-2">搜尋</button>
       </div>
 
       {/* 遊戲種類 */}
