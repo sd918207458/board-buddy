@@ -18,6 +18,7 @@ export default function Createroom() {
   });
   const [isLoading, setIsLoading] = useState(false);
 
+
   const gameCategories = ["策略", "合作", "推理", "陣營", "益智", "多人", "派對", "小品"];
   const gameTitles = {
     "策略": ["遊戲1-1", "遊戲1-2", "遊戲1-3", "遊戲1-4", "遊戲1-5", "遊戲1-6", "遊戲1-7", "遊戲1-8", "遊戲1-9", "遊戲1-10", "遊戲1-11", "遊戲1-12", "遊戲1-13", "遊戲1-14", "遊戲1-15"],
@@ -28,6 +29,7 @@ export default function Createroom() {
     "多人": ["遊戲6-1", "遊戲6-2", "遊戲6-3", "遊戲6-4", "遊戲6-5", "遊戲6-6", "遊戲6-7", "遊戲6-8", "遊戲6-9", "遊戲6-10", "遊戲6-11", "遊戲6-12", "遊戲6-13", "遊戲6-14", "遊戲6-15"],
     "派對": ["遊戲7-1", "遊戲7-2", "遊戲7-3", "遊戲7-4", "遊戲7-5", "遊戲7-6", "遊戲7-7", "遊戲7-8", "遊戲7-9", "遊戲7-10", "遊戲7-11", "遊戲7-12", "遊戲7-13", "遊戲7-14", "遊戲7-15"],
     "小品": ["遊戲8-1", "遊戲8-2", "遊戲8-3", "遊戲8-4", "遊戲8-5", "遊戲8-6", "遊戲8-7", "遊戲8-8", "遊戲8-9", "遊戲8-10", "遊戲8-11", "遊戲8-12", "遊戲8-13", "遊戲8-14", "遊戲8-15"],
+
   };
 
   const handleGameOptionChange = (index, field, value) => {
@@ -135,6 +137,7 @@ export default function Createroom() {
 
   return (
     <>
+      <Navbar />
       <Breadcrumbs />
       <div className="bg-[#003E52] min-h-screen">
         <div className="columns-2 flex m-auto size-4/5 rounded border-2 border-slate-200 p-4 relative">
@@ -167,7 +170,7 @@ export default function Createroom() {
               </div>
 
               <div className="pt-3.5">
-                <label htmlFor="img" className="block text-sm text-gray-500 dark:text-gray-300">上傳圖片</label>
+                <label htmlFor="img" className="block text-sm text-gray-500 dark:text-gray-300">揪團圖片</label>
                 <input
                   type="file"
                   name="img"
@@ -175,7 +178,69 @@ export default function Createroom() {
                   onChange={handleFileChange}
                 />
               </div>
-
+              <div className="pt-3.5">
+                <label className="block text-sm text-gray-500 dark:text-gray-300">遊戲選項</label>
+                {gameOptions.map((option, index) => (
+                  <div key={index} className="flex mt-2">
+                    <select
+                      className="mr-2 block w-full border border-gray-400 rounded-lg px-4 py-2"
+                      value={option.category}
+                      onChange={(e) => handleGameOptionChange(index, "category", e.target.value)}
+                    >
+                      <option value="">選擇類型</option>
+                      {gameCategories.map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      className="block w-full border border-gray-400 rounded-lg px-4 py-2"
+                      value={option.title}
+                      onChange={(e) => handleGameOptionChange(index, "title", e.target.value)}
+                    >
+                      <option value="">選擇遊戲</option>
+                      {option.category && gameTitles[option.category].map((title) => (
+                        <option key={title} value={title}>
+                          {title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={addGameOption}
+                  className="mt-2 text-blue-500 hover:underline"
+                >
+                  新增遊戲選項
+                </button>
+              </div>
+              <div className="pt-3.5">
+                <label className="block text-sm text-gray-500 dark:text-gray-300">揪團類型</label>
+                <div className="flex items-center mt-2">
+                  <label className="mr-4">
+                    <input
+                      type="radio"
+                      name="room_type"
+                      value="1"
+                      className="mr-1"
+                      onChange={handleChange}
+                    />
+                    Home
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      name="room_type"
+                      value="2"
+                      className="mr-1"
+                      onChange={handleChange}
+                    />
+                    桌遊店
+                  </label>
+                </div>
+              </div>
               <div className="pt-3.5">
                 <label htmlFor="event_date" className="block text-sm text-gray-500 dark:text-gray-300">活動日期</label>
                 <div className="flex items-center">
@@ -241,81 +306,8 @@ export default function Createroom() {
                 />
               </div>
 
-              <div className="pt-3.5">
-                <label className="block text-sm text-gray-500 dark:text-gray-300">揪團類型</label>
-                <div className="flex items-center mt-2">
-                  <label className="mr-4">
-                    <input
-                      type="radio"
-                      name="room_type"
-                      value="1"
-                      className="mr-1"
-                      onChange={handleChange}
-                    />
-                    Home
-                  </label>
-                  <label>
-                    <input
-                      type="radio"
-                      name="room_type"
-                      value="2"
-                      className="mr-1"
-                      onChange={handleChange}
-                    />
-                    桌遊店
-                  </label>
-                </div>
-              </div>
-
-              <div className="pt-3.5">
-                <label className="block text-sm text-gray-500 dark:text-gray-300">揪團圖片</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="block mt-2 w-full bg-white border border-gray-400 rounded-lg px-5 py-2.5 text-gray-700 focus:border-gray-500 focus:outline-none"
-                  onChange={handleFileChange}
-                />
-              </div>
-
-              <div className="pt-3.5">
-                <label className="block text-sm text-gray-500 dark:text-gray-300">遊戲選項</label>
-                {gameOptions.map((option, index) => (
-                  <div key={index} className="flex mt-2">
-                    <select
-                      className="mr-2 block w-full border border-gray-400 rounded-lg px-4 py-2"
-                      value={option.category}
-                      onChange={(e) => handleGameOptionChange(index, "category", e.target.value)}
-                    >
-                      <option value="">選擇類型</option>
-                      {gameCategories.map((category) => (
-                        <option key={category} value={category}>
-                          {category}
-                        </option>
-                      ))}
-                    </select>
-                    <select
-                      className="block w-full border border-gray-400 rounded-lg px-4 py-2"
-                      value={option.title}
-                      onChange={(e) => handleGameOptionChange(index, "title", e.target.value)}
-                    >
-                      <option value="">選擇遊戲</option>
-                      {option.category && gameTitles[option.category].map((title) => (
-                        <option key={title} value={title}>
-                          {title}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={addGameOption}
-                  className="mt-2 text-blue-500 hover:underline"
-                >
-                  新增遊戲選項
-                </button>
-              </div>
-
+            
+              
               <div className="flex justify-center mt-4">
                 <button
                   type="submit"
