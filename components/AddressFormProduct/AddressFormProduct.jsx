@@ -2,12 +2,23 @@ import React, { useState, useEffect } from "react";
 import {
   useShip711StoreCallback,
   useShip711StoreOpener,
-} from "@/hooks/use-ship-711-store"; // 引入7-11運送商店的回傳和開啟勾子
-import Callback from "@/pages/ship/callback";
+} from "@/hooks/use-ship-711-store";
+
+// Helper function to get token
+const getToken = () => localStorage.getItem("token");
+
+// Helper function to make authenticated fetch requests
+const fetchWithAuth = async (url, options = {}) => {
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${getToken()}`,
+    ...options.headers,
+  };
+  return fetch(url, { ...options, headers, credentials: "include" });
+};
 
 const AddressFormProduct = () => {
-  // useShip711StoreOpener的第一個傳入參數是"伺服器7-11運送商店用Callback路由網址"
-  // 指的是node(express)的對應api路由。詳情請見說明文件:
+  // 7-11 START
   const { store711, closeWindow } = useShip711StoreOpener(
     "http://localhost:3005/api/shipment/711",
     { autoCloseMins: 3 } // x分鐘沒完成選擇會自動關閉，預設5分鐘。
@@ -17,32 +28,32 @@ const AddressFormProduct = () => {
   const [isConvenienceStore, setIsConvenienceStore] = useState(false);
   const [formData, setFormData] = useState({
     city: "",
-    storeName: "",
-    storeAddress: "",
+    store_name: "", // 修改為資料庫欄位名稱
+    store_address: "", // 修改為資料庫欄位名稱
     address: "",
     cardNumber: "",
     cardName: "",
     expiryDate: "",
     cvc: "",
+    is_default: false, // 修改為資料庫欄位名稱
+    store_type: "", // 修改為資料庫欄位名稱
   });
 
-  // 使用 7-11 門市選擇 API 鈎子
   const { openWindow } = useShip711StoreOpener(
-    "http://localhost:3005/api/shipment/711", // 使用你在伺服器設置的 callback URL
+    "http://localhost:3005/api/shipment/711",
     { autoCloseMins: 3 }
   );
+
   useEffect(() => {
-    // 訂閱 "set-store" 事件，從子視窗中接收 store 資訊
     const handleStoreUpdate = (event) => {
       const { storename, storeaddress } = event.detail;
       setFormData((prevData) => ({
         ...prevData,
-        storeName: storename,
-        storeAddress: storeaddress,
+        store_name: storename, // 修改為資料庫欄位名稱
+        store_address: storeaddress, // 修改為資料庫欄位名稱
       }));
     };
 
-    // 監聽從子視窗傳回的資料
     document.addEventListener("set-store", handleStoreUpdate);
 
     return () => {
@@ -50,14 +61,12 @@ const AddressFormProduct = () => {
     };
   }, []);
 
-  // 回傳門市資訊的勾子，處理選擇 7-11 門市後的資料
   useShip711StoreCallback((storeInfo) => {
-    console.log("7-11 門市資訊回傳: ", storeInfo); // 確認回傳資料
     if (storeInfo) {
       setFormData((prevData) => ({
         ...prevData,
-        storeName: storeInfo.storeName,
-        storeAddress: storeInfo.storeAddress,
+        store_name: storeInfo.storeName, // 修改為資料庫欄位名稱
+        store_address: storeInfo.storeAddress, // 修改為資料庫欄位名稱
       }));
     }
   });
@@ -65,8 +74,27 @@ const AddressFormProduct = () => {
   const handleOptionChange = (e) => {
     if (e.target.value === "convenience_store") {
       setIsConvenienceStore(true);
+      // 清空表單的地址信息，因為選擇了 7-11 門市
+      setFormData((prevData) => ({
+        ...prevData,
+        address: "",
+        city: "",
+        district: "",
+        store_type: "7-11", // 設置商店類型為7-11
+      }));
     } else {
       setIsConvenienceStore(false);
+      // 如果選擇宅配，重新填充預設地址
+      const defaultAddress = addresses.find((address) => address.is_default); // 修改為資料庫欄位名稱
+      if (defaultAddress) {
+        setFormData((prevData) => ({
+          ...prevData,
+          address: defaultAddress.detailed_address || "",
+          city: defaultAddress.city || "",
+          district: defaultAddress.area || "",
+          is_default: defaultAddress.is_default, // 設置是否為預設地址
+        }));
+      }
     }
   };
 
@@ -78,9 +106,94 @@ const AddressFormProduct = () => {
     }));
   };
 
-  const handleSubmit = () => {
-    console.log("表單資料：", formData); // 提交表單資料的邏輯
+  // 當用戶選擇一個地址時，將其值填入表單
+  const handleAddressSelect = (address) => {
+    setFormData({
+      ...formData,
+      address: `${address.street}, ${address.area}, ${address.city}`,
+      city: address.city,
+      district: address.area,
+    });
   };
+
+  const handleSubmit = async () => {
+    try {
+      const response = await fetchWithAuth(
+        "http://localhost:3005/api/shipment/addresses",
+        {
+          method: "POST", // 根據需要也可以是 PUT
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("提交表單失敗");
+      }
+
+      const result = await response.json();
+      console.log("表單提交成功：", result);
+      setMessage(result.message); // 顯示成功訊息
+      fetchAddresses(); // 重新加載地址列表
+    } catch (error) {
+      console.error("表單提交錯誤：", error);
+      setMessage("表單提交失敗");
+    }
+  };
+
+  //defaultAddress
+  const [addresses, setAddresses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [message, setMessage] = useState(""); // 用來顯示設置預設地址的結果
+
+  // 獲取地址列表的函數
+  const fetchAddresses = async () => {
+    try {
+      const response = await fetchWithAuth(
+        "http://localhost:3005/api/shipment/addresses"
+      ); // 使用你在伺服器設置的 callback URL
+      if (!response.ok) {
+        throw new Error("Failed to fetch addresses");
+      }
+      const data = await response.json();
+
+      if (!data || !data.data) {
+        throw new Error("No address data found");
+      }
+
+      setAddresses(data.data); // 假設你的 API 回傳 data 是地址的數組
+
+      // 獲取預設地址並填充表單
+      const defaultAddress = data.data.find((address) => address.is_default); // 修改為資料庫欄位名稱
+      if (defaultAddress) {
+        setFormData((prevData) => ({
+          ...prevData,
+          address: defaultAddress.detailed_address || "",
+          city: defaultAddress.city || "",
+          district: defaultAddress.area || "",
+          is_default: defaultAddress.is_default, // 設置是否為預設地址
+        }));
+      }
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Fetch addresses error: ", error); // 在前端控制台打印詳細錯誤
+      setError("無法獲取地址");
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAddresses();
+  }, []); // 一進入頁面時呼叫 fetchAddresses
+
+  if (loading) {
+    return <div>加載中...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   return (
     <div>
@@ -143,30 +256,30 @@ const AddressFormProduct = () => {
                     </button>
                   </div>
                   {/* 顯示選擇的門市名稱和地址 */}
-                  {formData.storeName && (
+                  {formData.store_name && (
                     <div className="mt-4">
                       <label className="block text-gray-700">
                         7-11 門市名稱
                       </label>
                       <input
                         type="text"
-                        name="storeName"
-                        value={formData.storeName}
+                        name="store_name"
+                        value={formData.store_name} // 修改為資料庫欄位名稱
                         className="w-full px-4 py-2 mt-2 border rounded-md"
                         readOnly
                       />
                     </div>
                   )}
 
-                  {formData.storeAddress && (
+                  {formData.store_address && (
                     <div className="mt-4">
                       <label className="block text-gray-700">
                         7-11 門市地址
                       </label>
                       <input
                         type="text"
-                        name="storeAddress"
-                        value={formData.storeAddress}
+                        name="store_address"
+                        value={formData.store_address} // 修改為資料庫欄位名稱
                         className="w-full px-4 py-2 mt-2 border rounded-md"
                         readOnly
                       />
@@ -198,6 +311,36 @@ const AddressFormProduct = () => {
           <h2 className="text-lg font-semibold text-gray-700 capitalize dark:text-white mt-4 ">
             地址資訊
           </h2>
+          <div>
+            <h2>地址列表</h2>
+            {message && <div>{message}</div>} {/* 顯示設置預設地址後的訊息 */}
+            <ul>
+              {addresses && addresses.length > 0 ? (
+                addresses.map((address) => (
+                  <li
+                    key={address.address_id}
+                    className="mb-4 cursor-pointer"
+                    onClick={() => handleAddressSelect(address)}
+                  >
+                    {address.city},{address.area}, {address.street},{" "}
+                    {address.is_default ? (
+                      <span className="text-green-500 font-bold">
+                        （預設地址）
+                      </span>
+                    ) : null}
+                    <button
+                      onClick={() => setDefaultAddress(address.address_id)}
+                      className="ml-4 px-2 py-1 bg-blue-500 text-white rounded"
+                    >
+                      設為預設地址
+                    </button>
+                  </li>
+                ))
+              ) : (
+                <li>沒有地址可顯示</li>
+              )}
+            </ul>
+          </div>
           <form>
             <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2 w-full">
               <div>
