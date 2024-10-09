@@ -11,7 +11,7 @@ export default function Navbar({
   onAvatarUpdate,
   cartItems = [], // 購物車項目從父層傳入
   totalItems, // 總商品數量從父層傳入
-  totalPrice, // 小計金額從父層傳入
+  // totalPrice, // 小計金額從父層傳入
 }) {
   const [cartVisible, setCartVisible] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -20,9 +20,25 @@ export default function Navbar({
     username: username,
   });
 
+  // 購物車START
+
   const toggleCart = () => {
+    console.log("購物車按鈕被點擊"); // 測試是否觸發了此函數
+    console.log(cartItems); // 檢查 cartItems 是否正確傳遞
     setCartVisible((prevState) => !prevState);
   };
+
+  const totalPrice = cartItems.reduce((total, item) => {
+    const itemPrice = parseFloat(item.price.replace(/,/g, "")); // 移除價格中的逗號，然後轉換為數字
+    if (isNaN(itemPrice)) {
+      return total; // 如果價格不是數字，跳過該項
+    }
+    return total + itemPrice * item.quantity;
+  }, 0);
+
+  // 不再從 localStorage 獲取 cartItems，直接使用父層傳遞的值
+
+  // 購物車END
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -79,7 +95,7 @@ export default function Navbar({
               <span>揪團</span>
             </a>
           </Link>
-          <Link href="/product-list" legacyBehavior>
+          <Link href="/product/product-list" legacyBehavior>
             <a className="btn btn-ghost text-white flex flex-col items-center">
               <GiShoppingBag className="w-6 h-6" />
               <span>商城</span>
@@ -183,7 +199,6 @@ export default function Navbar({
             </Link>
           </div>
         )}
-
         {/* /////////////購物車//////////// */}
         {/* 購物車 icon*/}
         <div className="dropdown dropdown-end">
@@ -210,77 +225,75 @@ export default function Navbar({
               </svg>
               <span className="badge badge-sm indicator-item">
                 {totalItems}
-                {/* 直接使用父層傳下來的 totalItems */}
-                {/* {product.quantity} 顯示從資料庫中獲取的數量 */}
               </span>
             </div>
           </div>
-        </div>
 
-        {/* 購物車內容顯示 */}
-        {cartVisible && (
-          <div
-            tabIndex={0}
-            className="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-52 shadow"
-          >
-            <div className="card-body">
-              {/* 顯示每個購物車商品 */}
-              {cartItems && cartItems.length > 0 ? (
-                cartItems.map((product) => (
-                  <div
-                    key={product.product_id}
-                    className="flex items-center space-x-4"
-                  >
-                    {/* 圖片 */}
-                    <Image
-                      src={product.image}
-                      width={50}
-                      height={50}
-                      alt={product.product_name}
-                      className="rounded-lg"
-                    />
-                    {/* 商品名稱和數量 */}
-                    <div>
-                      <span className="block text-lg text-black font-bold">
-                        {product.product_name}
-                      </span>
-                      <span className="block text-lg text-black">
-                        數量: {product.quantity}
-                      </span>
+          {/* 購物車內容顯示 */}
+          {cartVisible && (
+            <div
+              tabIndex={0}
+              className="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-[300px] shadow"
+            >
+              <div className="card-body">
+                {/* 顯示每個購物車商品 */}
+                {cartItems && cartItems.length > 0 ? (
+                  cartItems.map((product) => (
+                    <div
+                      key={product.product_id}
+                      className="flex items-center space-x-4"
+                    >
+                      {/* 圖片 */}
+                      <Image
+                        src={product.image}
+                        width={50}
+                        height={50}
+                        alt={product.product_name}
+                        className="rounded-lg"
+                      />
+                      {/* 商品名稱和數量 */}
+                      <div>
+                        <span className="block text-lg text-black font-bold">
+                          {product.product_name}
+                        </span>
+                        <span className="block text-lg text-black">
+                          數量: {product.quantity}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-black">購物車是空的</p>
-              )}
+                  ))
+                ) : (
+                  <p className="text-black">購物車是空的</p>
+                )}
 
-              {/* 小計 */}
-              {cartItems && cartItems.length > 0 && (
-                <span className="block mt-4 text-black">
-                  小計: ${totalPrice}
-                </span>
-              )}
+                {/* 小計 */}
+                {cartItems && cartItems.length > 0 && (
+                  <span className="block mt-4 text-black">
+                    小計: ${totalPrice}
+                  </span>
+                )}
 
-              {/* 查看購物車按鈕 */}
-              <div className="card-actions mt-4">
-                <button
-                  className="btn btn-primary bg-[#003E52] btn-block hover:bg-black"
-                  onClick={() => {
-                    router.push({
-                      pathname: "/checkout",
-                      query: {
-                        cart: JSON.stringify(cartItems),
-                        total: totalPrice,
-                      }, // 傳遞購物車資訊
-                    });
-                  }}
-                >
-                  查看購物車
-                </button>
+                {/* 查看購物車按鈕 */}
+                <div className="card-actions mt-4">
+                  <button
+                    className="btn btn-primary bg-[#003E52] btn-block hover:bg-black"
+                    onClick={() => {
+                      router.push({
+                        pathname: "/checkout",
+                        query: {
+                          cart: JSON.stringify(cartItems),
+                          total: totalPrice,
+                        },
+                      });
+                    }}
+                  >
+                    查看購物車
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
