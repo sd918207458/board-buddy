@@ -1,20 +1,32 @@
-const InputField = ({ id, label, type, value, required, onChange }) => (
-  <div className="form-control">
-    <label htmlFor={id} className="label text-gray-700 dark:text-gray-300">
+const InputField = ({
+  name,
+  label,
+  type = "text",
+  value,
+  required = false,
+  onChange,
+  placeholder = "",
+  autoComplete = "off",
+  className = "",
+}) => (
+  <div className={`form-control ${className}`}>
+    <label htmlFor={name} className="label text-gray-700 dark:text-gray-300">
       <span className="label-text">
         {label} {required && <span className="text-red-500">*</span>}
       </span>
     </label>
     <input
-      id={id}
-      name={id}
+      id={name}
+      name={name}
       type={type}
-      value={value}
+      value={value || ""}
       onChange={onChange}
-      className="input input-bordered border-[#036672] focus:border-[#024c52]"
+      placeholder={placeholder}
+      className="input input-bordered border-[#036672] focus:border-[#024c52] dark:bg-gray-800 dark:text-white"
       required={required}
+      autoComplete={autoComplete}
     />
   </div>
 );
 
-export default InputField;
+export default InputField; // 確保你導出了這個組件

@@ -1,7 +1,6 @@
 
 import React, { useState } from "react";
-import { useRouter } from "next/router"; // 引入 useRouter 用於頁面跳轉
-import Navbar from "@/components/LoggedInNavbar";
+import { useRouter } from "next/router";
 import Footer from "@/components/footer";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { CSSTransition } from "react-transition-group";
@@ -23,18 +22,34 @@ const InputField = ({ label, type, id, placeholder, value, onChange }) => (
   </div>
 );
 
+// Toast 組件
+const Toast = ({ message, onClose }) => {
+  return (
+    <div className="fixed top-4 right-4 bg-red-500 text-white p-4 rounded shadow-lg z-50">
+      {message}
+      <button onClick={onClose} className="ml-4 font-bold">
+        &times;
+      </button>
+    </div>
+  );
+};
+
 export default function Register() {
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [toastMessage, setToastMessage] = useState(""); // Toast 狀態
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const router = useRouter(); // 使用 useRouter 進行頁面跳轉
+  const router = useRouter();
 
   // 表單驗證邏輯
   const validateForm = () => {
+    if (!username) {
+      return "請輸入使用者名稱";
+    }
     if (!email.includes("@")) {
       return "請輸入有效的電子信箱";
     }
@@ -52,37 +67,47 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setToastMessage(""); // 清除之前的錯誤訊息
+
+    const validationError = validateForm();
+    if (validationError) {
+      setToastMessage(validationError); // 使用 Toast 顯示錯誤
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const response = await fetch("http://localhost:3005/api/register", {
+      const response = await fetch("http://localhost:3005/api/auth/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          username,
           email,
           password,
           confirmPassword,
         }),
       });
 
-      // 檢查是否請求成功
-      if (!response.ok) {
-        const errorText = await response.text(); // 捕捉錯誤訊息作為文字而不是 JSON
-        throw new Error(`HTTP error: ${response.status}, ${errorText}`);
-      }
+      const data = await response.json(); // 捕捉錯誤響應
 
-      const data = await response.json(); // 解析 JSON 響應
-      alert("註冊成功");
+      if (response.status === 201) {
+        alert("註冊成功");
+        router.push("/member/login");
+      } else {
+        setToastMessage(data.message || "註冊失敗"); // 顯示伺服器錯誤訊息
+      }
     } catch (error) {
       console.error("錯誤:", error);
-      setErrorMessage(error.message);
+      setToastMessage("伺服器錯誤，請稍後再試");
+    } finally {
+      setIsLoading(false);
     }
   };
 
 
   return (
     <>
-      <Navbar />
       <div className="flex items-center justify-center min-h-screen bg-[#003E52]">
 
         <div className="card max-w-sm lg:max-w-4xl bg-base-100 shadow-xl">
@@ -99,19 +124,18 @@ export default function Register() {
             <h2 className="text-center text-2xl font-bold text-gray-700 dark:text-gray-200 mt-4">
               註冊
             </h2>
-            {/* 錯誤提示動畫 */}
-            <CSSTransition
-              in={!!errorMessage}
-              timeout={300}
-              classNames="fade"
-              unmountOnExit
-            >
-              <div className="text-red-500 text-center mt-4">
-                {errorMessage}
-              </div>
-            </CSSTransition>
 
             <form onSubmit={handleSubmit}>
+              {/* 使用者名稱輸入欄 */}
+              <InputField
+                label="使用者名稱"
+                type="text"
+                id="username"
+                placeholder="使用者名稱"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+
               {/* 電子信箱輸入欄 */}
               <InputField
                 label="電子信箱"
@@ -199,6 +223,14 @@ export default function Register() {
           </div>
         </div>
       </div>
+
+      {/* Toast 彈出通知 */}
+      {toastMessage && (
+        <Toast
+          message={toastMessage}
+          onClose={() => setToastMessage("")} // 點擊時關閉通知
+        />
+      )}
 
       <Footer />
     </>

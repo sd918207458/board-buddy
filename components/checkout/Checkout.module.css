@@ -1,0 +1,96 @@
+.cartContent {
+  width: 100%;
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+}
+
+.cartTable {
+  width: 100%;
+  border-collapse: collapse;
+
+}
+
+.cartTable th,
+.cartTable td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.productInfo {
+  display: flex;
+  align-items: center;
+}
+
+.productImage {
+  width: 60px;
+  height: auto;
+  margin-right: 10px;
+}
+
+.removeItem {
+  background: none;
+  border: none;
+  color: #ff0000;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.removeItem:hover {
+  color: #cc0000;
+}
+
+
+
+/* RWD: 調整樣式以適應不同大小的螢幕 */
+@media (max-width: 768px) {
+  .cartContent {
+    width: 100%; /* 小螢幕下寬度變為 100% */
+    padding: 10px;
+  }
+
+  .cartTable th,
+  .cartTable td {
+    padding: 8px;
+  }
+
+  .productImage {
+    width: 50px; /* 減小圖片大小 */
+  }
+
+  /* 調整表格以適應更小的螢幕 */
+  .cartTable thead {
+    display: none; /* 隱藏表頭 */
+  }
+
+  .cartTable tbody tr {
+    display: block; /* 每一行變成區塊顯示 */
+    margin-bottom: 10px; /* 每個產品之間留些空間 */
+  }
+
+  .cartTable td {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border: none; /* 去掉邊框 */
+    border-bottom: 1px solid #ddd; /* 每個產品之間的分隔線 */
+  }
+
+  .cartTable td::before {
+    content: attr(data-label); /* 使用 `data-label` 來顯示類似表頭的信息 */
+    flex-basis: 50%; /* 左側的標籤占50% */
+    font-weight: bold;
+  }
+
+  .productInfo {
+    flex-direction: column; /* 圖片和文字變成縱向排列 */
+    align-items: flex-start;
+  }
+
+  .productImage {
+    margin-bottom: 10px;
+  }
+}

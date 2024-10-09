@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product Detail Page</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      .product-container {
+        display: flex;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        background-color: transparent;
+      }
+      .product-image {
+        flex: 1;
+        padding-right: 20px;
+      }
+      .product-image img {
+        max-width: 100%;
+        border: 1px solid #ddd;
+      }
+      .product-details {
+        padding: 10px;
+        border-radius: 10px;
+        flex: 2;
+      }
+      .product-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      .product-price {
+        font-size: 20px;
+        color: #333;
+        margin-bottom: 10px;
+      }
+      .product-rating {
+        margin-bottom: 10px;
+      }
+      .product-rating span {
+        font-size: 18px;
+        color: #f4c150;
+      }
+      .product-description {
+        margin-bottom: 20px;
+        color: #555;
+      }
+      .product-quantity {
+        margin-bottom: 20px;
+      }
+      .quantity-selector {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid #ddd;
+        padding: 5px;
+      }
+      .quantity-selector input {
+        width: 40px;
+        text-align: center;
+        border: none;
+        outline: none;
+      }
+      .quantity-selector button {
+        background-color: #ddd;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+      }
+      .add-to-cart {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        text-decoration: none;
+        margin-right: 10px;
+      }
+      .wishlist {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: transparent;
+        color: #333;
+        border: 1px solid #333;
+        text-align: center;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="product-container">
+      <div class="product-image">
+        <img
+          src="https://i.postimg.cc/XYdbSzx8/image.png"
+          alt="I'M FABULOUS Body Oil"
+        />
+      </div>
+      <div class="product-details">
+        <div class="product-title">I'M Fabulous</div>
+        <div class="product-price">$50</div>
+        <!-- <div class="product-rating"><span>★★★★☆</span> 4.0/5</div> -->
+        <div class="product-description">
+          <span>作者</span><span>出版社</span><br /><br />
+          The French aromatherapy brand combines fatty hazelnut, sesame and
+          grape seed oils, along with helichrise oil for its regenerating
+          properties. Rosemary and sage impart a firming effect, while
+          petitgrain and lavender give the moisturizer its balanced scent. As
+          with all oils, pat it onto slightly damp skin for maximum hydration.
+        </div>
+        <div class="product-quantity">
+          Quantity:
+          <div class="quantity-selector">
+            <button type="button">-</button>
+            <input type="text" value="02" />
+            <button type="button">+</button>
+          </div>
+        </div>
+        <a href="#" class="add-to-cart">Add To Cart</a>
+        <a href="#" class="wishlist"><i class="fa-regular fa-heart"></i> Wishlist</a>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,257 +1,323 @@
 
 import React, { useState, useEffect } from "react";
-import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import UserTable from "@/components/table"; // 表格組件
-import users from "./../../public/user_table"; // 用於全訂單數據
-import users_1 from "./../../public/users_1"; // 用於其他狀態訂單數據
-import { CSSTransition, TransitionGroup } from "react-transition-group"; // 引入 React Transition Group
+import OrderTable from "@/components/table"; // 訂單表格組件
 
 export default function OrderTracking() {
-  const [isMounted, setIsMounted] = useState(false); // 判斷是否在客戶端
-  const [activeTab, setActiveTab] = useState("all"); // 管理當前選擇的 Tab
-  const [hasError, setHasError] = useState(false); // 用來追踪錯誤
-  const [currentPage, setCurrentPage] = useState(1); // 用於處理分頁的狀態
-  const itemsPerPage = 10; // 每頁顯示 5 筆訂單
-  const [currentData, setCurrentData] = useState([]); // 用來存儲當前顯示的訂單數據
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortKey, setSortKey] = useState("orderNumber");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [filteredData, setFilteredData] = useState([]); // 篩選後的數據
+  const [statusFilter, setStatusFilter] = useState(""); // 訂單狀態篩選條件
+  const [minAmount, setMinAmount] = useState(""); // 金額範圍篩選
+  const [maxAmount, setMaxAmount] = useState(""); // 金額範圍篩選
 
+  const sampleOrders = [
+    {
+      id: 1,
+      orderNumber: "ORD001",
+      date: "2024-10-01",
+      status: "Pending",
+      totalAmount: 1500,
+      totalItems: 3,
+      shippingAddress: "台北市中山區南京東路100號",
+    },
+    {
+      id: 2,
+      orderNumber: "ORD002",
+      date: "2024-10-02",
+      status: "Shipped",
+      totalAmount: 2500,
+      totalItems: 5,
+      shippingAddress: "台北市大安區忠孝東路50號",
+    },
+    {
+      id: 3,
+      orderNumber: "ORD003",
+      date: "2024-09-15",
+      status: "Delivered",
+      totalAmount: 3500,
+      totalItems: 2,
+      shippingAddress: "台中市西區民生路123號",
+    },
+    {
+      id: 4,
+      orderNumber: "ORD004",
+      date: "2024-09-25",
+      status: "Canceled",
+      totalAmount: 800,
+      totalItems: 1,
+      shippingAddress: "高雄市新興區中山一路200號",
+    },
+    {
+      id: 5,
+      orderNumber: "ORD005",
+      date: "2024-10-05",
+      status: "Pending",
+      totalAmount: 1200,
+      totalItems: 4,
+      shippingAddress: "台北市大同區延平北路300號",
+    },
+    {
+      id: 6,
+      orderNumber: "ORD006",
+      date: "2024-09-30",
+      status: "Delivered",
+      totalAmount: 4200,
+      totalItems: 7,
+      shippingAddress: "台北市信義區松高路50號",
+    },
+    {
+      id: 7,
+      orderNumber: "ORD007",
+      date: "2024-10-06",
+      status: "Shipped",
+      totalAmount: 2750,
+      totalItems: 5,
+      shippingAddress: "台南市東區中華東路200號",
+    },
+    {
+      id: 8,
+      orderNumber: "ORD008",
+      date: "2024-10-03",
+      status: "Canceled",
+      totalAmount: 950,
+      totalItems: 2,
+      shippingAddress: "桃園市中壢區中正路100號",
+    },
+    {
+      id: 9,
+      orderNumber: "ORD009",
+      date: "2024-10-04",
+      status: "Pending",
+      totalAmount: 1650,
+      totalItems: 3,
+      shippingAddress: "新北市板橋區文化路150號",
+    },
+    {
+      id: 10,
+      orderNumber: "ORD010",
+      date: "2024-10-02",
+      status: "Delivered",
+      totalAmount: 2900,
+      totalItems: 6,
+      shippingAddress: "台北市中正區忠孝東路60號",
+    },
+  ];
+
+  // 初始化並恢復上次的搜尋與排序狀態
   useEffect(() => {
-    try {
-      setIsMounted(true);
-      loadDataForCurrentPage(); // 初始化加載數據
-    } catch (error) {
-      console.error("Error mounting component: ", error);
-      setHasError(true);
-    }
-  }, [activeTab, currentPage]);
+    const savedSearchTerm = localStorage.getItem("searchTerm") || "";
+    const savedSortKey = localStorage.getItem("sortKey") || "orderNumber";
+    const savedSortOrder = localStorage.getItem("sortOrder") || "asc";
+    const savedStatusFilter = localStorage.getItem("statusFilter") || "";
+    const savedMinAmount = localStorage.getItem("minAmount") || "";
+    const savedMaxAmount = localStorage.getItem("maxAmount") || "";
 
-  // 根據選擇的 Tab 加載對應的數據
-  const loadDataForCurrentPage = () => {
-    let selectedUsers = [];
-    switch (activeTab) {
-      case "all":
-        selectedUsers = users;
-        break;
-      case "pending":
-        selectedUsers = users_1;
-        break;
-      case "history":
-        selectedUsers = users;
-        break;
-      case "canceled":
-        selectedUsers = users_1;
-        break;
-      default:
-        selectedUsers = users;
-        break;
-    }
+    setSearchTerm(savedSearchTerm);
+    setSortKey(savedSortKey);
+    setSortOrder(savedSortOrder);
+    setStatusFilter(savedStatusFilter);
+    setMinAmount(savedMinAmount);
+    setMaxAmount(savedMaxAmount);
 
-    // 計算當前頁面的訂單數據
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const paginatedData = selectedUsers.slice(startIndex, endIndex);
-
-    setCurrentData(paginatedData); // 更新當前頁的訂單數據
-  };
-
-  // 渲染對應的表格
-  const renderTable = () => {
-    try {
-      return <UserTable users={currentData} />; // 顯示當前頁的訂單數據
-    } catch (error) {
-      console.error("Error rendering table: ", error);
-      setHasError(true); // 捕獲渲染表格過程中的錯誤
-      return null;
-    }
-  };
-
-  if (hasError) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-red-100">
-        <div className="p-6 bg-white shadow-md rounded-lg">
-          <h2 className="text-2xl font-bold text-red-600">
-            發生錯誤，請稍後再試。
-          </h2>
-        </div>
-      </div>
+    filterAndSortOrders(
+      savedSearchTerm,
+      savedSortKey,
+      savedSortOrder,
+      savedStatusFilter,
+      savedMinAmount,
+      savedMaxAmount
     );
-  }
+  }, []);
 
-  // 計算總頁數
-  const totalItems = activeTab === "all" ? users.length : users_1.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  // 保存搜尋與排序狀態到 LocalStorage
+  const saveState = (key, value) => {
+    localStorage.setItem(key, value);
+  };
 
-  // 渲染分頁邏輯，當頁碼超過 5 頁時，用 ... 省略中間頁碼
-  const renderPagination = () => {
-    const pages = [];
+  // 篩選與排序訂單
+  const filterAndSortOrders = (
+    search,
+    sortKey,
+    sortOrder,
+    status,
+    minAmt,
+    maxAmt
+  ) => {
+    let filtered = sampleOrders.filter((order) =>
+      order.orderNumber.includes(search)
+    );
 
-    if (totalPages <= 5) {
-      // 小於等於 5 頁時，顯示所有頁碼
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(
-          <button
-            key={i}
-            className={`join-item btn ${currentPage === i ? "btn-active" : ""}`}
-            onClick={() => setCurrentPage(i)}
-          >
-            {i}
-          </button>
-        );
-      }
-    } else {
-      // 超過 5 頁時顯示前兩頁、當前頁附近以及最後兩頁
-      pages.push(
-        <button
-          key={1}
-          className={`join-item btn ${currentPage === 1 ? "btn-active" : ""}`}
-          onClick={() => setCurrentPage(1)}
-        >
-          1
-        </button>
-      );
+    if (status) {
+      filtered = filtered.filter((order) => order.status === status);
+    }
 
-      if (currentPage > 3) {
-        pages.push(
-          <span key="left-dots" className="join-item btn btn-disabled">
-            ...
-          </span>
-        );
-      }
-
-      // 顯示當前頁及其前後頁
-      for (
-        let i = Math.max(2, currentPage - 1);
-        i <= Math.min(currentPage + 1, totalPages - 1);
-        i++
-      ) {
-        pages.push(
-          <button
-            key={i}
-            className={`join-item btn ${currentPage === i ? "btn-active" : ""}`}
-            onClick={() => setCurrentPage(i)}
-          >
-            {i}
-          </button>
-        );
-      }
-
-      if (currentPage < totalPages - 2) {
-        pages.push(
-          <span key="right-dots" className="join-item btn btn-disabled">
-            ...
-          </span>
-        );
-      }
-
-      pages.push(
-        <button
-          key={totalPages}
-          className={`join-item btn ${
-            currentPage === totalPages ? "btn-active" : ""
-          }`}
-          onClick={() => setCurrentPage(totalPages)}
-        >
-          {totalPages}
-        </button>
+    if (minAmt) {
+      filtered = filtered.filter(
+        (order) => order.totalAmount >= Number(minAmt)
       );
     }
 
-    return pages;
+    if (maxAmt) {
+      filtered = filtered.filter(
+        (order) => order.totalAmount <= Number(maxAmt)
+      );
+    }
+
+    const sorted = filtered.sort((a, b) => {
+      if (sortOrder === "asc") {
+        return a[sortKey] > b[sortKey] ? 1 : -1;
+      } else {
+        return a[sortKey] < b[sortKey] ? 1 : -1;
+      }
+    });
+
+    setFilteredData(sorted);
   };
 
+  // 搜尋框輸入處理
+  const handleSearch = (e) => {
+    const search = e.target.value;
+    setSearchTerm(search);
+    saveState("searchTerm", search);
+    filterAndSortOrders(
+      search,
+      sortKey,
+      sortOrder,
+      statusFilter,
+      minAmount,
+      maxAmount
+    );
+  };
+
+  // 切換排序方式
+  const handleSort = (key) => {
+    const newOrder = sortKey === key && sortOrder === "asc" ? "desc" : "asc";
+    setSortKey(key);
+    setSortOrder(newOrder);
+    saveState("sortKey", key);
+    saveState("sortOrder", newOrder);
+    filterAndSortOrders(
+      searchTerm,
+      key,
+      newOrder,
+      statusFilter,
+      minAmount,
+      maxAmount
+    );
+  };
+
+  // 篩選條件處理
+  const handleFilter = () => {
+    saveState("statusFilter", statusFilter);
+    saveState("minAmount", minAmount);
+    saveState("maxAmount", maxAmount);
+    filterAndSortOrders(
+      searchTerm,
+      sortKey,
+      sortOrder,
+      statusFilter,
+      minAmount,
+      maxAmount
+    );
+  };
+
+  // 渲染訂單表格
+  const renderTable = () =>
+    filteredData.length > 0 ? (
+      <OrderTable orders={filteredData} />
+    ) : (
+      <div className="text-center p-4">目前沒有訂單。</div>
+    );
 
   return (
     <>
-      <Navbar />
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
         <div className="w-full max-w-4xl mx-auto bg-white rounded-lg shadow-lg dark:bg-gray-800">
           <div className="w-full p-4">
             <Breadcrumbs />
           </div>
-
           <section className="p-6">
             <h2 className="text-2xl font-bold text-gray-800 dark:text-white text-center">
               我的訂單
             </h2>
           </section>
 
-          {/* Tabs 選項卡 */}
-          {isMounted && (
-            <div className="tabs tabs-boxed justify-center mb-6">
-              <button
-                className={`tab ${activeTab === "all" ? "tab-active" : ""}`}
-                onClick={() => {
-                  setActiveTab("all");
-                  setCurrentPage(1); // 切換 Tab 時重置到第 1 頁
-                }}
+          {/* 搜尋與篩選區塊 */}
+          <div className="p-6 flex flex-col gap-4">
+            <input
+              type="text"
+              placeholder="搜尋訂單編號"
+              value={searchTerm}
+              onChange={handleSearch}
+              className="input input-bordered"
+            />
+            <div className="flex gap-4">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="select select-bordered"
               >
-                全部訂單
-              </button>
+                <option value="">全部狀態</option>
+                <option value="Pending">尚未出貨</option>
+                <option value="Shipped">已出貨</option>
+                <option value="Delivered">已送達</option>
+                <option value="Canceled">取消訂單</option>
+              </select>
+              <input
+                type="number"
+                placeholder="最低金額"
+                value={minAmount}
+                onChange={(e) => setMinAmount(e.target.value)}
+                className="input input-bordered"
+              />
+              <input
+                type="number"
+                placeholder="最高金額"
+                value={maxAmount}
+                onChange={(e) => setMaxAmount(e.target.value)}
+                className="input input-bordered"
+              />
               <button
-                className={`tab ${activeTab === "pending" ? "tab-active" : ""}`}
-                onClick={() => {
-                  setActiveTab("pending");
-                  setCurrentPage(1); // 切換 Tab 時重置到第 1 頁
-                }}
+                onClick={handleFilter}
+                className="btn btn-primary  bg-[#003E52]"
               >
-                尚未出貨
-              </button>
-              <button
-                className={`tab ${activeTab === "history" ? "tab-active" : ""}`}
-                onClick={() => {
-                  setActiveTab("history");
-                  setCurrentPage(1); // 切換 Tab 時重置到第 1 頁
-                }}
-              >
-                歷史訂單
-              </button>
-              <button
-                className={`tab ${
-                  activeTab === "canceled" ? "tab-active" : ""
-                }`}
-                onClick={() => {
-                  setActiveTab("canceled");
-                  setCurrentPage(1); // 切換 Tab 時重置到第 1 頁
-                }}
-              >
-                取消訂單
+                篩選
               </button>
             </div>
-          )}
-
-          {/* 使用 React Transition Group 來處理表格切換的動畫效果 */}
-          {isMounted && (
-            <TransitionGroup className="p-6">
-              <CSSTransition key={activeTab} timeout={300} classNames="fade">
-                <div>{renderTable()}</div>
-              </CSSTransition>
-            </TransitionGroup>
-          )}
-
-          {/* 分頁按鈕 */}
-          <div className="join items-center justify-center mt-4 mb-6 w-full">
-            <button
-              className="join-item btn"
-              disabled={currentPage === 1}
-              onClick={() =>
-                setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
-              }
-            >
-              «
-            </button>
-            {renderPagination()}
-            <button
-              className="join-item btn"
-              disabled={currentPage === totalPages}
-              onClick={() =>
-                setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages))
-              }
-            >
-              »
-            </button>
-
           </div>
+
+          {/* 排序方式 */}
+          <div className="p-6 flex justify-between relative z-10">
+            <div className="dropdown dropdown-end">
+              <label tabIndex={0} className="btn m-1">
+                排序方式
+              </label>
+              <ul
+                tabIndex={0}
+                className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
+              >
+                <li>
+                  <button onClick={() => handleSort("date")}>按日期排序</button>
+                </li>
+                <li>
+                  <button onClick={() => handleSort("totalAmount")}>
+                    按金額排序
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => handleSort("status")}>
+                    按狀態排序
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* 表格 */}
+          {renderTable()}
         </div>
       </div>
       <Footer />

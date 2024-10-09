@@ -21,9 +21,11 @@ const Breadcrumbs = ({ customCrumbs }) => {
     "my-orders": "會員中心",
     "personal-info": "個人資料",
 
+
     FAQ: "常見問題",
     "payment-methods": "付款方式",
     wishlist: "我的收藏",
+
 
     "order-tracking": "訂單追蹤",
     "order-details": "訂單明細",
@@ -35,8 +37,10 @@ const Breadcrumbs = ({ customCrumbs }) => {
         {/* 第一個項目 "Home" */}
         <li>
 
+
           <Link href="/" legacyBehavior>
             <a className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800">
+
 
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -53,12 +57,15 @@ const Breadcrumbs = ({ customCrumbs }) => {
               </svg>
               首頁
 
+
             </a>
+
 
           </Link>
         </li>
 
         {/* 使用分隔符號 */}
+
 
         <TransitionGroup component={null}>
           {breadcrumbs.map((name, index) => {
@@ -102,6 +109,7 @@ const Breadcrumbs = ({ customCrumbs }) => {
             );
           })}
         </TransitionGroup>
+
 
       </ul>
     </div>

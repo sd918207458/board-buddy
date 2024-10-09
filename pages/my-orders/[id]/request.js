@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { CSSTransition } from "react-transition-group";
@@ -37,19 +36,76 @@ export default function Request() {
     name: "",
     email: "",
     phone: "",
-    orderNumber: "",
+    orderNumber: "", // 這將從下拉選單中獲取
     orderDate: "",
     productName: "",
     productModel: "",
     productQuantity: "",
     returnReason: "",
   });
+  const [orders, setOrders] = useState([]); // 存儲使用者的訂單資料
   const [submitMessage, setSubmitMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [loadingOrders, setLoadingOrders] = useState(true);
+
+  // 獲取存取令牌
+  const getToken = () => localStorage.getItem("token");
+
+  // 使用封裝的請求函數，自動添加 token
+  const fetchWithToken = async (url, options = {}) => {
+    const token = getToken();
+    const headers = {
+      ...options.headers,
+      Authorization: `Bearer ${token}`, // 將 token 附加到 Authorization header
+    };
+    return fetch(url, { ...options, headers, credentials: "include" });
+  };
 
   useEffect(() => {
     setIsMounted(true);
+
+    // 獲取使用者的訂單資料
+    const fetchOrders = async () => {
+      try {
+        setLoadingOrders(true); // 訂單加載狀態
+        const response = await fetchWithToken(
+          "http://localhost:3005/api/orders",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const result = await response.json();
+        if (response.ok) {
+          setOrders(result.data);
+        } else {
+          setErrorMessage("無法載入訂單資料");
+        }
+      } catch (error) {
+        console.error("獲取訂單失敗:", error);
+        setErrorMessage("無法載入訂單資料");
+      } finally {
+        setLoadingOrders(false);
+      }
+    };
+
+    fetchOrders();
   }, []);
+
+  // 當選擇訂單時，自動填充訂單日期和商品名稱等
+  const handleOrderChange = (e) => {
+    const selectedOrder = orders.find(
+      (order) => order.order_id === Number(e.target.value)
+    );
+    setFormData({
+      ...formData,
+      orderNumber: selectedOrder.order_id,
+      orderDate: selectedOrder.order_date,
+      productName: selectedOrder.product_name,
+    });
+  };
 
   // 表單驗證邏輯
   const validateForm = () => {
@@ -96,19 +152,43 @@ export default function Request() {
     }
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // 模擬提交處理
-      setSubmitMessage("提交成功！我們已收到您的退換貨申請。");
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        orderNumber: "",
-        orderDate: "",
-        productName: "",
-        productModel: "",
-        productQuantity: "",
-        returnReason: "",
-      });
+      const response = await fetchWithToken(
+        "http://localhost:3005/api/request/create",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            order_id: formData.orderNumber,
+            member_id: 1, // 假設會員ID為1，實際應根據用戶狀態動態設置
+            order_date: formData.orderDate,
+            product_name: formData.productName,
+            product_model: formData.productModel,
+            product_quantity: formData.productQuantity,
+            reason: formData.returnReason,
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setSubmitMessage(result.message);
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          orderNumber: "",
+          orderDate: "",
+          productName: "",
+          productModel: "",
+          productQuantity: "",
+          returnReason: "",
+        });
+      } else {
+        setErrorMessage(result.message);
+      }
     } catch (error) {
       setErrorMessage("提交失敗，請稍後重試。");
     } finally {
@@ -116,11 +196,10 @@ export default function Request() {
     }
   };
 
-  if (!isMounted) return null;
+  if (!isMounted || loadingOrders) return <div>載入訂單資料中...</div>;
 
   return (
     <>
-      <Navbar />
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52]">
         <div className="card w-full max-w-lg mx-auto overflow-hidden bg-white dark:bg-gray-800 shadow-lg lg:max-w-4xl rounded-lg">
           <div className="w-full p-4">
@@ -171,17 +250,34 @@ export default function Request() {
                 }
                 required
               />
-              <InputField
-                label="訂單編號"
-                name="orderNumber"
-                value={formData.orderNumber}
-                onChange={(e) =>
-                  setFormData({ ...formData, [e.target.name]: e.target.value })
-                }
-                required
-              />
+
+              {/* 使用者選擇訂單 */}
+              <div className="form-control">
+                <label
+                  htmlFor="orderNumber"
+                  className="label text-gray-700 dark:text-gray-300"
+                >
+                  <span className="label-text">訂單編號</span>
+                </label>
+                <select
+                  id="orderNumber"
+                  name="orderNumber"
+                  value={formData.orderNumber}
+                  onChange={handleOrderChange}
+                  className="select select-bordered border-[#036672] focus:border-[#024c52]"
+                  required
+                >
+                  <option value="">請選擇訂單</option>
+                  {orders.map((order) => (
+                    <option key={order.order_id} value={order.order_id}>
+                      {`訂單編號: ${order.order_id} 日期: ${order.order_date}`}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
+            {/* 其他欄位 */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <InputField
                 label="訂單日期"
@@ -246,7 +342,6 @@ export default function Request() {
               ></textarea>
             </div>
 
-            {/* CSSTransition 動畫效果 */}
             <CSSTransition
               in={!!errorMessage}
               timeout={300}
