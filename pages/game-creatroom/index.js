@@ -135,7 +135,6 @@ export default function Createroom() {
 
   return (
     <>
-      <Navbar />
       <Breadcrumbs />
       <div className="bg-[#003E52] min-h-screen">
         <div className="columns-2 flex m-auto size-4/5 rounded border-2 border-slate-200 p-4 relative">

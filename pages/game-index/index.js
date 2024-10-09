@@ -101,7 +101,6 @@ export default function Gameindex() {
   return (
     <>
       <div className="bg-[#003E52]">
-        <Navbar />
         <Breadcrumbs />
         <Carousel1 />
         <SearchBar2 />
