@@ -15,19 +15,29 @@ const Checkout = () => {
   const router = useRouter();
   const [cartItems, setCartItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [isMounted, setIsMounted] = useState(false); // 判斷是否加載完畢
 
-  // 在頁面加載時從 localStorage 取得購物車內容
   useEffect(() => {
-    const storedCartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
-    setCartItems(storedCartItems);
+    // 確保只在客戶端加載購物車數據
+    setIsMounted(true);
+    if (typeof window !== "undefined") {
+      const storedCartItems =
+        JSON.parse(localStorage.getItem("cartItems")) || [];
+      setCartItems(storedCartItems);
 
-    // 計算總價
-    const storedTotalPrice = storedCartItems.reduce((total, item) => {
-      const itemPrice = parseFloat(item.price.replace(/,/g, "")); // 移除逗號並轉換為數字
-      return total + itemPrice * item.quantity;
-    }, 0);
-    setTotalPrice(storedTotalPrice);
+      // 計算總價
+      const storedTotalPrice = storedCartItems.reduce((total, item) => {
+        const itemPrice = parseFloat(item.price.replace(/,/g, "")); // 移除逗號並轉換為數字
+        return total + itemPrice * item.quantity;
+      }, 0);
+      setTotalPrice(storedTotalPrice);
+    }
   }, []);
+
+  if (!isMounted) {
+    return null; // 防止伺服器渲染不一致
+  }
+
   // 更新商品數量
   const handleQuantityChange = (index, amount) => {
     const newCartItems = [...cartItems];
@@ -94,14 +104,21 @@ const Checkout = () => {
                   </td>
                   <td>NT${item.price}</td>
                   <td>
-                    <button onClick={() => handleQuantityChange(index, -1)}>
+                    <button
+                      onClick={() => handleQuantityChange(index, -1)}
+                      className={styles.button} // 使用局部 class
+                    >
                       -
                     </button>
                     <span>{item.quantity}</span>
-                    <button onClick={() => handleQuantityChange(index, 1)}>
+                    <button
+                      onClick={() => handleQuantityChange(index, 1)}
+                      className={styles.button} // 使用局部 class
+                    >
                       +
                     </button>
                   </td>
+
                   {/* 移除逗號並計算小計，並加上千位逗號 */}
                   <td>
                     NT$
