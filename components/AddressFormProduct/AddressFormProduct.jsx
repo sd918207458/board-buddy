@@ -17,6 +17,16 @@ const fetchWithAuth = async (url, options = {}) => {
   return fetch(url, { ...options, headers, credentials: "include" });
 };
 
+const handleAddressSelect = (address) => {
+  setFormData({
+    ...formData,
+    address: address.street,
+    city: address.city,
+    district: address.area,
+  });
+  setDefaultAddress(address.address_id); // 設為預設地址
+};
+
 const AddressFormProduct = () => {
   // 7-11 START
   const { store711, closeWindow } = useShip711StoreOpener(
@@ -38,7 +48,7 @@ const AddressFormProduct = () => {
     is_default: false, // 修改為資料庫欄位名稱
     store_type: "", // 修改為資料庫欄位名稱
   });
-
+  // 7-11
   const { openWindow } = useShip711StoreOpener(
     "http://localhost:3005/api/shipment/711",
     { autoCloseMins: 3 }
@@ -137,6 +147,40 @@ const AddressFormProduct = () => {
     } catch (error) {
       console.error("表單提交錯誤：", error);
       setMessage("表單提交失敗");
+    }
+  };
+  // 更新 setDefaultAddress 函數
+  const setDefaultAddress = async (addressId) => {
+    try {
+      const response = await fetchWithAuth(
+        `http://localhost:3005/api/shipment/addresses/${addressId}/default`,
+        {
+          method: "PUT",
+        }
+      );
+      if (!response.ok) {
+        throw new Error("設置預設地址失敗");
+      }
+
+      const result = await response.json();
+      setMessage(result.message);
+
+      // 找到設為預設的地址並填入表單
+      const selectedAddress = addresses.find(
+        (address) => address.address_id === addressId
+      );
+      if (selectedAddress) {
+        setFormData({
+          ...formData,
+          address: `${selectedAddress.street}, ${selectedAddress.area}, ${selectedAddress.city}`,
+          city: selectedAddress.city,
+          district: selectedAddress.area,
+        });
+      }
+
+      fetchAddresses(); // 重新獲取地址列表
+    } catch (error) {
+      setMessage(error.message);
     }
   };
 
@@ -291,7 +335,10 @@ const AddressFormProduct = () => {
 
             {/* 地址資訊 */}
             <div className="flex gap-6 mt-4">
-              <label className="inline-flex items-center">
+              <label
+                className="inline-flex items-center"
+                onClick={() => handleAddressSelect(address)}
+              >
                 <input
                   type="radio"
                   name="radio-2"
@@ -308,12 +355,14 @@ const AddressFormProduct = () => {
             </div>
           </div>
 
+          {/* //////////////////// */}
           <h2 className="text-lg font-semibold text-gray-700 capitalize dark:text-white mt-4 ">
             地址資訊
           </h2>
           <div>
+            {/* // */}
             <h2>地址列表</h2>
-            {message && <div>{message}</div>} {/* 顯示設置預設地址後的訊息 */}
+            {message && <div>{message}</div>}
             <ul>
               {addresses && addresses.length > 0 ? (
                 addresses.map((address) => (
@@ -322,24 +371,19 @@ const AddressFormProduct = () => {
                     className="mb-4 cursor-pointer"
                     onClick={() => handleAddressSelect(address)}
                   >
-                    {address.city},{address.area}, {address.street},{" "}
+                    {address.city}, {address.area}, {address.street}{" "}
                     {address.is_default ? (
                       <span className="text-green-500 font-bold">
                         （預設地址）
                       </span>
                     ) : null}
-                    <button
-                      onClick={() => setDefaultAddress(address.address_id)}
-                      className="ml-4 px-2 py-1 bg-blue-500 text-white rounded"
-                    >
-                      設為預設地址
-                    </button>
                   </li>
                 ))
               ) : (
                 <li>沒有地址可顯示</li>
               )}
             </ul>
+            {/* // */}
           </div>
           <form>
             <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2 w-full">
