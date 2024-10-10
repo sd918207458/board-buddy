@@ -14,31 +14,33 @@ const Card = ({ product, addToCart, toggleFavorite }) => {
     setIsFavorite(isAlreadyFavorite); // 設定是否為收藏狀態
   }, [product.product_id]); // 當 product_id 改變時重新檢查
 
-  // 將收藏的商品存入 localStorage
-  const handleFavoriteClick = (productId) => {
-    // 先從 localStorage 中獲取當前的收藏列表
-    const favoriteItems =
-      JSON.parse(localStorage.getItem("favoriteItems")) || [];
+// 將收藏的商品存入 localStorage
+const handleFavoriteClick = (productId) => {
+  // 先從 localStorage 中獲取當前的收藏列表
+  const favoriteItems =
+    JSON.parse(localStorage.getItem("favoriteItems")) || [];
 
-    // 檢查該商品是否已經存在於收藏列表中
-    const isAlreadyFavorite = favoriteItems.some(
-      (item) => item.product_id === productId
+  // 檢查該商品是否已經存在於收藏列表中
+  const isAlreadyFavorite = favoriteItems.some(
+    (item) => item.product_id === productId
+  );
+
+  let updatedFavorites;
+  if (isAlreadyFavorite) {
+    // 如果商品已經存在於收藏列表中，將其移除
+    updatedFavorites = favoriteItems.filter(
+      (item) => item.product_id !== productId
     );
+    setIsFavorite(false); // 更新愛心狀態為未收藏
+  } else {
+    // 如果商品不在收藏列表中，將其添加進去
+    updatedFavorites = [...favoriteItems, product];
+    setIsFavorite(true); // 更新愛心狀態為收藏
+  }
 
-    if (isAlreadyFavorite) {
-      // 如果商品已經存在於收藏列表中，將其移除
-      const updatedFavorites = favoriteItems.filter(
-        (item) => item.product_id !== productId
-      );
-      localStorage.setItem("favoriteItems", JSON.stringify(updatedFavorites)); // 更新 localStorage
-      setIsFavorite(false); // 更新愛心狀態為未收藏
-    } else {
-      // 如果商品不在收藏列表中，將其添加進去
-      const updatedFavorites = [...favoriteItems, product];
-      localStorage.setItem("favoriteItems", JSON.stringify(updatedFavorites)); // 更新 localStorage
-      setIsFavorite(true); // 更新愛心狀態為收藏
-    }
-  };
+  localStorage.setItem("favoriteItems", JSON.stringify(updatedFavorites)); // 更新 localStorage
+  console.log("Updated favorite items in localStorage:", updatedFavorites); // 日誌檢查更新後的收藏資料
+};
 
   return (
     <Link
@@ -75,15 +77,16 @@ const Card = ({ product, addToCart, toggleFavorite }) => {
             加入購物車
           </button>
           <button
-            onClick={(e) => {
-              e.preventDefault(); // 防止跳轉到商品詳細頁面
-              handleFavoriteClick(product.product_id); // 更新收藏狀態
-              toggleFavorite(product.product_id); // 切換收藏狀態
-            }}
-            className="py-1.5 px-4 text-white border border-white rounded-lg hover:bg-white hover:text-[#003E52] transition-all"
-          >
-            加入收藏
-          </button>
+  onClick={(e) => {
+    e.preventDefault(); // 防止跳轉到商品詳細頁面
+    handleFavoriteClick(product.product_id); // 更新收藏狀態
+    toggleFavorite(product); // 將完整的 product 傳遞給 toggleFavorite
+  }}
+  className="py-1.5 px-4 text-white border border-white rounded-lg hover:bg-white hover:text-[#003E52] transition-all"
+>
+  {isFavorite ? "取消收藏" : "加入收藏"}
+</button>
+
         </div>
       </div>
 
