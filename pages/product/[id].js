@@ -44,8 +44,47 @@ const ProductDetail = ({ addToCart }) => {
     }
   }, [id]); // 當 id 改變時，重新發送請求
 
-  // 切換收藏狀態
+  // 在頁面加載時檢查是否收藏
+  useEffect(() => {
+    if (product) {
+      const favoriteItems =
+        JSON.parse(localStorage.getItem("favoriteItems")) || [];
+
+      const isAlreadyFavorite = favoriteItems.some(
+        (item) => item.product_id === product.product_id
+      );
+
+      setLiked(isAlreadyFavorite); // 根據是否收藏更新 liked 狀態
+    }
+  }, [product]);
+
+  // 切換收藏狀態並存儲到 localStorage
   const toggleLike = () => {
+    const favoriteItems =
+      JSON.parse(localStorage.getItem("favoriteItems")) || [];
+
+    const isAlreadyFavorite = favoriteItems.some(
+      (item) => item.product_id === product.product_id
+    );
+
+    let updatedFavorites;
+
+    if (isAlreadyFavorite) {
+      // 如果商品已經存在於收藏列表中，將其移除
+      updatedFavorites = favoriteItems.filter(
+        (item) => item.product_id !== product.product_id
+      );
+      toast.info("商品已移出收藏");
+    } else {
+      // 如果商品不在收藏列表中，將其添加進去
+      updatedFavorites = [...favoriteItems, product];
+      toast.success("商品已加入收藏！");
+    }
+
+    // 更新 localStorage
+    localStorage.setItem("favoriteItems", JSON.stringify(updatedFavorites));
+
+    // 更新收藏狀態
     setLiked(!liked);
   };
 
