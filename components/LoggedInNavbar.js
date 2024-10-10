@@ -4,15 +4,16 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import UploadAvatar from "./personal-info/upload_avatar";
 import Image from "next/image"; // 確保引入了 Image 組件
+import { useCart } from "@/hooks/useCart";
 
-export default function Navbar({
-  avatarUrl,
-  username,
-  onAvatarUpdate,
-  cartItems = [], // 購物車項目從父層傳入
-  totalItems, // 總商品數量從父層傳入
-  // totalPrice, // 小計金額從父層傳入
-}) {
+export default function Navbar({ avatarUrl, username, onAvatarUpdate }) {
+  const {
+    cartItems,
+    totalItems,
+    isCartVisible,
+    setIsCartVisible,
+    updateCartItems,
+  } = useCart();
   const [cartVisible, setCartVisible] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState({
@@ -274,10 +275,6 @@ export default function Navbar({
                     onClick={() => {
                       router.push({
                         pathname: "/checkout",
-                        query: {
-                          cart: JSON.stringify(cartItems),
-                          total: totalPrice,
-                        }, // 傳遞購物車資訊
                       });
                     }}
                   >

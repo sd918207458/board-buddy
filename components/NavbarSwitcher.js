@@ -2,13 +2,10 @@ import React, { useEffect, useState } from "react";
 import LoggedInNavbar from "@/components/LoggedInNavbar";
 import LoggedOutNavbar from "@/components/LoggedOutNavbar";
 import { useRouter } from "next/router";
+import { useCart } from "@/hooks/useCart";
 
-const NavbarSwitcher = ({
-  cartItems,
-  isCartVisible,
-  updateCartItems,
-  totalItems,
-}) => {
+const NavbarSwitcher = () => {
+  const { cartItems, totalItems, isCartVisible, setIsCartVisible } = useCart();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // 控制載入狀態
   const [avatarUrl, setAvatarUrl] = useState(""); // 用來管理頭像 URL
@@ -71,12 +68,7 @@ const NavbarSwitcher = ({
       updateCartItems={updateCartItems} // 傳遞購物車更新函數
     />
   ) : (
-    <LoggedOutNavbar
-      cartItems={cartItems}
-      totalItems={totalItems}
-      isCartVisible={isCartVisible} // 傳遞購物車顯示狀態
-      updateCartItems={updateCartItems} // 傳遞購物車更新函數
-    />
+    <LoggedOutNavbar />
   );
 };
 

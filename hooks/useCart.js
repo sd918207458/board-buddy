@@ -1,16 +1,22 @@
-import { useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
-export const useCart = () => {
+// 創建一個 CartContext
+const CartContext = createContext();
+// 提供 CartProvider 給應用中的所有組件
+export const CartProvider = ({ children }) => {
   // 初始化購物車商品數據的狀態
   const [cartItems, setCartItems] = useState([]);
 
   // 控制購物車是否可見的狀態
   const [isCartVisible, setIsCartVisible] = useState(false);
 
+  const [isMounted, setIsMounted] = useState(false); // 新增 isMounted 狀態
+
   // useEffect 用於在組件加載時從 localStorage 讀取購物車數據
   useEffect(() => {
     const storedCartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
     setCartItems(storedCartItems); // 設置購物車的初始數據
+    setIsMounted(true); // 當購物車數據加載完成後設置 isMounted 為 true
   }, []); // 空依賴數組意味著這個效果僅在組件首次加載時運行
 
   // useEffect 用於在 cartItems 改變時自動保存購物車數據到 localStorage
@@ -65,15 +71,30 @@ export const useCart = () => {
     }
   };
 
-  return {
-    cartItems, // 返回購物車中的商品
-    addToCart, // 返回將商品加入購物車的函數
-    setCartItems, // 返回設置購物車內容的函數
-    totalPrice, // 返回購物車的總價
-    isCartVisible, // 返回購物車是否可見的狀態
-    setIsCartVisible, // 返回設置購物車可見狀態的函數
-    updateCartItems, // 返回更新購物車項目的函數
-    totalItems, // 返回購物車內所有商品的總數
-    handleQuantityChange,
-  };
+  useEffect(() => {
+    console.log("Cart items in useCart:", cartItems);
+    console.log("Total price in useCart:", totalPrice);
+  }, [cartItems, totalPrice]);
+
+  return (
+    <CartContext.Provider
+      value={{
+        cartItems, // 返回購物車中的商品
+        addToCart, // 返回將商品加入購物車的函數
+        setCartItems, // 返回設置購物車內容的函數
+        totalPrice, // 返回購物車的總價
+        isCartVisible, // 返回購物車是否可見的狀態
+        setIsCartVisible, // 返回設置購物車可見狀態的函數
+        updateCartItems, // 返回更新購物車項目的函數
+        totalItems, // 返回購物車內所有商品的總數
+        handleQuantityChange,
+        isMounted,
+      }}
+    >
+      {children}
+    </CartContext.Provider>
+  );
 };
+
+// 使用 useContext 來獲取共享的購物車狀態
+export const useCart = () => useContext(CartContext);
