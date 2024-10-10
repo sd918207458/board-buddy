@@ -33,6 +33,12 @@ const ProductSearch = ({
                 <ul className="space-y-2">
                   <li
                     className="hover:bg-gray-200 cursor-pointer"
+                    onClick={() => handleFilterChange("default")}
+                  >
+                    依照預設
+                  </li>
+                  <li
+                    className="hover:bg-gray-200 cursor-pointer"
                     onClick={() => handleFilterChange("popular")}
                   >
                     依照熱門程度
