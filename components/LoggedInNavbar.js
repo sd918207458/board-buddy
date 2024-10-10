@@ -280,10 +280,6 @@ export default function Navbar({
                     onClick={() => {
                       router.push({
                         pathname: "/checkout",
-                        query: {
-                          cart: JSON.stringify(cartItems),
-                          total: totalPrice,
-                        }, // 傳遞購物車資訊
                       });
                     }}
                   >
