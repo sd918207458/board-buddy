@@ -7,9 +7,6 @@ const Sidecart = () => {
   const { cartItems, totalPrice, isMounted } = useCart(); // 共享購物車數據
   const shippingCost = 130; // 固定運費
 
-  if (!isMounted) {
-    return null; // 防止伺服器渲染不一致
-  }
   console.log("Sidecart Items:", cartItems); // 打印購物車內容，檢查是否同步更新
   console.log("Total Price:", totalPrice); // 打印總價，檢查是否正確更新
 

@@ -1,14 +1,8 @@
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import AddressFormProduct from "@/components/AddressFormProduct/AddressFormProduct";
-import dynamic from "next/dynamic";
-// 動態加載 Checkout 和 Sidecart 組件
-const Checkout = dynamic(() => import("@/components/checkout/checkout"), {
-  ssr: false,
-});
-const Sidecart = dynamic(() => import("@/components/Sidecart/Sidecart"), {
-  ssr: false,
-});
+import Sidecart from "@/components/Sidecart/Sidecart";
+import Checkout from "@/components/checkout/checkout";
 
 export default function CheckoutPage() {
   return (

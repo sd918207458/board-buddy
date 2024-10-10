@@ -1,63 +1,79 @@
 import { useState, useEffect } from "react";
 
-// 自定義 useCart hook，管理購物車狀態和邏輯
 export const useCart = () => {
-  const [cartItems, setCartItems] = useState([]); // 購物車商品數據
-  const [totalPrice, setTotalPrice] = useState(0); // 總價
-  const [isMounted, setIsMounted] = useState(false); // 判斷是否加載完畢
+  // 初始化購物車商品數據的狀態
+  const [cartItems, setCartItems] = useState([]);
 
+  // 控制購物車是否可見的狀態
+  const [isCartVisible, setIsCartVisible] = useState(false);
+
+  // useEffect 用於在組件加載時從 localStorage 讀取購物車數據
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedCartItems =
-        JSON.parse(localStorage.getItem("cartItems")) || [];
-      console.log("Loaded cart items:", storedCartItems);
-      setCartItems(storedCartItems);
+    const storedCartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+    setCartItems(storedCartItems); // 設置購物車的初始數據
+  }, []); // 空依賴數組意味著這個效果僅在組件首次加載時運行
 
-      const storedTotalPrice = storedCartItems.reduce((total, item) => {
-        const itemPrice = parseFloat(item.price.replace(/,/g, ""));
-        return total + itemPrice * item.quantity;
-      }, 0);
-      setTotalPrice(storedTotalPrice);
-      setIsMounted(true); // 在數據加載完畢後設置 isMounted
+  // useEffect 用於在 cartItems 改變時自動保存購物車數據到 localStorage
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      localStorage.setItem("cartItems", JSON.stringify(cartItems)); // 保存購物車數據到 localStorage
     }
-  }, []);
+  }, [cartItems]); // 當 cartItems 改變時觸發這個效果
 
-  // 更新購物車商品數量
+  // 將商品加入購物車的函數
+  const addToCart = (product) => {
+    // 檢查購物車中是否已經存在該商品
+    const existingProduct = cartItems.find(
+      (item) => item.product_id === product.product_id
+    );
+
+    if (existingProduct) {
+      // 如果商品已存在，更新數量
+      setCartItems((prevItems) =>
+        prevItems.map((item) =>
+          item.product_id === product.product_id
+            ? { ...item, quantity: item.quantity + product.quantity } // 增加數量
+            : item
+        )
+      );
+    } else {
+      // 如果商品不存在，將商品添加到購物車
+      setCartItems([...cartItems, { ...product, quantity: product.quantity }]);
+    }
+    setIsCartVisible(true); // 顯示購物車內容
+  };
+  // 更新購物車項目函數，供 Navbar 使用
+  const updateCartItems = (newCartItems) => {
+    setCartItems(newCartItems);
+  };
+
+  const totalItems = cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
+  // 計算購物車內所有商品的總價
+  const totalPrice = cartItems.reduce((total, item) => {
+    const itemPrice = parseFloat(item.price.replace(/,/g, "")); // 去除價格中的逗號，並轉換為數字
+    return total + itemPrice * item.quantity; // 將每個商品的價格乘以數量，並累加到總價
+  }, 0); // 初始總價為 0
   const handleQuantityChange = (index, amount) => {
     const newCartItems = [...cartItems];
     if (newCartItems[index].quantity + amount > 0) {
-      newCartItems[index].quantity += amount;
-      setCartItems(newCartItems); // 更新購物車狀態
-      localStorage.setItem("cartItems", JSON.stringify(newCartItems)); // 保存到 localStorage
-      updateTotalPrice(newCartItems); // 更新總價
-      console.log("Updated cart items:", newCartItems);
+      newCartItems[index].quantity += amount; // 更新數量
+      setCartItems(newCartItems); // 更新狀態
+      localStorage.setItem("cartItems", JSON.stringify(newCartItems)); // 保存更新到 localStorage
     }
   };
 
-  // 移除購物車中的商品
-  const handleRemoveItem = (index) => {
-    const newCartItems = cartItems.filter((_, i) => i !== index); // 移除指定商品
-    setCartItems(newCartItems); // 更新購物車狀態
-    localStorage.setItem("cartItems", JSON.stringify(newCartItems)); // 保存到 localStorage
-    updateTotalPrice(newCartItems); // 更新總價
-    console.log("Item removed:", newCartItems);
-  };
-
-  // 計算並更新總價
-  const updateTotalPrice = (items) => {
-    const total = items.reduce((sum, item) => {
-      const itemPrice = parseFloat(item.price.replace(/,/g, ""));
-      return sum + itemPrice * item.quantity;
-    }, 0);
-    setTotalPrice(total); // 更新總價
-    console.log("Updated total price:", total);
-  };
-
   return {
-    cartItems,
-    totalPrice,
+    cartItems, // 返回購物車中的商品
+    addToCart, // 返回將商品加入購物車的函數
+    setCartItems, // 返回設置購物車內容的函數
+    totalPrice, // 返回購物車的總價
+    isCartVisible, // 返回購物車是否可見的狀態
+    setIsCartVisible, // 返回設置購物車可見狀態的函數
+    updateCartItems, // 返回更新購物車項目的函數
+    totalItems, // 返回購物車內所有商品的總數
     handleQuantityChange,
-    handleRemoveItem,
-    isMounted,
   };
 };

@@ -12,10 +12,6 @@ const Checkout = () => {
     isMounted, // 判斷組件是否加載完成
   } = useCart();
 
-  if (!isMounted) {
-    return null; // 防止伺服器渲染不一致
-  }
-
   return (
     <>
       <section className={`${styles.cartContent} max-w-4xl`}>
