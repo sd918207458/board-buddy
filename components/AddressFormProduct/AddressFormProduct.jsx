@@ -3,6 +3,9 @@ import {
   useShip711StoreCallback,
   useShip711StoreOpener,
 } from "@/hooks/use-ship-711-store";
+import { useRouter } from "next/router";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Helper function to get token
 const getToken = () => localStorage.getItem("token");
@@ -17,14 +20,19 @@ const fetchWithAuth = async (url, options = {}) => {
   return fetch(url, { ...options, headers, credentials: "include" });
 };
 
-const handleAddressSelect = (address) => {
-  setFormData({
-    ...formData,
-    address: address.street,
-    city: address.city,
-    district: address.area,
-  });
-  setDefaultAddress(address.address_id); // 設為預設地址
+// 當用戶選擇地址時，將地址的值填入表單
+const handleAddressSelect = (address, setFormData, formData) => {
+  if (address && address.city && address.area && address.street) {
+    // 更新 formData 狀態，填入選中的地址資料
+    setFormData({
+      ...formData,
+      address: address.street,
+      city: address.city,
+      district: address.area,
+    });
+  } else {
+    console.error("選中的地址數據不完整", address);
+  }
 };
 
 const AddressFormProduct = () => {
@@ -47,6 +55,8 @@ const AddressFormProduct = () => {
     cvc: "",
     is_default: false, // 修改為資料庫欄位名稱
     store_type: "", // 修改為資料庫欄位名稱
+    district: "",
+    address: "",
   });
   // 7-11
   const { openWindow } = useShip711StoreOpener(
@@ -107,7 +117,7 @@ const AddressFormProduct = () => {
       }
     }
   };
-
+  //7-11
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -117,38 +127,90 @@ const AddressFormProduct = () => {
   };
 
   // 當用戶選擇一個地址時，將其值填入表單
+
   const handleAddressSelect = (address) => {
-    setFormData({
-      ...formData,
-      address: `${address.street}, ${address.area}, ${address.city}`,
-      city: address.city,
-      district: address.area,
-    });
-  };
-
-  const handleSubmit = async () => {
-    try {
-      const response = await fetchWithAuth(
-        "http://localhost:3005/api/shipment/addresses",
-        {
-          method: "POST", // 根據需要也可以是 PUT
-          body: JSON.stringify(formData),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("提交表單失敗");
-      }
-
-      const result = await response.json();
-      console.log("表單提交成功：", result);
-      setMessage(result.message); // 顯示成功訊息
-      fetchAddresses(); // 重新加載地址列表
-    } catch (error) {
-      console.error("表單提交錯誤：", error);
-      setMessage("表單提交失敗");
+    if (address && address.city && address.area && address.street) {
+      setFormData({
+        city: address.city,
+        district: address.area, // 確保正確地使用 area 替代 district
+        address: address.detailed_address,
+      });
+    } else {
+      console.error("選中的地址數據不完整", address);
     }
   };
+  console.log(formData);
+
+  // const handleAddressSelect = (address) => {
+  //   setFormData({
+  //     ...formData,
+  //     address: `${address.street}, ${address.area}, ${address.city}`,
+  //     city: address.city,
+  //     district: address.area,
+  //   });
+  // };
+  // 在組件加載時從後端獲取地址
+
+  // 獲取地址列表的函數
+  const fetchAddresses = async () => {
+    try {
+      const response = await fetchWithAuth(
+        "http://localhost:3005/api/shipment/addresses"
+      ); // 使用你在伺服器設置的 callback URL
+      if (!response.ok) {
+        throw new Error("Failed to fetch addresses");
+      }
+      const data = await response.json();
+
+      if (!data || !data.data) {
+        throw new Error("No address data found");
+      }
+
+      setAddresses(data.data); // 假設你的 API 回傳 data 是地址的數組
+
+      // 獲取預設地址並填充表單
+      const defaultAddress = data.data.find((address) => address.is_default); // 修改為資料庫欄位名稱
+      if (defaultAddress) {
+        setFormData((prevData) => ({
+          ...prevData,
+          address: defaultAddress.detailed_address || "",
+          city: defaultAddress.city || "",
+          district: defaultAddress.area || "",
+          is_default: defaultAddress.is_default, // 設置是否為預設地址
+        }));
+      }
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Fetch addresses error: ", error); // 在前端控制台打印詳細錯誤
+      setError("無法獲取地址");
+      setLoading(false);
+    }
+  };
+
+  // const handleSubmit = async () => {
+  //   try {
+  //     const response = await fetchWithAuth(
+  //       "http://localhost:3005/api/shipment/addresses",
+  //       {
+  //         method: "POST", // 根據需要也可以是 PUT
+  //         body: JSON.stringify(formData),
+  //       }
+  //     );
+
+  //     if (!response.ok) {
+  //       throw new Error("提交表單失敗");
+  //     }
+
+  //     const result = await response.json();
+  //     console.log("表單提交成功：", result);
+  //     setMessage(result.message); // 顯示成功訊息
+  //     fetchAddresses(); // 重新加載地址列表
+  //   } catch (error) {
+  //     console.error("表單提交錯誤：", error);
+  //     setMessage("表單提交失敗");
+  //   }
+  // };
   // 更新 setDefaultAddress 函數
   const setDefaultAddress = async (addressId) => {
     try {
@@ -190,43 +252,6 @@ const AddressFormProduct = () => {
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(""); // 用來顯示設置預設地址的結果
 
-  // 獲取地址列表的函數
-  const fetchAddresses = async () => {
-    try {
-      const response = await fetchWithAuth(
-        "http://localhost:3005/api/shipment/addresses"
-      ); // 使用你在伺服器設置的 callback URL
-      if (!response.ok) {
-        throw new Error("Failed to fetch addresses");
-      }
-      const data = await response.json();
-
-      if (!data || !data.data) {
-        throw new Error("No address data found");
-      }
-
-      setAddresses(data.data); // 假設你的 API 回傳 data 是地址的數組
-
-      // 獲取預設地址並填充表單
-      const defaultAddress = data.data.find((address) => address.is_default); // 修改為資料庫欄位名稱
-      if (defaultAddress) {
-        setFormData((prevData) => ({
-          ...prevData,
-          address: defaultAddress.detailed_address || "",
-          city: defaultAddress.city || "",
-          district: defaultAddress.area || "",
-          is_default: defaultAddress.is_default, // 設置是否為預設地址
-        }));
-      }
-
-      setLoading(false);
-    } catch (error) {
-      console.error("Fetch addresses error: ", error); // 在前端控制台打印詳細錯誤
-      setError("無法獲取地址");
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
     fetchAddresses();
   }, []); // 一進入頁面時呼叫 fetchAddresses
@@ -238,7 +263,61 @@ const AddressFormProduct = () => {
   if (error) {
     return <div>{error}</div>;
   }
+  //送出
+  const router = useRouter();
 
+  // const handleSubmit = () => {
+  //   // 顯示 Toast 提示
+  //   toast.success("完成訂單", {
+  //     position: "top-right",
+  //     autoClose: 3000, // 自動關閉時間
+  //     hideProgressBar: false,
+  //     closeOnClick: true,
+  //     pauseOnHover: true,
+  //     draggable: true,
+  //     progress: undefined,
+  //   });
+
+  //   // 在 3 秒後跳轉到 /product/product-list 頁面
+  //   setTimeout(() => {
+  //     router.push("/product/product-list");
+  //   }, 3000); // 等待3秒後跳轉
+  // };
+  //
+  //test
+  const handleSubmit = () => {
+    // 模擬訂單資訊
+    const orderData = {
+      orderId: new Date().getTime(), // 簡單的生成訂單ID
+      items: cartItems,
+      total: cartItems.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
+      ),
+      date: new Date().toISOString(),
+    };
+
+    // 保存訂單到LocalStorage（儲存到訂單歷史記錄中）
+    const storedOrders = JSON.parse(localStorage.getItem("orders")) || [];
+    storedOrders.push(orderData);
+    localStorage.setItem("orders", JSON.stringify(storedOrders));
+
+    // 清空購物車
+    localStorage.removeItem("cart");
+
+    // 顯示完成訂單的Toast
+    toast.success("訂單已完成", {
+      position: "top-right",
+      autoClose: 3000,
+    });
+
+    // 3秒後跳轉到產品列表頁面
+    setTimeout(() => {
+      router.push("/product/product-list");
+    }, 3000);
+  };
+
+  //test
   return (
     <div>
       <div>
@@ -336,15 +415,13 @@ const AddressFormProduct = () => {
             {/* 地址資訊 */}
             {/* 預設地址或自訂地址 */}
             <div className="flex gap-6 mt-4">
-              <label
-                className="inline-flex items-center"
-                onClick={() => handleAddressSelect(address)}
-              >
+              <label className="inline-flex items-center">
                 <input
                   type="radio"
                   name="radio-2"
                   className="radio"
                   defaultChecked
+                  onClick={() => handleAddressSelect(address)}
                 />
                 <span className="ml-2">預設地址</span>
               </label>
@@ -400,7 +477,9 @@ const AddressFormProduct = () => {
                   type="text"
                   name="city"
                   value={formData.city}
-                  onChange={handleChange}
+                  onChange={(e) =>
+                    setFormData({ ...formData, city: e.target.value })
+                  } // 更新狀態
                   className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
                   placeholder="請輸入縣市"
                 />
@@ -418,7 +497,9 @@ const AddressFormProduct = () => {
                   type="text"
                   name="district"
                   value={formData.district}
-                  onChange={handleChange}
+                  onChange={(e) =>
+                    setFormData({ ...formData, district: e.target.value })
+                  } // 更新狀態
                   className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
                   placeholder="請輸入鄉鎮市區"
                 />
@@ -435,7 +516,9 @@ const AddressFormProduct = () => {
                   type="text"
                   name="address"
                   value={formData.address}
-                  onChange={handleChange}
+                  onChange={(e) =>
+                    setFormData({ ...formData, district: e.target.value })
+                  } // 更新狀態
                   className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
                   placeholder="請輸入詳細地址"
                 />
@@ -528,6 +611,7 @@ const AddressFormProduct = () => {
               </button>
             </div>
           </form>
+          <ToastContainer />
         </section>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router"; // 用來捕獲動態路由參數
+import { useCart } from "@/hooks/useCart"; // 引入購物車上下文
 import styles from "../../components/ProductDetail/ProductDetail.module.css";
 
 import Image from "next/image";
@@ -8,7 +9,8 @@ import { FaHeart } from "react-icons/fa"; // 實心愛心
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const ProductDetail = ({ addToCart }) => {
+const ProductDetail = () => {
+  const { addToCart } = useCart(); // 從購物車上下文中取得 addToCart 函數
   const router = useRouter();
   const { id } = router.query; // 使用 useRouter 獲取 URL 中的 id
 
@@ -21,11 +23,10 @@ const ProductDetail = ({ addToCart }) => {
   // 根據產品 ID 獲取產品資料
   useEffect(() => {
     if (id) {
-      // 當 id 存在時，發送 API 請求
       const fetchProduct = async () => {
         try {
           const response = await fetch(
-            `http://localhost:3005/api/productsGame/${id}` // 動態 API 地址，根據 id 替換
+            `http://localhost:3005/api/productsGame/${id}`
           );
           const result = await response.json();
           if (result.status === "success") {
@@ -33,16 +34,16 @@ const ProductDetail = ({ addToCart }) => {
           } else {
             setError("Failed to fetch product data");
           }
-          setLoading(false); // 加載完成
+          setLoading(false);
         } catch (err) {
           setError("Failed to fetch product data");
-          setLoading(false); // 加載完成但出現錯誤
+          setLoading(false);
         }
       };
 
       fetchProduct();
     }
-  }, [id]); // 當 id 改變時，重新發送請求
+  }, [id]);
 
   // 在頁面加載時檢查是否收藏
   useEffect(() => {
@@ -54,7 +55,7 @@ const ProductDetail = ({ addToCart }) => {
         (item) => item.product_id === product.product_id
       );
 
-      setLiked(isAlreadyFavorite); // 根據是否收藏更新 liked 狀態
+      setLiked(isAlreadyFavorite);
     }
   }, [product]);
 
@@ -70,21 +71,16 @@ const ProductDetail = ({ addToCart }) => {
     let updatedFavorites;
 
     if (isAlreadyFavorite) {
-      // 如果商品已經存在於收藏列表中，將其移除
       updatedFavorites = favoriteItems.filter(
         (item) => item.product_id !== product.product_id
       );
       toast.info("商品已移出收藏");
     } else {
-      // 如果商品不在收藏列表中，將其添加進去
       updatedFavorites = [...favoriteItems, product];
       toast.success("商品已加入收藏！");
     }
 
-    // 更新 localStorage
     localStorage.setItem("favoriteItems", JSON.stringify(updatedFavorites));
-
-    // 更新收藏狀態
     setLiked(!liked);
   };
 
@@ -93,7 +89,7 @@ const ProductDetail = ({ addToCart }) => {
     if (quantity < 9) {
       setQuantity((prevQuantity) => prevQuantity + 1);
     } else {
-      toast.error("數量最多不能超過9"); // 使用 toast.error 顯示錯誤通知
+      toast.error("數量最多不能超過9");
     }
   };
 
@@ -102,39 +98,22 @@ const ProductDetail = ({ addToCart }) => {
     if (quantity > 1) {
       setQuantity((prevQuantity) => prevQuantity - 1);
     } else {
-      toast.error("數量不能小於1"); // 使用 toast.error 顯示錯誤通知
+      toast.error("數量不能小於1");
     }
   };
 
   const handleAddToCart = () => {
-    const existingCart = JSON.parse(localStorage.getItem("cartItems")) || [];
-
-    const existingProduct = existingCart.find(
-      (item) => item.product_id === product.product_id
-    );
-
-    let updatedCart;
-    if (existingProduct) {
-      updatedCart = existingCart.map((item) =>
-        item.product_id === product.product_id
-          ? { ...item, quantity: item.quantity + quantity }
-          : item
-      );
-    } else {
-      updatedCart = [...existingCart, { ...product, quantity }];
-    }
-
-    localStorage.setItem("cartItems", JSON.stringify(updatedCart));
-
+    // 使用 useCart 的 addToCart 函數來將商品加入購物車
+    addToCart({ ...product, quantity });
     toast.success("商品已加入購物車！");
   };
 
   if (loading) {
-    return <p>Loading...</p>; // 加載中顯示的內容
+    return <p>Loading...</p>;
   }
 
   if (error) {
-    return <p>{error}</p>; // 錯誤信息顯示
+    return <p>{error}</p>;
   }
 
   return (
@@ -147,13 +126,13 @@ const ProductDetail = ({ addToCart }) => {
                 product.image
                   ? product.image
                   : "https://i.postimg.cc/5tTJJ4ST/33.png"
-              } // 如果 product.image 存在則顯示，否則顯示預設圖片
+              }
               width={800}
               height={800}
               alt={product.product_name}
               onError={(e) =>
                 (e.target.src = "https://i.postimg.cc/5tTJJ4ST/33.png")
-              } // 如果圖片加載失敗，顯示預設圖片
+              }
             />
           </div>
           <div className={styles["product-details"]}>
@@ -191,7 +170,6 @@ const ProductDetail = ({ addToCart }) => {
                     >
                       +
                     </button>
-                    {/* 必須加上 ToastContainer 才能顯示通知 */}
                     <ToastContainer
                       position="top-right"
                       autoClose={2000}
@@ -210,7 +188,7 @@ const ProductDetail = ({ addToCart }) => {
             </div>
             <div className={styles["button-container"]}>
               <button
-                onClick={() => addToCart({ ...product, quantity })} // 使用來自 _app.js 的 addToCart 函數
+                onClick={handleAddToCart} // 使用 addToCart 加入購物車
                 className={`${styles["add-to-cart"]} transition-all duration-200 ease-in-out focus:shadow hover:bg-gray-800`}
               >
                 加入購物車
@@ -235,7 +213,7 @@ const ProductDetail = ({ addToCart }) => {
           </div>
         </div>
 
-        {/* orderDetailDes */}
+        {/* 下面的遊戲詳細介紹區塊 */}
         <div className={styles.container}>
           <div className={styles["flex-nav"]}>
             <div className={styles.hoverable}>

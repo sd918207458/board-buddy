@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link"; // 引入 Next.js 的 Link 組件
+import { useCart } from "@/hooks/useCart"; // 引入購物車上下文
 
-const Card = ({ product, addToCart, toggleFavorite }) => {
+const Card = ({ product }) => {
+  const { totalPrice } = useCart(); // 總價
+  const { addToCart } = useCart(); // 從購物車上下文中獲取 addToCart 函數
   const [isFavorite, setIsFavorite] = useState(false); // 初始化收藏狀態
+
   // 檢查商品是否已經在收藏列表中
   useEffect(() => {
     const favoriteItems =
@@ -14,34 +18,39 @@ const Card = ({ product, addToCart, toggleFavorite }) => {
     setIsFavorite(isAlreadyFavorite); // 設定是否為收藏狀態
   }, [product.product_id]); // 當 product_id 改變時重新檢查
 
-// 將收藏的商品存入 localStorage
-const handleFavoriteClick = (productId) => {
-  // 先從 localStorage 中獲取當前的收藏列表
-  const favoriteItems =
-    JSON.parse(localStorage.getItem("favoriteItems")) || [];
+  // 將收藏的商品存入 localStorage
+  const handleFavoriteClick = (productId) => {
+    const favoriteItems =
+      JSON.parse(localStorage.getItem("favoriteItems")) || [];
 
-  // 檢查該商品是否已經存在於收藏列表中
-  const isAlreadyFavorite = favoriteItems.some(
-    (item) => item.product_id === productId
-  );
-
-  let updatedFavorites;
-  if (isAlreadyFavorite) {
-    // 如果商品已經存在於收藏列表中，將其移除
-    updatedFavorites = favoriteItems.filter(
-      (item) => item.product_id !== productId
+    const isAlreadyFavorite = favoriteItems.some(
+      (item) => item.product_id === productId
     );
-    setIsFavorite(false); // 更新愛心狀態為未收藏
-  } else {
-    // 如果商品不在收藏列表中，將其添加進去
-    updatedFavorites = [...favoriteItems, product];
-    setIsFavorite(true); // 更新愛心狀態為收藏
-  }
 
-  localStorage.setItem("favoriteItems", JSON.stringify(updatedFavorites)); // 更新 localStorage
-  console.log("Updated favorite items in localStorage:", updatedFavorites); // 日誌檢查更新後的收藏資料
-};
+    let updatedFavorites;
+    if (isAlreadyFavorite) {
+      updatedFavorites = favoriteItems.filter(
+        (item) => item.product_id !== productId
+      );
+      setIsFavorite(false); // 更新愛心狀態為未收藏
+    } else {
+      updatedFavorites = [...favoriteItems, product];
+      setIsFavorite(true); // 更新愛心狀態為收藏
+    }
 
+    localStorage.setItem("favoriteItems", JSON.stringify(updatedFavorites)); // 更新 localStorage
+    console.log("Updated favorite items in localStorage:", updatedFavorites); // 日誌檢查更新後的收藏資料
+  };
+  const handleAddToCart = () => {
+    // 清除價格中的逗號並轉換為數字
+    const cleanPrice = parseFloat(product.price.replace(/,/g, ""));
+    const productWithQuantity = {
+      ...product,
+      price: cleanPrice, // 使用處理過的價格
+      quantity: 1,
+    };
+    addToCart(productWithQuantity); // 將商品加入購物車
+  };
   return (
     <Link
       href={`/product/${product.product_id}`} // 使用動態路由
@@ -67,26 +76,22 @@ const handleFavoriteClick = (productId) => {
         <div className="flex space-x-2">
           <button
             onClick={(e) => {
-              // e.stopPropagation(); // 阻止事件冒泡，避免觸發鏈接
               e.preventDefault(); // 防止跳轉到商品詳細頁面
-              addToCart({ ...product, quantity: 1 }); // 確保傳入 quantity// 將商品加入購物車
+              handleAddToCart();
             }}
-            className="py-1.5 px-4 text-white border border-white rounded-lg
-            hover:bg-white hover:text-[#003E52] transition-all"
+            className="py-1.5 px-4 text-white border border-white rounded-lg hover:bg-white hover:text-[#003E52] transition-all"
           >
             加入購物車
           </button>
           <button
-  onClick={(e) => {
-    e.preventDefault(); // 防止跳轉到商品詳細頁面
-    handleFavoriteClick(product.product_id); // 更新收藏狀態
-    toggleFavorite(product); // 將完整的 product 傳遞給 toggleFavorite
-  }}
-  className="py-1.5 px-4 text-white border border-white rounded-lg hover:bg-white hover:text-[#003E52] transition-all"
->
-  {isFavorite ? "取消收藏" : "加入收藏"}
-</button>
-
+            onClick={(e) => {
+              e.preventDefault(); // 防止跳轉到商品詳細頁面
+              handleFavoriteClick(product.product_id); // 更新收藏狀態
+            }}
+            className="py-1.5 px-4 text-white border border-white rounded-lg hover:bg-white hover:text-[#003E52] transition-all"
+          >
+            {isFavorite ? "取消收藏" : "加入收藏"}
+          </button>
         </div>
       </div>
 
