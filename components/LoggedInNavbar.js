@@ -229,42 +229,42 @@ export default function Navbar({
             </div>
           </div>
 
-        {/* 購物車內容顯示 */}
-        {cartVisible && (
-          <div
-            tabIndex={0}
-            className="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-52 shadow"
-          >
-            <div className="card-body">
-              {/* 顯示每個購物車商品 */}
-              {cartItems && cartItems.length > 0 ? (
-                cartItems.map((product) => (
-                  <div
-                    key={product.product_id}
-                    className="flex items-center space-x-4"
-                  >
-                    {/* 圖片 */}
-                    <Image
-                      src={product.image}
-                      width={50}
-                      height={50}
-                      alt={product.product_name}
-                      className="rounded-lg"
-                    />
-                    {/* 商品名稱和數量 */}
-                    <div>
-                      <span className="block text-lg text-black font-bold">
-                        {product.product_name}
-                      </span>
-                      <span className="block text-lg text-black">
-                        數量: {product.quantity}
-                      </span>
+          {/* 購物車內容顯示 */}
+          {cartVisible && (
+            <div
+              tabIndex={0}
+              className="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-52 shadow"
+            >
+              <div className="card-body">
+                {/* 顯示每個購物車商品 */}
+                {cartItems && cartItems.length > 0 ? (
+                  cartItems.map((product) => (
+                    <div
+                      key={product.product_id}
+                      className="flex items-center space-x-4"
+                    >
+                      {/* 圖片 */}
+                      <Image
+                        src={product.image}
+                        width={50}
+                        height={50}
+                        alt={product.product_name}
+                        className="rounded-lg"
+                      />
+                      {/* 商品名稱和數量 */}
+                      <div>
+                        <span className="block text-lg text-black font-bold">
+                          {product.product_name}
+                        </span>
+                        <span className="block text-lg text-black">
+                          數量: {product.quantity}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-black">購物車是空的</p>
-              )}
+                  ))
+                ) : (
+                  <p className="text-black">購物車是空的</p>
+                )}
 
                 {/* 小計 */}
                 {cartItems && cartItems.length > 0 && (
@@ -273,26 +273,27 @@ export default function Navbar({
                   </span>
                 )}
 
-              {/* 查看購物車按鈕 */}
-              <div className="card-actions mt-4">
-                <button
-                  className="btn btn-primary bg-[#003E52] btn-block hover:bg-black"
-                  onClick={() => {
-                    router.push({
-                      pathname: "/checkout",
-                      query: {
-                        cart: JSON.stringify(cartItems),
-                        total: totalPrice,
-                      }, // 傳遞購物車資訊
-                    });
-                  }}
-                >
-                  查看購物車
-                </button>
+                {/* 查看購物車按鈕 */}
+                <div className="card-actions mt-4">
+                  <button
+                    className="btn btn-primary bg-[#003E52] btn-block hover:bg-black"
+                    onClick={() => {
+                      router.push({
+                        pathname: "/checkout",
+                        query: {
+                          cart: JSON.stringify(cartItems),
+                          total: totalPrice,
+                        }, // 傳遞購物車資訊
+                      });
+                    }}
+                  >
+                    查看購物車
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
