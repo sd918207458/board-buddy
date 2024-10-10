@@ -5,7 +5,13 @@ import { useRouter } from "next/router";
 import { useCart } from "@/hooks/useCart";
 
 const NavbarSwitcher = () => {
-  const { cartItems, totalItems, isCartVisible, setIsCartVisible } = useCart();
+  const {
+    cartItems,
+    totalItems,
+    isCartVisible,
+    setIsCartVisible,
+    updateCartItems,
+  } = useCart();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // 控制載入狀態
   const [avatarUrl, setAvatarUrl] = useState(""); // 用來管理頭像 URL
@@ -50,8 +56,6 @@ const NavbarSwitcher = () => {
   const handleAvatarUpdate = (newAvatarUrl) => {
     setAvatarUrl(newAvatarUrl); // 更新頭像
   };
-  // 購物車
-  // 移除不必要的購物車初始化邏輯，購物車內容應該來自父層傳遞進來的 `cartItems`
 
   if (isLoading) {
     return <div>Loading...</div>; // 顯示載入狀態

@@ -72,33 +72,45 @@ export default function Favorites() {
   );
 
   const renderTable = () => {
-    if (activeTab === "all" && favoriteProducts.length === 0) {
+    if (loading) {
       return (
-        <div className="text-center">
-          尚無收藏的商品。
-          <br />
-          <button className="btn btn-primary mt-4">查看推薦商品</button>
+        <div className="flex justify-center items-center">
+          <span className="loading loading-spinner loading-lg text-primary"></span>
         </div>
       );
     }
 
+    if (activeTab === "all" && favoriteProducts.length === 0) {
+      return <div className="text-center">尚無收藏的商品。</div>;
+    }
+
     if (activeTab === "pending" && favoriteStores.length === 0) {
+      return <div className="text-center">尚無收藏的店家。</div>;
+    }
+
+    if (activeTab === "all") {
       return (
         <section className="max-w-4xl mx-auto grid grid-cols-2 gap-6 mt-4 sm:grid-cols-2">
           {favoriteProducts.map((product, index) => (
             <div
-              key={product.id ? `product-${product.id}` : `product-${index}`}
+              key={product.product_id || index}
               className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105 hover:shadow-lg"
             >
               <figure>
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="rounded-t-lg h-48 w-full object-cover"
-                />
+                {product.image ? (
+                  <img
+                    src={product.image}
+                    alt={product.product_name}
+                    className="rounded-t-lg h-48 w-full object-cover"
+                  />
+                ) : (
+                  <div className="h-48 w-full bg-gray-200 rounded-t-lg flex items-center justify-center">
+                    <span className="text-gray-500">No Image Available</span>
+                  </div>
+                )}
               </figure>
               <div className="card-body">
-                <h2 className="card-title">{product.name}</h2>
+                <h2 className="card-title">{product.product_name}</h2>
                 <p>{product.description}</p>
                 <div className="card-actions justify-end">
                   <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
@@ -115,31 +127,29 @@ export default function Favorites() {
         <section className="max-w-4xl mx-auto grid grid-cols-2 gap-6 mt-4 sm:grid-cols-2">
           {favoriteStores.map((store, index) => (
             <div
-              key={store.id ? `store-${store.id}` : `store-${index}`}
-              className="card bg-white w-96 shadow-lg hover:shadow-2xl transition-shadow duration-300 rounded-lg"
+              key={store.id || index}
+              className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105 hover:shadow-lg"
             >
-              <figure className="relative">
-                <img
-                  src={store.image}
-                  alt={store.name}
-                  className="h-48 w-full object-cover"
-                />
+              <figure>
+                {store.image ? (
+                  <img
+                    src={store.image}
+                    alt={store.name}
+                    className="rounded-t-lg h-48 w-full object-cover"
+                  />
+                ) : (
+                  <div className="h-48 w-full bg-gray-200 rounded-t-lg flex items-center justify-center">
+                    <span className="text-gray-500">No Image Available</span>
+                  </div>
+                )}
               </figure>
               <div className="card-body">
-                <h2 className="card-title text-lg font-bold text-gray-800 dark:text-white">
-                  {store.name}
-                  <span className="badge badge-secondary ml-2">熱門</span>
-                </h2>
-                <p className="text-gray-600 dark:text-gray-300">
-                  {store.description}
-                </p>
-                <div className="flex justify-between items-center mt-4">
+                <h2 className="card-title">{store.name}</h2>
+                <p>{store.description}</p>
+                <div className="card-actions justify-end">
                   <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
                     瀏覽店家
                   </button>
-                  <span className="text-gray-500 dark:text-gray-400 text-sm">
-                    {store.location}
-                  </span>
                 </div>
               </div>
             </div>
