@@ -334,6 +334,7 @@ const AddressFormProduct = () => {
             )}
 
             {/* 地址資訊 */}
+            {/* 預設地址或自訂地址 */}
             <div className="flex gap-6 mt-4">
               <label
                 className="inline-flex items-center"
@@ -390,24 +391,6 @@ const AddressFormProduct = () => {
               <div>
                 <label
                   className="text-gray-700 dark:text-gray-200"
-                  htmlFor="address"
-                >
-                  地址
-                </label>
-                <input
-                  id="address"
-                  type="text"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
-                  placeholder="請輸入詳細地址"
-                />
-              </div>
-
-              <div>
-                <label
-                  className="text-gray-700 dark:text-gray-200"
                   htmlFor="city"
                 >
                   縣市名稱
@@ -438,6 +421,23 @@ const AddressFormProduct = () => {
                   onChange={handleChange}
                   className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
                   placeholder="請輸入鄉鎮市區"
+                />
+              </div>
+              <div>
+                <label
+                  className="text-gray-700 dark:text-gray-200"
+                  htmlFor="address"
+                >
+                  地址
+                </label>
+                <input
+                  id="address"
+                  type="text"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
+                  placeholder="請輸入詳細地址"
                 />
               </div>
             </div>

@@ -9,13 +9,16 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import { useCart } from "@/hooks/useCart";
 
-export default function LoggedOutNavbar({
-  totalItems, // 這個是從 `props` 傳遞進來的購物車商品總數
-  // isCartVisible,
-  cartItems = [], // 從 _app.js 傳入的購物車項目
-  updateCartItems, // 從 _app.js 傳入的更新購物車函數
-}) {
+export default function LoggedOutNavbar() {
+  const {
+    cartItems,
+    totalItems,
+    isCartVisible,
+    setIsCartVisible,
+    updateCartItems,
+  } = useCart();
   // 購物車START
 
   // 切換購物車顯示狀態

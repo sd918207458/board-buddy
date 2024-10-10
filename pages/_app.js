@@ -7,35 +7,16 @@ import "@/styles/payment.css";
 import "@/styles/address.css";
 import NavbarSwitcher from "@/components/NavbarSwitcher"; // 引入 NavbarSwitcher 組件
 import { AuthProvider } from "@/hooks/use-auth";
-import { useCart } from "@/hooks/useCart"; // 使用共享的購物車邏輯
+import { CartProvider } from "@/hooks/useCart"; // 使用 CartProvider 來包裹應用
 
 export default function App({ Component, pageProps }) {
-  const {
-    cartItems,
-    addToCart,
-    setCartItems,
-    totalItems,
-    isCartVisible,
-    setIsCartVisible,
-    updateCartItems,
-  } = useCart(); // 使用 useCart hook 來管理購物車
-
   return (
     <AuthProvider>
-      <NavbarSwitcher
-        cartItems={cartItems}
-        isCartVisible={isCartVisible}
-        setCartItems={setCartItems}
-        setIsCartVisible={setIsCartVisible}
-        updateCartItems={updateCartItems} // 傳遞 updateCartItems 給 Navbar
-        totalItems={totalItems} // 將 totalItems 傳遞下去
-      />
-      <Component
-        {...pageProps}
-        cartItems={cartItems}
-        setCartItems={setCartItems}
-        addToCart={addToCart}
-      />
+      <CartProvider>
+        <NavbarSwitcher />
+
+        <Component {...pageProps} />
+      </CartProvider>
     </AuthProvider>
   );
 }
