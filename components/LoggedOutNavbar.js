@@ -209,7 +209,6 @@ export default function LoggedOutNavbar({
                     onClick={() => {
                       router.push({
                         pathname: "/checkout",
-                        query: { total: totalPrice }, // 只傳遞必要的參數
                       });
                     }}
                   >
