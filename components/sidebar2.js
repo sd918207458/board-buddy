@@ -1,15 +1,14 @@
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-const images = {
-  已成團: [...Array(6)].map((_, index) => `https://picsum.photos/200/300?random=${index}`),
-  未成團: [...Array(6)].map((_, index) => `https://picsum.photos/200/300?random=${index + 6}`),
-  已滿人: [...Array(6)].map((_, index) => `https://picsum.photos/200/300?random=${index + 12}`),
+
+// 假设这些是您的 API 路径
+const API_URLS = {
+  favorites: 'http://localhost:3005/api/roomheart',
+  joinRecords: 'http://localhost:3005/api/joinRecords',
+  postRecords: 'http://localhost:3005/api/postRecords',
 };
 
-const historyImages = {
-  已成團: [...Array(6)].map((_, index) => `https://picsum.photos/200/300?random=${index + 18}`),
-  未成團: [...Array(6)].map((_, index) => `https://picsum.photos/200/300?random=${index + 24}`),
-};
+
 
 const postRecords = [...Array(6)].map((_, index) => ({
   id: index,
@@ -40,15 +39,92 @@ const messages = {
 const DrawerComponent = () => {
   const [activeTab, setActiveTab] = useState('已成團');
   const [drawerContent, setDrawerContent] = useState('我的最愛');
+  const [favorites, setFavorites] = useState([]);
+  const [joinRecords, setJoinRecords] = useState([]);
+  const [postRecords, setPostRecords] = useState([]); // 确保初始值是数组
   const [selectedFriend, setSelectedFriend] = useState(null);
   const [selectedFeedback, setSelectedFeedback] = useState('');
   const [description, setDescription] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [newMessage, setNewMessage] = useState('');
 
+  // 获取我的最爱数据
+  const fetchFavorites = async () => {
+    try {
+      const response = await fetch(API_URLS.favorites);
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setFavorites(data);
+      } else {
+        console.error('Favorites data is not an array:', data);
+        setFavorites([]);
+      }
+    } catch (error) {
+      console.error('Error fetching favorites:', error);
+      setFavorites([]);
+    }
+  };
+
+  // 获取加入记录数据
+  const fetchJoinRecords = async () => {
+    try {
+      const response = await fetch(API_URLS.joinRecords);
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setJoinRecords(data);
+      } else {
+        console.error('Join records data is not an array:', data);
+        setJoinRecords([]);
+      }
+    } catch (error) {
+      console.error('Error fetching join records:', error);
+      setJoinRecords([]);
+    }
+  };
+
+  // 获取发文记录数据
+  const fetchPostRecords = async () => {
+    try {
+      const response = await fetch(API_URLS.postRecords);
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setPostRecords(data);
+      } else {
+        console.error('Post records data is not an array:', data);
+        setPostRecords([]); // 确保设置为数组
+      }
+    } catch (error) {
+      console.error('Error fetching post records:', error);
+      setPostRecords([]); // 确保设置为数组
+    }
+  };
+
+  useEffect(() => {
+    fetchFavorites();
+    fetchJoinRecords();
+    fetchPostRecords();
+
+    // 设置定时器每5秒更新一次数据
+    const interval = setInterval(() => {
+      fetchFavorites();
+      fetchJoinRecords();
+      fetchPostRecords();
+    }, 5000); // 5000毫秒 = 5秒
+
+    // 清理定时器
+    return () => clearInterval(interval);
+  }, []);
+
   const handleOpenDrawer = (content) => {
     setDrawerContent(content);
-    document.getElementById('my-drawer-4').checked = true; // 打開抽屜
+    document.getElementById('my-drawer-4').checked = true;
+  };
+
+  const handleDeletePost = (id) => {
+    if (window.confirm('是否刪除此筆揪團？')) {
+      console.log(`刪除發文紀錄 ID: ${id}`);
+      // 此处可加入删除逻辑
+    }
   };
 
   const handleSubmitFeedback = () => {
@@ -68,12 +144,6 @@ const DrawerComponent = () => {
     setSelectedFriend(null);
   };
 
-  const handleDeletePost = (id) => {
-    if (window.confirm('是否刪除此筆揪團？')) {
-      console.log(`刪除發文紀錄 ID: ${id}`);
-      // 此處可加入刪除邏輯
-    }
-  };
 
   return (
     <div className="drawer drawer-end">
@@ -125,24 +195,29 @@ const DrawerComponent = () => {
               </div>
               <div className="overflow-y-auto h-[calc(100%-6rem)] mt-4">
                 <div className="flex flex-col space-y-4">
-                  {images[activeTab].map((src, index) => (
-                    <div key={index} className="card bg-base-100 shadow-xl w-full h-48">
+                  {activeTab === '已成團' && favorites.map((item) => (
+                    <div key={item.id} className="card bg-base-100 shadow-xl w-full h-48">
                       <div className="flex h-full">
                         <figure className="w-2/5 h-full">
-                          <img src={src} alt="Random" className="object-cover w-full h-full" />
+                          <img src={item.imageUrl} alt="Random" className="object-cover w-full h-full" />
                         </figure>
                         <div className="card-body w-3/5 flex flex-col justify-between">
-                          <h2 className="card-title">標題 {index + 1}</h2>
+                          <h2 className="card-title">{item.room_name}</h2>
                           <ul className="list-disc list-inside">
-                            <li>類型：動作</li>
-                            <li>地址：某地點</li>
-                            <li>時間：{new Date().toLocaleString()}</li>
-                            <li>遊戲：大冒險</li>
+                            <li>地址：{item.location}</li>
+                            <li>時間：{item.event_date}</li>
+                            <li>遊戲：{item.game1}.遊戲：{item.game2}.遊戲：{item.game3}</li>
                           </ul>
                         </div>
                       </div>
                     </div>
                   ))}
+                  {activeTab === '未成團' && (
+                    <p>尚無資料</p>
+                  )}
+                  {activeTab === '已滿人' && (
+                    <p>尚無資料</p>
+                  )}
                 </div>
               </div>
             </>
@@ -158,20 +233,47 @@ const DrawerComponent = () => {
               </div>
               <div className="overflow-y-auto h-[calc(100%-6rem)] mt-4">
                 <div className="flex flex-col space-y-4">
-                  {historyImages[activeTab].map((src, index) => (
-                    <div key={index} className="card bg-base-100 shadow-xl w-full h-48">
+                  {activeTab === '已成團' && joinRecords.map((record) => (
+                    <div key={record.id} className="card bg-base-100 shadow-xl w-full h-48">
                       <div className="flex h-full">
                         <figure className="w-2/5 h-full">
-                          <img src={src} alt="Random" className="object-cover w-full h-full" />
+                          <img src={record.imageUrl} alt="Random" className="object-cover w-full h-full" />
                         </figure>
                         <div className="card-body w-3/5 flex flex-col justify-between">
-                          <h2 className="card-title">加入紀錄 {index + 1}</h2>
+                          <h2 className="card-title">{record.room_name}</h2>
                           <ul className="list-disc list-inside">
-                            <li>類型：冒險</li>
-                            <li>地址：某地點</li>
-                            <li>時間：{new Date().toLocaleString()}</li>
-                            <li>遊戲：偉大的冒險</li>
+                            <li>地址：{record.location}</li>
+                            <li>時間：{record.event_date}</li>
                           </ul>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {activeTab === '未成團' && (
+                    <p>尚無資料</p>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+          {drawerContent === '發文紀錄' && (
+            <>
+              <div className="overflow-y-auto h-[calc(100%-6rem)] mt-4">
+                <div className="flex flex-col space-y-4">
+                  {postRecords.map((post) => (
+                    <div key={post.id} className="card bg-base-100 shadow-xl w-full h-48">
+                      <div className="flex h-full">
+                        <figure className="w-2/5 h-full">
+                          <img src={post.imageUrl} alt="Random" className="object-cover w-full h-full" />
+                        </figure>
+                        <div className="card-body w-3/5 flex flex-col justify-between">
+                          <h2 className="card-title">{post.room_name}</h2>
+                          <ul className="list-disc list-inside">
+                            <li>地址：{post.location}</li>
+                            <li>時間：{post.event_date}</li>
+                            <li>遊戲：{post.game1}.遊戲：{post.game2}.遊戲：{post.game3}</li>
+                          </ul>
+                          <button className="btn btn-sm" onClick={() => handleDeletePost(post.id)}>刪除</button>
                         </div>
                       </div>
                     </div>
@@ -179,44 +281,6 @@ const DrawerComponent = () => {
                 </div>
               </div>
             </>
-          )}
-          {drawerContent === '發文紀錄' && (
-            <div className="overflow-y-auto h-[calc(100%-6rem)] mt-4">
-              <div className="flex flex-col space-y-4">
-                {postRecords.map((record) => (
-                  <div key={record.id} className="card bg-base-100 shadow-xl w-full h-48 relative">
-                    <div className="flex h-full">
-                      <figure className="w-2/5 h-full">
-                        <img src={record.image} alt="Random" className="object-cover w-full h-full" />
-                      </figure>
-                      <div className="card-body w-3/5 flex flex-col justify-between">
-                        <h2 className="card-title">{record.title}</h2>
-                        <ul className="list-disc list-inside">
-                          <li>類型：{record.type}</li>
-                          <li>時間：{new Date().toLocaleString()}</li>
-                          <li>內容：這是發文的詳細描述。</li>
-                        </ul>
-                        <div className="absolute top-2 right-2 flex space-x-2">
-  <button
-    className="text-lightgray hover:font-bold hover:underline text-xs"
-    onClick={() => handleEdit(record.id)}
-  >
-    編輯
-  </button>
-  <button
-    className="text-lightgray hover:font-bold hover:underline text-xs"
-    onClick={() => handleDeletePost(record.id)}
-  >
-    刪除
-  </button>
-</div>
-
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
           )}
           {drawerContent === '意見回饋' && (
             <div className="flex flex-col w-full">
