@@ -1,95 +1,190 @@
-import { useEffect, useState } from 'react';
+// import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-// 假设这些是您的 API 路径
-const API_URLS = {
-  favorites: 'http://localhost:3005/api/roomheart',
-  joinRecords: 'http://localhost:3005/api/joinRecords',
-  postRecords: 'http://localhost:3005/api/postRecords',
-};
+// const friendsData = [
+//   { name: '小明', avatar: 'https://picsum.photos/50/50?random=1' },
+//   { name: '小紅', avatar: 'https://picsum.photos/50/50?random=2' },
+//   { name: '小華', avatar: 'https://picsum.photos/50/50?random=3' },
+//   { name: '小李', avatar: 'https://picsum.photos/50/50?random=4' },
+//   { name: '小張', avatar: 'https://picsum.photos/50/50?random=5' },
+// ];
+
+// const messages = {
+//   herry: [
+//     { from: '我', text: '嗨，herry！' },
+//     { from: 'herry', text: '你好！' },
+//   ],
+//   ginny: [
+//     { from: '我', text: 'ginny，你在嗎？' },
+//     { from: 'ginny', text: '在的，怎麼了？' },
+//   ],
+// };
 
 const DrawerComponent = () => {
-  const [activeTab, setActiveTab] = useState('已成團');
-  const [drawerContent, setDrawerContent] = useState('我的最愛');
-  const [favorites, setFavorites] = useState([]);
-  const [joinRecords, setJoinRecords] = useState([]);
-  const [postRecords, setPostRecords] = useState([]); // 确保初始值是数组
+  const [drawerContent, setDrawerContent] = useState('聊天室');
+  const [selectedFriend, setSelectedFriend] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [newMessage, setNewMessage] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [friendsData, setFriendsData] = useState([]);
+  const [messages, setMessages] = useState({}); // 用于存储聊天消息
+  const [uuid, setUUID] = useState(''); // 用于存储 UUID
+  const [socket, setSocket] = useState(null); // WebSocket 实例
+  const usersId = 7; // 定义 user_id，确保在整个组件中使用相同的值
 
-  // 获取我的最爱数据
-  const fetchFavorites = async () => {
-    try {
-      const response = await fetch(API_URLS.favorites);
-      const data = await response.json();
-      if (Array.isArray(data)) {
-        setFavorites(data);
-      } else {
-        console.error('Favorites data is not an array:', data);
-        setFavorites([]);
-      }
-    } catch (error) {
-      console.error('Error fetching favorites:', error);
-      setFavorites([]);
-    }
-  };
-
-  // 获取加入记录数据
-  const fetchJoinRecords = async () => {
-    try {
-      const response = await fetch(API_URLS.joinRecords);
-      const data = await response.json();
-      if (Array.isArray(data)) {
-        setJoinRecords(data);
-      } else {
-        console.error('Join records data is not an array:', data);
-        setJoinRecords([]);
-      }
-    } catch (error) {
-      console.error('Error fetching join records:', error);
-      setJoinRecords([]);
-    }
-  };
-
-  // 获取发文记录数据
-  const fetchPostRecords = async () => {
-    try {
-      const response = await fetch(API_URLS.postRecords);
-      const data = await response.json();
-      if (Array.isArray(data)) {
-        setPostRecords(data);
-      } else {
-        console.error('Post records data is not an array:', data);
-        setPostRecords([]); // 确保设置为数组
-      }
-    } catch (error) {
-      console.error('Error fetching post records:', error);
-      setPostRecords([]); // 确保设置为数组
-    }
-  };
-
+  // 初始化 WebSocket
   useEffect(() => {
-    fetchFavorites();
-    fetchJoinRecords();
-    fetchPostRecords();
+    const ws = new WebSocket('ws://localhost:3001');
+    setSocket(ws);
 
-    // 设置定时器每5秒更新一次数据
-    const interval = setInterval(() => {
-      fetchFavorites();
-      fetchJoinRecords();
-      fetchPostRecords();
-    }, 5000); // 5000毫秒 = 5秒
+    ws.onopen = () => {
+      console.log('WebSocket连接已打开');
+    };
 
-    // 清理定时器
-    return () => clearInterval(interval);
+    ws.onmessage = (res) => {
+      const data = JSON.parse(res.data);
+      console.log(data);
+      if (data.context === 'user') {
+        setUUID(data.uuid);
+      } else if (data.context === 'message') {
+        setMessages(prevMessages => ({
+          ...prevMessages,
+          [data.from]: [...(prevMessages[data.from] || []), data],
+        }));
+      }
+    };
+
+    return () => {
+      ws.close(); // 组件卸载时关闭 WebSocket 连接
+    };
   }, []);
+
+  const handleSendMessage = () => {
+    if (socket && selectedFriend && newMessage) {
+      const messageData = {
+        from: '我',
+        content: newMessage,
+        context: 'message',
+      };
+      
+      // 发送消息到 WebSocket
+      socket.send(JSON.stringify(messageData));
+  
+      // 更新 messages 状态
+      setMessages(prevMessages => ({
+        ...prevMessages,
+        [selectedFriend]: [
+          ...(prevMessages[selectedFriend] || []),
+          { from: '我', text: newMessage }
+        ]
+      }));
+  
+      setNewMessage('');
+    } else {
+      console.error('WebSocket 尚未连接或未选择好友');
+    }
+  };   
+
+  // const handleSendMessage = () => {
+  //   if (selectedFriend && newMessage) {
+  //     messages[selectedFriend].push({ from: '我', text: newMessage });
+  //     setNewMessage('');
+  //   }
+  // };
+
+
+  const handleBackToChatList = () => {
+    setSelectedFriend(null);
+  };
 
   const handleOpenDrawer = (content) => {
     setDrawerContent(content);
     document.getElementById('my-drawer-4').checked = true;
   };
 
-  const handleDeletePost = (id) => {
-    if (window.confirm('是否刪除此筆揪團？')) {
-      console.log(`刪除發文紀錄 ID: ${id}`);
-      // 此处可加入删除逻辑
+// 从数据库获取好友列表
+const fetchFriends = async (userId) => {
+  console.log("发送的 user_id:", userId); // 打印 user_id
+  try {
+    const response = await fetch('http://localhost:3005/api/friendData', { 
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ user_id: userId })  // 传递 user_id
+    });
+    
+    const friends = await response.json();
+    console.log('好友列表请求:', friends);
+    
+    if (response.ok) {
+      setFriendsData(friends.data); // 直接存储 `data` 部分      
+    }
+  } catch (error) {
+    console.error('请求失败', error);
+  }
+};
+
+// 初始化时获取好友列表
+useEffect(() => {
+  fetchFriends(usersId); // 在初始化时传递 user_id
+}, [usersId]);
+
+  // 搜索好友
+  const handleAddFriend = async () => {
+    try {
+      const response = await fetch('http://localhost:3005/api/friend', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: searchTerm }), // 假设 searchTerm 是搜索框中的输入值
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
+  
+        // 检查返回的结构并提取 data 字段中的数组
+        if (result.status === 'success' && Array.isArray(result.data)) {
+          // 根据输入的 username 进行过滤
+          const filteredUsers = result.data.filter(user => user.username === searchTerm);
+  
+          setSearchResults(filteredUsers); // 将筛选后的结果设置到状态中
+        } else {
+          setSearchResults([]); // 如果没有匹配的用户，设置为空数组
+          console.log('Unexpected response format:', result);
+        }
+      } else {
+        console.log('搜索失败，状态码:', response.status);
+      }
+    } catch (error) {
+      console.error('请求失败', error);
+    }
+  };  
+
+  // 请求好友
+  const handleFriendRequest = async (friendId) => {
+    console.log("friendId:", friendId);
+    try {
+      const response = await fetch('http://localhost:3005/api/FriendRequest', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ user_id: usersId, friend_id: friendId })  // 示例数据
+      });
+      
+      const result = await response.json();
+      // 输出请求结果
+      console.log('请求结果:', result);  // 这里输出 result
+      
+      if (response.ok) {
+        console.log('好友请求成功', result);
+        // 重新获取好友列表
+        fetchFriends(usersId);  // 成功后重新抓取最新的好友数据
+      }
+    } catch (error) {
+      console.error('网络错误:', error);
     }
   };
 
@@ -97,126 +192,110 @@ const DrawerComponent = () => {
     <div className="drawer drawer-end">
       <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content">
-        {/* Drawer Button */}
         <div className="relative">
           <div className="fixed right-4 top-1/2 transform -translate-y-1/2 flex flex-col space-y-4">
-            <button className="btn tooltip tooltip-left" data-tip="我的最愛" onClick={() => handleOpenDrawer('我的最愛')}>
+            <button className="btn tooltip tooltip-left" data-tip="聊天室" onClick={() => handleOpenDrawer('聊天室')}>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="#EFB880">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8a9 9 0 1115.556 5.192L21 21l-4.808-1.556A9 9 0 013 8z" />
               </svg>
             </button>
-            <button className="btn tooltip tooltip-left" data-tip="加入紀錄" onClick={() => handleOpenDrawer('加入紀錄')}>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="#EFB880">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-              </svg>
-            </button>
-            <button className="btn tooltip tooltip-left" data-tip="發文紀錄" onClick={() => handleOpenDrawer('發文紀錄')}>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="#EFB880">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 11.5V7.5a2.5 2.5 0 00-2.5-2.5h-15A2.5 2.5 0 001 7.5v4a2.5 2.5 0 002.5 2.5h15A2.5 2.5 0 0021 11.5z" />
-              </svg>
+            <button className="btn btn-secondary" onClick={() => handleOpenDrawer('加好友')}>
+              加好友
             </button>
           </div>
         </div>
       </div>
 
-      <div className="drawer-side">
+      <div className="drawer-side" style={{ zIndex: 50 }}>
         <label htmlFor="my-drawer-4" aria-label="close sidebar" className="drawer-overlay"></label>
         <div className="menu bg-base-200 rounded-box w-1/4 h-full p-4 relative z-10">
-          <h2 className="text-xl font-bold mb-4">{drawerContent}</h2>
-          {drawerContent === '我的最愛' && (
-            <>
-              <div className="tabs">
-                {['已成團', '未成團', '已滿人'].map(tab => (
-                  <a key={tab} className={`tab ${activeTab === tab ? 'tab-active' : ''}`} onClick={() => setActiveTab(tab)}>
-                    {tab}
-                  </a>
-                ))}
-              </div>
-              <div className="overflow-y-auto h-[calc(100%-6rem)] mt-4">
-                <div className="flex flex-col space-y-4">
-                  {activeTab === '已成團' && favorites.map((item) => (
-                    <div key={item.id} className="card bg-base-100 shadow-xl w-full h-48">
-                      <div className="flex h-full">
-                        <figure className="w-2/5 h-full">
-                          <img src={item.imageUrl} alt="Random" className="object-cover w-full h-full" />
-                        </figure>
-                        <div className="card-body w-3/5 flex flex-col justify-between">
-                          <h2 className="card-title">{item.room_name}</h2>
-                          <ul className="list-disc list-inside">
-                            <li>地址：{item.location}</li>
-                            <li>時間：{item.event_date}</li>
-                            <li>遊戲：{item.game1}.遊戲：{item.game2}.遊戲：{item.game3}</li>
-                          </ul>
-                        </div>
-                      </div>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold">{drawerContent}</h2>
+            {drawerContent === '聊天室'}
+          </div>
+
+          {drawerContent === '聊天室' && (
+            <div className="w-full">
+              {selectedFriend ? (
+                <>
+                  <div className="flex items-center mb-2">
+                    <button onClick={handleBackToChatList} className="text-blue-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12H3m0 0l6 6m-6-6l6-6" />
+                      </svg>
+                    </button>
+                    <span className="ml-2 text-xl font-bold">{selectedFriend}</span>
+                  </div>
+                  <div className="overflow-y-auto h-[calc(80vh-6rem)] mb-4 w-full">
+                  {messages[selectedFriend]?.map((msg, index) => (
+                    <div key={index} className={`p-2 ${msg.from === '我' ? 'text-right' : ''}`}>
+                      {msg.from !== '我' && (
+                        <img src={friendsData.find(f => f.name === msg.from)?.avatar} alt={msg.from} className="inline-block w-8 h-8 rounded-full mr-1" />
+                      )}
+                      <strong>{msg.from !== '我' ? msg.from : ''}:</strong> {msg.text || msg.content}
                     </div>
                   ))}
-                  {activeTab === '未成團' && (
-                    <p>尚無資料</p>
-                  )}
-                  {activeTab === '已滿人' && (
-                    <p>尚無資料</p>
-                  )}
-                </div>
-              </div>
-            </>
-          )}
-          {drawerContent === '加入紀錄' && (
-            <>
-              <div className="tabs">
-                {['已成團', '未成團'].map(tab => (
-                  <a key={tab} className={`tab ${activeTab === tab ? 'tab-active' : ''}`} onClick={() => setActiveTab(tab)}>
-                    {tab}
-                  </a>
-                ))}
-              </div>
-              <div className="overflow-y-auto h-[calc(100%-6rem)] mt-4">
-                {activeTab === '已成團' && joinRecords.map((item) => (
-                  <div key={item.id} className="card bg-base-100 shadow-xl w-full h-48">
-                    <div className="flex h-full">
-                      <figure className="w-2/5 h-full">
-                        <img src={item.imageUrl} alt="Random" className="object-cover w-full h-full" />
-                      </figure>
-                      <div className="card-body w-3/5 flex flex-col justify-between">
-                        <h2 className="card-title">{item.room_name}</h2>
-                        <ul className="list-disc list-inside">
-                          <li>地址：{item.location}</li>
-                          <li>時間：{item.event_date}</li>
-                          <li>遊戲：{item.game1}.遊戲：{item.game2}.遊戲：{item.game3}</li>
-                        </ul>
-                      </div>
-                    </div>
                   </div>
-                ))}
-                {activeTab === '未成團' && (
-                  <p>尚無資料</p>
-                )}
-              </div>
-            </>
-          )}
-          {drawerContent === '發文紀錄' && (
-            <>
-              <div className="overflow-y-auto h-[calc(100%-6rem)] mt-4">
-                {postRecords.map((item) => (
-                  <div key={item.id} className="card bg-base-100 shadow-xl w-full h-48">
-                    <div className="flex h-full">
-                      <figure className="w-2/5 h-full">
-                        <img src={item.imageUrl} alt="Random" className="object-cover w-full h-full" />
-                      </figure>
-                      <div className="card-body w-3/5 flex flex-col justify-between">
-                        <h2 className="card-title">{item.room_name}</h2>
-                        <ul className="list-disc list-inside">
-                          <li>地址：{item.location}</li>
-                          <li>時間：{item.event_date}</li>
-                          <li>遊戲：{item.game1}.遊戲：{item.game2}.遊戲：{item.game3}</li>
-                        </ul>
-                        <button onClick={() => handleDeletePost(item.id)} className="btn btn-danger">刪除</button>
-                      </div>
+                  <input
+                    type="text"
+                    placeholder="輸入訊息..."
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    className="input input-bordered w-full mb-2"
+                  />
+                  <button className="btn btn-primary" onClick={handleSendMessage}>發送</button>
+                </>
+              ) : (
+                <>
+                  <input
+                    type="text"
+                    placeholder="搜尋好友..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="input input-bordered w-full mb-4"
+                  />
+                  <div className="flex flex-col space-y-2">
+                  {Array.isArray(friendsData) && (
+                    <div>
+                      {friendsData.filter(friend => friend.username.includes(searchTerm)).map((friend, index) => (
+                        <div key={index} className="flex items-center space-x-2 p-2 border rounded-lg" onClick={() => setSelectedFriend(friend.username)}>
+                          <img src={friend.avatar} alt={friend.username} className="w-10 h-10 rounded-full" />
+                          <span className="font-semibold">{friend.username}</span>
+                        </div>
+                      ))}
                     </div>
+                  )}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {drawerContent === '加好友' && (
+            <div className="w-full">
+              <input
+                type="text"
+                placeholder="輸入用戶名..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="input input-bordered w-full mb-4"
+              />
+              <button className="btn btn-primary mb-4" onClick={handleAddFriend}>
+                搜尋
+              </button>
+
+              <div className="flex flex-col space-y-2">
+                {(searchResults || []).map((user, index) => (
+                  <div key={index} className="flex items-center space-x-2 p-2 border rounded-lg">
+                    <img src={user.avatar} alt={user.username} className="w-10 h-10 rounded-full" />
+                    <span className="font-semibold">{user.username}</span>
+                    <button className="btn btn-secondary" onClick={() => handleFriendRequest(user.member_id)}>
+                      請求好友
+                    </button>
                   </div>
                 ))}
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>

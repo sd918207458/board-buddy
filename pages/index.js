@@ -8,7 +8,7 @@ import PopularProducts from "@/components/home/PopularProducts";
 import PopularStores from "@/components/home/PopularStores";
 import GroupEvents from "@/components/home/GroupEvents";
 import RecommendedGames from "@/components/home/RecommendedGames";
-
+import Test from "@/components/test";
 export default function Home() {
   return (
     <>
@@ -18,6 +18,7 @@ export default function Home() {
       <PopularStores /> {/* 熱門店家輪播圖 */}
       <GroupEvents /> {/* 桌遊揪團活動 */}
       <RecommendedGames /> {/* 推薦桌遊區塊 */}
+      <Test/>
       <Footer />
     </>
   );

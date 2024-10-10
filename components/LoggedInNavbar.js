@@ -91,7 +91,7 @@ export default function Navbar({ avatarUrl, username, onAvatarUpdate }) {
               <span>首頁</span>
             </a>
           </Link>
-          <Link href="/group" legacyBehavior>
+          <Link href="/game-index" legacyBehavior>
             <a className="btn btn-ghost text-white flex flex-col items-center">
               <GiThreeFriends className="w-6 h-6" />
               <span>揪團</span>

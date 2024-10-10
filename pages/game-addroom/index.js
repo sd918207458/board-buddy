@@ -1,10 +1,11 @@
-import React from "react";
-import Navbar from "@/components/navbar";
+import React, { useState } from "react"; // 导入 useState
+import NavbarSwitcher from "@/components/NavbarSwitcher"; // 使用 NavbarSwitcher 组件
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { useRouter } from "next/router";
 
 export default function Addroom() {
+  const [username, setUsername] = useState(""); // 用于接收 Navbar 中的 username
   const router = useRouter();
   const { game } = router.query;
 
@@ -16,25 +17,59 @@ export default function Addroom() {
 
   // 加入房间的处理函数
   const handleJoinRoom = async () => {
-    const roomId = parsedGame.room_id;  // 从游戏数据中获取 room_id
-    const memberId = null; // 这里可以根据实际需求设置 member_id，当前设为 null
-
+    // 从游戏数据中获取所需信息
+    const {
+      room_id,
+      img,
+      room_name,
+      room_intro,
+      room_type,
+      game1,
+      game2,
+      game3,
+      location,
+      event_date,
+    } = parsedGame; // 假设 parsedGame 包含这些字段
+  
     try {
+      // 第一步：加入房间
       const response = await fetch('http://localhost:3005/api/roomadd', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          room_id: roomId,
-          member_id: memberId,
+          room_id: room_id, // 使用从游戏数据中获取的 room_id
+          member_id: username, // 使用从 Navbar 中接收到的 username
         }),
       });
-
+  
       const result = await response.json();
-
+  
       if (result.status === 'success') {
         alert('成功加入房间');
+  
+        // 第二步：记录房间历史
+        await fetch('http://localhost:3005/api/roomhistory', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            room_id: room_id,
+            member_id: username,
+            img: img,
+            room_name: room_name,
+            room_intro: room_intro,
+            room_type: room_type,
+            game1: game1,
+            game2: game2,
+            game3: game3,
+            location: location,
+            event_date: event_date,
+          }),
+        });
+  
         router.push('http://localhost:3000/game-index'); // 跳转到指定页面
       } else {
         alert(`加入房间失败: ${result.message}`);
@@ -44,9 +79,23 @@ export default function Addroom() {
       alert('加入房间时发生错误');
     }
   };
+  
 
+  // 处理 username 获取
+  const handleUsernameRetrieved = (retrievedUsername) => {
+    setUsername(retrievedUsername); // 更新 username
+  };
   return (
     <>
+      <div style={{
+        position: 'absolute', // 使用绝对定位
+        top: '-200px', // 将其定位到视口上方
+        left: '50%', // 水平居中
+        transform: 'translateX(-50%)', // 确保居中
+        zIndex: -1, // 使其在 z 轴上低于其他元素
+      }}>
+        <NavbarSwitcher onUsernameRetrieved={handleUsernameRetrieved} />
+      </div> 
       <Breadcrumbs />
       <div className="bg-white">
         <div className="mx-auto grid max-w-2xl grid-cols-1 items-center gap-x-8 gap-y-16 px-4 py-24 sm:px-6 sm:py-32 lg:max-w-7xl lg:grid-cols-2 lg:px-8">

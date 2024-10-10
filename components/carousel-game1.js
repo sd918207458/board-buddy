@@ -6,38 +6,39 @@ const CarouselHeader = () => {
 
   const contents = [
     {
-      title: "標題一：這是第一個選擇",
-      description: "這是第一個選擇的內文，這裡可以放一些詳細的描述。",
-      modalTitle: "彈出標題一",
-      img: "https://picsum.photos/400/300?random=1",
-      buttonText: "我要當主揪 一",
-      modalImg: "https://picsum.photos/800/640?random=1",
+      title: "好多桌遊找不到人玩？",
+      description: "不論任何時間.地點.桌遊類型，只要你揪沒有找不到的小夥伴，Board buddy提供你一個快速方便的揪團平台。",
+      modalTitle: "Board buddy 主揪秘籍",
+      img: "https://img.freepik.com/premium-photo/organize-variety-games-such-as-board-games-ca-generative-ai_1198270-76354.jpg?w=2000", // 領軍者
+      buttonText: "如何當主揪",
+      modalImg: "https://example.com/modal-leader.png",
     },
     {
-      title: "標題二：這是第二個選擇",
-      description: "這是第二個選擇的內文，這裡可以放一些詳細的描述。",
-      modalTitle: "彈出標題二",
-      img: "https://picsum.photos/400/300?random=2",
-      buttonText: "我要當主揪 二",
-      modalImg: "https://picsum.photos/800/640?random=2",
+      title: "翻遍社團找不到喜歡的遊戲空間？",
+      description: "客製化的篩選條件，快速直觀的找到最適合您的揪團好所在。",
+      modalTitle: "Board buddy 參與者秘籍",
+      img: "https://img.freepik.com/free-photo/friends-planning-trip-together_23-2148925837.jpg?t=st=1728599036~exp=1728602636~hmac=ea39128b9a84a1e414af86e48553a38e41f43b0aae4f86764af71626228835d9&w=2000", // 找朋友的感覺
+      buttonText: "揪團怎參加",
+      modalImg: "https://example.com/modal-friends.png",
     },
     {
-      title: "標題三：這是第三個選擇",
-      description: "這是第三個選擇的內文，這裡可以放一些詳細的描述。",
-      modalTitle: "彈出標題三",
-      img: "https://picsum.photos/400/300?random=3",
-      buttonText: "我要當主揪 三",
-      modalImg: "https://picsum.photos/800/640?random=3",
+      title: "我是誰我在哪",
+      description: "網站功能一覽，快速成為Board buddy的OG",
+      modalTitle: "功能一覽",
+      img: "https://img.freepik.com/premium-photo/asian-hipster-looking-camera-while-pose-camera-sky-scrapper-endeavor_31965-300226.jpg?w=2000", // 經驗很多的嘻哈歌手
+      buttonText: "OG養成鈕",
+      modalImg: "https://example.com/modal-experience.png",
     },
     {
       title: "標題四：這是第四個選擇",
       description: "這是第四個選擇的內文，這裡可以放一些詳細的描述。",
       modalTitle: "彈出標題四",
-      img: "https://picsum.photos/400/300?random=4",
+      img: "https://example.com/another-character.png", // 第四個角色
       buttonText: "我要當主揪 四",
-      modalImg: "https://picsum.photos/800/640?random=4",
+      modalImg: "https://example.com/modal-fourth.png",
     },
   ];
+  
 
   const handleButtonClick = (index) => {
     setCurrentContent(index);

@@ -4,18 +4,9 @@ import React, { useEffect, useState } from 'react';
 // 假设这些是您的 API 路径
 const API_URLS = {
   favorites: 'http://localhost:3005/api/roomheart',
-  joinRecords: 'http://localhost:3005/api/joinRecords',
-  postRecords: 'http://localhost:3005/api/postRecords',
+  joinRecords: 'http://localhost:3005/api/roomhistory',
+  postRecords: 'http://localhost:3005/api/gamecreat',
 };
-
-
-
-const postRecords = [...Array(6)].map((_, index) => ({
-  id: index,
-  title: `發文紀錄 ${index + 1}`,
-  type: '發文類型',
-  image: `https://picsum.photos/200/300?random=${index + 36}`,
-}));
 
 const friendsData = [
   { name: '小明', avatar: 'https://picsum.photos/50/50?random=1' },
@@ -82,34 +73,63 @@ const DrawerComponent = () => {
     }
   };
 
-  // 获取发文记录数据
-  const fetchPostRecords = async () => {
-    try {
-      const response = await fetch(API_URLS.postRecords);
-      const data = await response.json();
-      if (Array.isArray(data)) {
-        setPostRecords(data);
-      } else {
-        console.error('Post records data is not an array:', data);
-        setPostRecords([]); // 确保设置为数组
-      }
-    } catch (error) {
-      console.error('Error fetching post records:', error);
+  // 获取发文记录数据并筛选出 member_id 为 tai 的数据
+const fetchPostRecords = async () => {
+  try {
+    const response = await fetch(API_URLS.postRecords);
+    const data = await response.json();
+    if (Array.isArray(data)) {
+      // 筛选出 member_id 为 'tai' 的记录
+      const filteredData = data.filter(record => record.member_id === 'tai');
+      setPostRecords(filteredData);
+    } else {
+      console.error('Post records data is not an array:', data);
       setPostRecords([]); // 确保设置为数组
     }
-  };
+  } catch (error) {
+    console.error('Error fetching post records:', error);
+    setPostRecords([]); // 确保设置为数组
+  }
+};
+
 
   useEffect(() => {
     fetchFavorites();
     fetchJoinRecords();
     fetchPostRecords();
 
+    const postRecords = [...Array(6)].map((_, index) => ({
+      id: index,
+      title: `發文紀錄 ${index + 1}`,
+      type: '發文類型',
+      image: `https://picsum.photos/200/300?random=${index + 36}`,
+    }));
+    
+    const friendsData = [
+      { name: '小明', avatar: 'https://picsum.photos/50/50?random=1' },
+      { name: '小紅', avatar: 'https://picsum.photos/50/50?random=2' },
+      { name: '小華', avatar: 'https://picsum.photos/50/50?random=3' },
+      { name: '小李', avatar: 'https://picsum.photos/50/50?random=4' },
+      { name: '小張', avatar: 'https://picsum.photos/50/50?random=5' },
+    ];
+    
+    const messages = {
+      小明: [
+        { from: '我', text: '嗨，小明！' },
+        { from: '小明', text: '你好！' },
+      ],
+      小紅: [
+        { from: '我', text: '小紅，你在嗎？' },
+        { from: '小紅', text: '在的，怎麼了？' },
+      ],
+    };
+    
     // 设置定时器每5秒更新一次数据
     const interval = setInterval(() => {
       fetchFavorites();
       fetchJoinRecords();
       fetchPostRecords();
-    }, 5000); // 5000毫秒 = 5秒
+    }, 2000); // 5000毫秒 = 5秒
 
     // 清理定时器
     return () => clearInterval(interval);
@@ -180,7 +200,7 @@ const DrawerComponent = () => {
   </div>
 </div>
 
-      <div className="drawer-side">
+      <div className="drawer-side" style={{zIndex:50}}>
         <label htmlFor="my-drawer-4" aria-label="close sidebar" className="drawer-overlay"></label>
         <div className="menu bg-base-200 rounded-box w-1/4 h-full p-4 relative z-10">
           <h2 className="text-xl font-bold mb-4">{drawerContent}</h2>
@@ -199,14 +219,14 @@ const DrawerComponent = () => {
                     <div key={item.id} className="card bg-base-100 shadow-xl w-full h-48">
                       <div className="flex h-full">
                         <figure className="w-2/5 h-full">
-                          <img src={item.imageUrl} alt="Random" className="object-cover w-full h-full" />
+                          <img src={item.img ? `http://localhost:3005/room/${item.img}` : "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1470&q=80"} alt="Random" className="object-cover w-full h-full" />
                         </figure>
                         <div className="card-body w-3/5 flex flex-col justify-between">
                           <h2 className="card-title">{item.room_name}</h2>
                           <ul className="list-disc list-inside">
                             <li>地址：{item.location}</li>
                             <li>時間：{item.event_date}</li>
-                            <li>遊戲：{item.game1}.遊戲：{item.game2}.遊戲：{item.game3}</li>
+                            <li>遊戲：{item.game1}.{item.game2}.{item.game3}</li>
                           </ul>
                         </div>
                       </div>
@@ -237,13 +257,14 @@ const DrawerComponent = () => {
                     <div key={record.id} className="card bg-base-100 shadow-xl w-full h-48">
                       <div className="flex h-full">
                         <figure className="w-2/5 h-full">
-                          <img src={record.imageUrl} alt="Random" className="object-cover w-full h-full" />
+                          <img src={record.img ? `http://localhost:3005/room/${record.img}` : "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1470&q=80"} alt="Random" className="object-cover w-full h-full" />
                         </figure>
                         <div className="card-body w-3/5 flex flex-col justify-between">
                           <h2 className="card-title">{record.room_name}</h2>
                           <ul className="list-disc list-inside">
                             <li>地址：{record.location}</li>
                             <li>時間：{record.event_date}</li>
+                            <li>遊戲：{record.game1}.{record.game2}.{record.game3}</li>
                           </ul>
                         </div>
                       </div>
@@ -264,14 +285,14 @@ const DrawerComponent = () => {
                     <div key={post.id} className="card bg-base-100 shadow-xl w-full h-48">
                       <div className="flex h-full">
                         <figure className="w-2/5 h-full">
-                          <img src={post.imageUrl} alt="Random" className="object-cover w-full h-full" />
+                          <img src={post.img ? `http://localhost:3005/room/${post.img}` : "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1470&q=80"} alt="Random" className="object-cover w-full h-full" />
                         </figure>
                         <div className="card-body w-3/5 flex flex-col justify-between">
                           <h2 className="card-title">{post.room_name}</h2>
                           <ul className="list-disc list-inside">
                             <li>地址：{post.location}</li>
                             <li>時間：{post.event_date}</li>
-                            <li>遊戲：{post.game1}.遊戲：{post.game2}.遊戲：{post.game3}</li>
+                            <li>遊戲：{post.game1}.{post.game2}.{post.game3}</li>
                           </ul>
                           <button className="btn btn-sm" onClick={() => handleDeletePost(post.id)}>刪除</button>
                         </div>
