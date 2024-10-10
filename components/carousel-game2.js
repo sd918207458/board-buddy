@@ -10,9 +10,9 @@ const Card = ({ img, title, description, type, game, location, date }) => {
     return (
         <div className="relative w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-lg dark:bg-gray-800">
             {img && <img className="object-cover object-center w-full h-56" src={img} alt={title} />}
-            <div className="flex items-center px-6 py-3 bg-gray-900">
-                <h1 className="mx-3 text-[24px] font-bold text-red-600">人數: 7/9 (已成團)</h1>
-            </div>
+            {/* <div className="flex items-center px-6 py-3 bg-gray-900">
+                <h1 className="mx-3 text-[24px] font-bold text-red-600">人數: 5/9 (已成團)</h1>
+            </div> */}
             <div className="px-6 py-4">
                 <h1 className="text-xl font-semibold text-gray-800 dark:text-white">{title}</h1>
                 <p className="py-2 text-gray-700 dark:text-gray-400">{description}</p>
@@ -80,7 +80,7 @@ const Carousel = ({ gamesData }) => {
                         return (
                             <Card 
                                 key={index} 
-                                img={img || 'defaultImage.png'}  // 如果没有图片，使用默认图片
+                                img={img ? `http://localhost:3005/room/${img}` : "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1470&q=80"}  // 如果没有图片，使用默认图片
                                 title={room_name} 
                                 description={room_intro} 
                                 type={typeDisplay}  

@@ -7,7 +7,8 @@ import Sidebar from "@/components/sidebar2";
 import SearchBar from '@/components/searchbar';
 import Carousel2 from "@/components/carousel-game2";
 import Gamecard from "@/components/gamecard";
-
+import CreateRoomButton from "@/components/createroombutton";
+CreateRoomButton
 export default function Gameindex() {
   const [searchResults, setSearchResults] = useState([]); // 用于存储搜索结果
   const [allGames, setAllGames] = useState([]); // 用于存储所有游戏数据
@@ -182,7 +183,7 @@ export default function Gameindex() {
                 <div key={index} className="relative w-full sm:w-[30%] max-w-sm overflow-hidden bg-white rounded-lg shadow-lg dark:bg-gray-800">
                 <img className="object-cover object-center w-full h-56" src="sjdj" alt="找不到圖片" />
                 <div className="flex items-center justify-center px-6 py-3 bg-gray-900">
-                    <h2 className="text-[24px] font-bold text-white-600 text-center">{store.name}</h2>
+                    <h2 className="text-[24px] font-bold text-white-600 text-center text-white">{store.name}</h2>
                 </div>
                 <div className="px-6 py-4">
                     <div className="flex flex-col mt-4 text-gray-700 dark:text-gray-200">
@@ -208,6 +209,7 @@ export default function Gameindex() {
         </div>
 
         <Sidebar />
+        <CreateRoomButton/>
         <Footer />
       </div>
     </>

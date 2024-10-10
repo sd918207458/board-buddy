@@ -17,25 +17,59 @@ export default function Addroom() {
 
   // 加入房间的处理函数
   const handleJoinRoom = async () => {
-    const roomId = parsedGame.room_id;  // 从游戏数据中获取 room_id
-    const memberId = null; // 这里可以根据实际需求设置 member_id，当前设为 null
-
+    // 从游戏数据中获取所需信息
+    const {
+      room_id,
+      img,
+      room_name,
+      room_intro,
+      room_type,
+      game1,
+      game2,
+      game3,
+      location,
+      event_date,
+    } = parsedGame; // 假设 parsedGame 包含这些字段
+  
     try {
+      // 第一步：加入房间
       const response = await fetch('http://localhost:3005/api/roomadd', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          room_id: roomId,
-          member_id: username // 使用从 Navbar 中接收到的 username
+          room_id: room_id, // 使用从游戏数据中获取的 room_id
+          member_id: username, // 使用从 Navbar 中接收到的 username
         }),
       });
-
+  
       const result = await response.json();
-
+  
       if (result.status === 'success') {
         alert('成功加入房间');
+  
+        // 第二步：记录房间历史
+        await fetch('http://localhost:3005/api/roomhistory', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            room_id: room_id,
+            member_id: username,
+            img: img,
+            room_name: room_name,
+            room_intro: room_intro,
+            room_type: room_type,
+            game1: game1,
+            game2: game2,
+            game3: game3,
+            location: location,
+            event_date: event_date,
+          }),
+        });
+  
         router.push('http://localhost:3000/game-index'); // 跳转到指定页面
       } else {
         alert(`加入房间失败: ${result.message}`);
@@ -45,12 +79,12 @@ export default function Addroom() {
       alert('加入房间时发生错误');
     }
   };
+  
 
   // 处理 username 获取
   const handleUsernameRetrieved = (retrievedUsername) => {
     setUsername(retrievedUsername); // 更新 username
   };
-
   return (
     <>
       <div style={{
