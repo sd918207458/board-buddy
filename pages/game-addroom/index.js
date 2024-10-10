@@ -1,10 +1,11 @@
-import React from "react";
-import Navbar from "@/components/navbar";
+import React, { useState } from "react"; // 导入 useState
+import NavbarSwitcher from "@/components/NavbarSwitcher"; // 使用 NavbarSwitcher 组件
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { useRouter } from "next/router";
 
 export default function Addroom() {
+  const [username, setUsername] = useState(""); // 用于接收 Navbar 中的 username
   const router = useRouter();
   const { game } = router.query;
 
@@ -27,7 +28,7 @@ export default function Addroom() {
         },
         body: JSON.stringify({
           room_id: roomId,
-          member_id: memberId,
+          member_id: username // 使用从 Navbar 中接收到的 username
         }),
       });
 
@@ -45,8 +46,22 @@ export default function Addroom() {
     }
   };
 
+  // 处理 username 获取
+  const handleUsernameRetrieved = (retrievedUsername) => {
+    setUsername(retrievedUsername); // 更新 username
+  };
+
   return (
     <>
+      <div style={{
+        position: 'absolute', // 使用绝对定位
+        top: '-200px', // 将其定位到视口上方
+        left: '50%', // 水平居中
+        transform: 'translateX(-50%)', // 确保居中
+        zIndex: -1, // 使其在 z 轴上低于其他元素
+      }}>
+        <NavbarSwitcher onUsernameRetrieved={handleUsernameRetrieved} />
+      </div> 
       <Breadcrumbs />
       <div className="bg-white">
         <div className="mx-auto grid max-w-2xl grid-cols-1 items-center gap-x-8 gap-y-16 px-4 py-24 sm:px-6 sm:py-32 lg:max-w-7xl lg:grid-cols-2 lg:px-8">

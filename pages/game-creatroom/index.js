@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import Navbar from "@/components/navbar";
+import NavbarSwitcher from "@/components/NavbarSwitcher"; // 使用 NavbarSwitcher 组件
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 
 export default function Createroom() {
+  const [username, setUsername] = useState(""); // 用于接收 Navbar 中的 username
   const [gameOptions, setGameOptions] = useState([{ category: "", title: "" }]);
   const [formData, setFormData] = useState({
     room_name: "",
@@ -18,18 +19,21 @@ export default function Createroom() {
   });
   const [isLoading, setIsLoading] = useState(false);
 
+  // 用于接收从 NavbarSwitcher 传递过来的 username
+  const handleUsernameRetrieved = (retrievedUsername) => {
+    setUsername(retrievedUsername);
+  };
 
   const gameCategories = ["策略", "合作", "推理", "陣營", "益智", "多人", "派對", "小品"];
   const gameTitles = {
-    "策略": ["遊戲1-1", "遊戲1-2", "遊戲1-3", "遊戲1-4", "遊戲1-5", "遊戲1-6", "遊戲1-7", "遊戲1-8", "遊戲1-9", "遊戲1-10", "遊戲1-11", "遊戲1-12", "遊戲1-13", "遊戲1-14", "遊戲1-15"],
-    "合作": ["遊戲2-1", "遊戲2-2", "遊戲2-3", "遊戲2-4", "遊戲2-5", "遊戲2-6", "遊戲2-7", "遊戲2-8", "遊戲2-9", "遊戲2-10", "遊戲2-11", "遊戲2-12", "遊戲2-13", "遊戲2-14", "遊戲2-15"],
-    "推理": ["遊戲3-1", "遊戲3-2", "遊戲3-3", "遊戲3-4", "遊戲3-5", "遊戲3-6", "遊戲3-7", "遊戲3-8", "遊戲3-9", "遊戲3-10", "遊戲3-11", "遊戲3-12", "遊戲3-13", "遊戲3-14", "遊戲3-15"],
-    "陣營": ["遊戲4-1", "遊戲4-2", "遊戲4-3", "遊戲4-4", "遊戲4-5", "遊戲4-6", "遊戲4-7", "遊戲4-8", "遊戲4-9", "遊戲4-10", "遊戲4-11", "遊戲4-12", "遊戲4-13", "遊戲4-14", "遊戲4-15"],
-    "益智": ["遊戲5-1", "遊戲5-2", "遊戲5-3", "遊戲5-4", "遊戲5-5", "遊戲5-6", "遊戲5-7", "遊戲5-8", "遊戲5-9", "遊戲5-10", "遊戲5-11", "遊戲5-12", "遊戲5-13", "遊戲5-14", "遊戲5-15"],
-    "多人": ["遊戲6-1", "遊戲6-2", "遊戲6-3", "遊戲6-4", "遊戲6-5", "遊戲6-6", "遊戲6-7", "遊戲6-8", "遊戲6-9", "遊戲6-10", "遊戲6-11", "遊戲6-12", "遊戲6-13", "遊戲6-14", "遊戲6-15"],
-    "派對": ["遊戲7-1", "遊戲7-2", "遊戲7-3", "遊戲7-4", "遊戲7-5", "遊戲7-6", "遊戲7-7", "遊戲7-8", "遊戲7-9", "遊戲7-10", "遊戲7-11", "遊戲7-12", "遊戲7-13", "遊戲7-14", "遊戲7-15"],
-    "小品": ["遊戲8-1", "遊戲8-2", "遊戲8-3", "遊戲8-4", "遊戲8-5", "遊戲8-6", "遊戲8-7", "遊戲8-8", "遊戲8-9", "遊戲8-10", "遊戲8-11", "遊戲8-12", "遊戲8-13", "遊戲8-14", "遊戲8-15"],
-
+    策略: ["遊戲1-1", "遊戲1-2", "遊戲1-3", "遊戲1-4", "遊戲1-5", "遊戲1-6", "遊戲1-7", "遊戲1-8", "遊戲1-9", "遊戲1-10", "遊戲1-11", "遊戲1-12", "遊戲1-13", "遊戲1-14", "遊戲1-15"],
+    合作: ["遊戲2-1", "遊戲2-2", "遊戲2-3", "遊戲2-4", "遊戲2-5", "遊戲2-6", "遊戲2-7", "遊戲2-8", "遊戲2-9", "遊戲2-10", "遊戲2-11", "遊戲2-12", "遊戲2-13", "遊戲2-14", "遊戲2-15"],
+    推理: ["遊戲3-1", "遊戲3-2", "遊戲3-3", "遊戲3-4", "遊戲3-5", "遊戲3-6", "遊戲3-7", "遊戲3-8", "遊戲3-9", "遊戲3-10", "遊戲3-11", "遊戲3-12", "遊戲3-13", "遊戲3-14", "遊戲3-15"],
+    陣營: ["遊戲4-1", "遊戲4-2", "遊戲4-3", "遊戲4-4", "遊戲4-5", "遊戲4-6", "遊戲4-7", "遊戲4-8", "遊戲4-9", "遊戲4-10", "遊戲4-11", "遊戲4-12", "遊戲4-13", "遊戲4-14", "遊戲4-15"],
+    益智: ["遊戲5-1", "遊戲5-2", "遊戲5-3", "遊戲5-4", "遊戲5-5", "遊戲5-6", "遊戲5-7", "遊戲5-8", "遊戲5-9", "遊戲5-10", "遊戲5-11", "遊戲5-12", "遊戲5-13", "遊戲5-14", "遊戲5-15"],
+    多人: ["遊戲6-1", "遊戲6-2", "遊戲6-3", "遊戲6-4", "遊戲6-5", "遊戲6-6", "遊戲6-7", "遊戲6-8", "遊戲6-9", "遊戲6-10", "遊戲6-11", "遊戲6-12", "遊戲6-13", "遊戲6-14", "遊戲6-15"],
+    派對: ["遊戲7-1", "遊戲7-2", "遊戲7-3", "遊戲7-4", "遊戲7-5", "遊戲7-6", "遊戲7-7", "遊戲7-8", "遊戲7-9", "遊戲7-10", "遊戲7-11", "遊戲7-12", "遊戲7-13", "遊戲7-14", "遊戲7-15"],
+    小品: ["遊戲8-1", "遊戲8-2", "遊戲8-3", "遊戲8-4", "遊戲8-5", "遊戲8-6", "遊戲8-7", "遊戲8-8", "遊戲8-9", "遊戲8-10", "遊戲8-11", "遊戲8-12", "遊戲8-13", "遊戲8-14", "遊戲8-15"],
   };
 
   const handleGameOptionChange = (index, field, value) => {
@@ -41,11 +45,7 @@ export default function Createroom() {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData({ ...formData, img: reader.result });
-      };
-      reader.readAsDataURL(file);
+      setFormData({ ...formData, img: file }); // Store the File object
     }
   };
 
@@ -57,53 +57,59 @@ export default function Createroom() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
+  
     if (!formData.room_name || !formData.room_intro) {
       alert("請填寫所有必需字段！");
       setIsLoading(false);
       return;
     }
-
+  
     if (parseInt(formData.minperson) <= 0 || parseInt(formData.maxperson) <= 0) {
       alert("人數必須大於零！");
       setIsLoading(false);
       return;
     }
-
-    // 确保 gameOptions 中的 category 正确
+  
     const types = gameOptions.map(option => option.category);
     const games = gameOptions.map(option => option.title);
-
-    const jsonData = {
-      room_name: formData.room_name,
-      room_intro: formData.room_intro,
-      minperson: parseInt(formData.minperson),
-      maxperson: parseInt(formData.maxperson),
-      event_date: formData.event_date,
-      location: formData.location,
-      img: formData.img,
-      roomrule: formData.roomrule,
-      room_type: formData.room_type,
-      type1: types[0] || "", // 如果没有选择则返回空字符串
-      game1: games[0] || "",
-      type2: types[1] || "",
-      game2: games[1] || "",
-      type3: types[2] || "",
-      game3: games[2] || "",
-    };
-
+  
+    const formDataToSend = new FormData();
+    formDataToSend.append("room_name", formData.room_name);
+    formDataToSend.append("room_intro", formData.room_intro);
+    formDataToSend.append("minperson", parseInt(formData.minperson));
+    formDataToSend.append("maxperson", parseInt(formData.maxperson));
+    formDataToSend.append("event_date", formData.event_date);
+    formDataToSend.append("location", formData.location);
+    formDataToSend.append("roomrule", formData.roomrule);
+    formDataToSend.append("room_type", formData.room_type);
+    formDataToSend.append("member_id", username);
+    formDataToSend.append("type1", types[0] || "");
+    formDataToSend.append("game1", games[0] || "");
+    formDataToSend.append("type2", types[1] || "");
+    formDataToSend.append("game2", games[1] || "");
+    formDataToSend.append("type3", types[2] || "");
+    formDataToSend.append("game3", games[2] || "");
+  
+    if (formData.img) {
+      formDataToSend.append("img", formData.img);
+    }
+  
+    // Debugging: Log FormData contents
+    for (const [key, value] of formDataToSend.entries()) {
+      console.log(key, value);
+    }
+  
     try {
       const response = await fetch("http://localhost:3005/api/gamecreat", {
         method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(jsonData),
+        body: formDataToSend,
       });
-
+  
       if (response.ok) {
         const data = await response.json();
         console.log("Room created:", data);
+        
+        // 清除表单数据
         setFormData({
           room_name: "",
           room_intro: "",
@@ -115,7 +121,9 @@ export default function Createroom() {
           roomrule: "",
           room_type: ""
         });
-        setGameOptions([{ category: "", title: "" }]);
+        
+        setGameOptions([{ category: "", title: "" }]); // 重置游戏选项
+      
         alert("房間創建成功！");
       } else {
         const errorData = await response.json();
@@ -127,7 +135,7 @@ export default function Createroom() {
       setIsLoading(false);
     }
   };
-
+  
 
   const addGameOption = () => {
     if (gameOptions.length < 3) {
@@ -137,6 +145,15 @@ export default function Createroom() {
 
   return (
     <>
+      <div style={{
+        position: 'absolute', // 使用绝对定位
+        top: '-200px', // 将其定位到视口上方
+        left: '50%', // 水平居中
+        transform: 'translateX(-50%)', // 确保居中
+        zIndex: -1, // 使其在 z 轴上低于其他元素
+      }}>
+        <NavbarSwitcher onUsernameRetrieved={handleUsernameRetrieved} />
+      </div> 
       <Breadcrumbs />
       <div className="bg-[#003E52] min-h-screen">
         <div className="columns-2 flex m-auto size-4/5 rounded border-2 border-slate-200 p-4 relative">
@@ -313,7 +330,7 @@ export default function Createroom() {
                   className={`px-6 py-2 text-white bg-blue-500 rounded-lg ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                   disabled={isLoading}
                 >
-                  {isLoading ? '提交中...' : '提交'}
+                  {isLoading ? '創建中...' : '創建'}
                 </button>
               </div>
             </form>

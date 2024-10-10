@@ -180,7 +180,7 @@ const DrawerComponent = () => {
   </div>
 </div>
 
-      <div className="drawer-side">
+      <div className="drawer-side" style={{zIndex:50}}>
         <label htmlFor="my-drawer-4" aria-label="close sidebar" className="drawer-overlay"></label>
         <div className="menu bg-base-200 rounded-box w-1/4 h-full p-4 relative z-10">
           <h2 className="text-xl font-bold mb-4">{drawerContent}</h2>

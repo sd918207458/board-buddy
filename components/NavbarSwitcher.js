@@ -8,6 +8,7 @@ const NavbarSwitcher = ({
   isCartVisible,
   updateCartItems,
   totalItems,
+  onUsernameRetrieved // 新增一个 prop 来暴露 username
 }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // 控制載入狀態
@@ -30,6 +31,9 @@ const NavbarSwitcher = ({
             setIsLoggedIn(true);
             setAvatarUrl(data.data.user.avatar); // 設置初始頭像
             setUsername(data.data.user.username); // 設置初始使用者名稱
+            if (onUsernameRetrieved) {
+              onUsernameRetrieved(data.data.user.username); // 调用 prop 将 username 暴露出去
+            }
           } else {
             // 如果 token 無效，清理 localStorage
             localStorage.removeItem("token");
@@ -48,7 +52,7 @@ const NavbarSwitcher = ({
       setIsLoggedIn(false);
       setIsLoading(false);
     }
-  }, [router]);
+  }, [router, onUsernameRetrieved]);
 
   const handleAvatarUpdate = (newAvatarUrl) => {
     setAvatarUrl(newAvatarUrl); // 更新頭像

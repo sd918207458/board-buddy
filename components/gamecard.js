@@ -42,8 +42,12 @@ const GameCard = ({ game }) => {
                 <div className="lg:flex lg:items-center">
                     <img
                         className="object-cover w-full lg:mx-6 lg:w-1/2 rounded-xl h-48 lg:h-64"
-                        src={game.imageUrl || "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"}
+                        src={game.img ? `http://localhost:3005/room/${game.img}` : "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1470&q=80"}
                         alt={game.room_name}
+                        onError={(e) => {
+                            e.target.onerror = null; // 防止无限循环
+                            e.target.src = "https://via.placeholder.com/150"; // 替换为占位符
+                        }}
                     />
                     <div className="relative lg:w-1/2 lg:mx-6 rounded-lg">
                         <p className="text-sm text-blue-500 uppercase">
@@ -63,12 +67,12 @@ const GameCard = ({ game }) => {
                         <div className="flex items-center mt-6">
                             <img
                                 className="object-cover object-center w-10 h-10 rounded-full"
-                                src={game.hostImage || "https://images.unsplash.com/photo-1531590878845-12627191e687?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=764&q=80"}
+                                src={game.hostImage || "https://images.unsplash.com/photo-1531590878845-12627191e687?ixlib=rb-1.2.1&auto=format&fit=crop&w=764&q=80"}
                                 alt={game.hostName || "Host"}
                             />
 
                             <div className="mx-4">
-                                <h1 className="text-sm text-gray-100 dark:text-gray-200">{game.hostName || "Host"}</h1>
+                                <h1 className="text-sm text-gray-100 dark:text-gray-200">{game.member_id || "Host"}</h1>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">Host</p>
                             </div>
 
@@ -100,8 +104,9 @@ const GameCard = ({ game }) => {
 
 GameCard.propTypes = {
     game: PropTypes.shape({
-        imageUrl: PropTypes.string,
+        img: PropTypes.string,
         room_id: PropTypes.string,
+        member_id: PropTypes.string,
         room_type: PropTypes.number,
         room_name: PropTypes.string,
         room_intro: PropTypes.string,
@@ -128,8 +133,9 @@ const GameCardList = ({ games = [] }) => {
 
 GameCardList.propTypes = {
     games: PropTypes.arrayOf(PropTypes.shape({
-        imageUrl: PropTypes.string,
+        img: PropTypes.string,
         room_id: PropTypes.string,
+        member_id: PropTypes.string,
         room_type: PropTypes.number,
         room_name: PropTypes.string,
         room_intro: PropTypes.string,
