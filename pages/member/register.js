@@ -3,7 +3,8 @@ import React, { useState } from "react";
 import { useRouter } from "next/router";
 import Footer from "@/components/footer";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
-import { CSSTransition } from "react-transition-group";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // 可重用的輸入欄位組件
 const InputField = ({ label, type, id, placeholder, value, onChange }) => (
@@ -22,18 +23,6 @@ const InputField = ({ label, type, id, placeholder, value, onChange }) => (
   </div>
 );
 
-// Toast 組件
-const Toast = ({ message, onClose }) => {
-  return (
-    <div className="fixed top-4 right-4 bg-red-500 text-white p-4 rounded shadow-lg z-50">
-      {message}
-      <button onClick={onClose} className="ml-4 font-bold">
-        &times;
-      </button>
-    </div>
-  );
-};
-
 export default function Register() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -41,7 +30,6 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [toastMessage, setToastMessage] = useState(""); // Toast 狀態
   const [termsAccepted, setTermsAccepted] = useState(false);
   const router = useRouter();
 
@@ -68,11 +56,10 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setToastMessage(""); // 清除之前的錯誤訊息
 
     const validationError = validateForm();
     if (validationError) {
-      setToastMessage(validationError); // 使用 Toast 顯示錯誤
+      toast.error(validationError); // 使用 react-toastify 顯示錯誤
       setIsLoading(false);
       return;
     }
@@ -92,14 +79,14 @@ export default function Register() {
       const data = await response.json(); // 捕捉錯誤響應
 
       if (response.status === 201) {
-        alert("註冊成功");
+        toast.success("註冊成功");
         router.push("/member/login");
       } else {
-        setToastMessage(data.message || "註冊失敗"); // 顯示伺服器錯誤訊息
+        toast.error(data.message || "註冊失敗"); // 顯示伺服器錯誤訊息
       }
     } catch (error) {
       console.error("錯誤:", error);
-      setToastMessage("伺服器錯誤，請稍後再試");
+      toast.error("伺服器錯誤，請稍後再試");
     } finally {
       setIsLoading(false);
     }
@@ -114,11 +101,7 @@ export default function Register() {
           <div className="card-body w-full px-6 py-8">
 
             <div className="flex justify-center">
-              <img
-                className="w-auto h-8"
-                src="https://merakiui.com/images/logo.svg"
-                alt="Logo"
-              />
+              <img className="w-auto h-8" src="/logo.jfif" alt="Logo" />
             </div>
 
             <h2 className="text-center text-2xl font-bold text-gray-700 dark:text-gray-200 mt-4">
@@ -224,13 +207,8 @@ export default function Register() {
         </div>
       </div>
 
-      {/* Toast 彈出通知 */}
-      {toastMessage && (
-        <Toast
-          message={toastMessage}
-          onClose={() => setToastMessage("")} // 點擊時關閉通知
-        />
-      )}
+      {/* ToastContainer for react-toastify notifications */}
+      <ToastContainer />
 
       <Footer />
     </>

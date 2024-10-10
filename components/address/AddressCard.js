@@ -29,7 +29,7 @@ const AddressCard = ({
           </>
         )}
 
-        <div className="flex justify-between">
+        <div className="flex justify-between mt-4">
           <button
             className="btn btn-primary"
             onClick={() => handleEdit(address)}

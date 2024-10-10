@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import { CSSTransition } from "react-transition-group";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // 可重用的輸入欄位組件
 const InputField = ({
@@ -36,27 +37,24 @@ export default function Request() {
     name: "",
     email: "",
     phone: "",
-    orderNumber: "", // 這將從下拉選單中獲取
+    orderNumber: "",
     orderDate: "",
     productName: "",
     productModel: "",
     productQuantity: "",
     returnReason: "",
   });
-  const [orders, setOrders] = useState([]); // 存儲使用者的訂單資料
-  const [submitMessage, setSubmitMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
 
   // 獲取存取令牌
   const getToken = () => localStorage.getItem("token");
 
-  // 使用封裝的請求函數，自動添加 token
   const fetchWithToken = async (url, options = {}) => {
     const token = getToken();
     const headers = {
       ...options.headers,
-      Authorization: `Bearer ${token}`, // 將 token 附加到 Authorization header
+      Authorization: `Bearer ${token}`,
     };
     return fetch(url, { ...options, headers, credentials: "include" });
   };
@@ -64,10 +62,9 @@ export default function Request() {
   useEffect(() => {
     setIsMounted(true);
 
-    // 獲取使用者的訂單資料
     const fetchOrders = async () => {
       try {
-        setLoadingOrders(true); // 訂單加載狀態
+        setLoadingOrders(true);
         const response = await fetchWithToken(
           "http://localhost:3005/api/orders",
           {
@@ -81,11 +78,11 @@ export default function Request() {
         if (response.ok) {
           setOrders(result.data);
         } else {
-          setErrorMessage("無法載入訂單資料");
+          toast.error("無法載入訂單資料");
         }
       } catch (error) {
         console.error("獲取訂單失敗:", error);
-        setErrorMessage("無法載入訂單資料");
+        toast.error("無法載入訂單資料");
       } finally {
         setLoadingOrders(false);
       }
@@ -94,7 +91,6 @@ export default function Request() {
     fetchOrders();
   }, []);
 
-  // 當選擇訂單時，自動填充訂單日期和商品名稱等
   const handleOrderChange = (e) => {
     const selectedOrder = orders.find(
       (order) => order.order_id === Number(e.target.value)
@@ -107,7 +103,6 @@ export default function Request() {
     });
   };
 
-  // 表單驗證邏輯
   const validateForm = () => {
     const {
       name,
@@ -138,15 +133,13 @@ export default function Request() {
     return null;
   };
 
-  // 表單提交處理
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setErrorMessage("");
 
     const validationError = validateForm();
     if (validationError) {
-      setErrorMessage(validationError);
+      toast.error(validationError);
       setIsSubmitting(false);
       return;
     }
@@ -161,7 +154,7 @@ export default function Request() {
           },
           body: JSON.stringify({
             order_id: formData.orderNumber,
-            member_id: 1, // 假設會員ID為1，實際應根據用戶狀態動態設置
+            member_id: 1,
             order_date: formData.orderDate,
             product_name: formData.productName,
             product_model: formData.productModel,
@@ -174,7 +167,7 @@ export default function Request() {
       const result = await response.json();
 
       if (response.ok) {
-        setSubmitMessage(result.message);
+        toast.success(result.message);
         setFormData({
           name: "",
           email: "",
@@ -187,10 +180,10 @@ export default function Request() {
           returnReason: "",
         });
       } else {
-        setErrorMessage(result.message);
+        toast.error(result.message);
       }
     } catch (error) {
-      setErrorMessage("提交失敗，請稍後重試。");
+      toast.error("提交失敗，請稍後重試。");
     } finally {
       setIsSubmitting(false);
     }
@@ -277,7 +270,6 @@ export default function Request() {
               </div>
             </div>
 
-            {/* 其他欄位 */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <InputField
                 label="訂單日期"
@@ -342,17 +334,6 @@ export default function Request() {
               ></textarea>
             </div>
 
-            <CSSTransition
-              in={!!errorMessage}
-              timeout={300}
-              classNames="fade"
-              unmountOnExit
-            >
-              <div className="mt-4 text-center text-red-500">
-                {errorMessage}
-              </div>
-            </CSSTransition>
-
             <div className="form-control mt-6">
               <button
                 type="submit"
@@ -364,20 +345,12 @@ export default function Request() {
                 {isSubmitting ? "提交中..." : "提交表單"}
               </button>
             </div>
-
-            <CSSTransition
-              in={!!submitMessage}
-              timeout={300}
-              classNames="fade"
-              unmountOnExit
-            >
-              <div className="mt-4 text-center text-green-500">
-                {submitMessage}
-              </div>
-            </CSSTransition>
           </form>
         </div>
       </div>
+
+      {/* ToastContainer for toast notifications */}
+      <ToastContainer />
       <Footer />
     </>
   );

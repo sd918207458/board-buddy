@@ -64,7 +64,7 @@ const NavbarSwitcher = ({
     <LoggedInNavbar
       avatarUrl={avatarUrl}
       username={username}
-      onAvatarUpdate={handleAvatarUpdate}
+      onAvatarUpdate={handleAvatarUpdate} // 傳遞更新頭像回調函數
       cartItems={cartItems} // 傳遞購物車內容
       totalItems={totalItems} // 傳遞購物車商品總數
       isCartVisible={isCartVisible} // 傳遞購物車顯示狀態

@@ -1,15 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { useRouter } from "next/router";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function OrderDetails() {
   const [orderDetails, setOrderDetails] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null); // 用來存儲點擊的圖片
 
   const router = useRouter();
-  const { id } = router.query; // 使用 id 代替 order_id
+  const { id } = router.query;
 
   // 獲取存取令牌
   const getToken = () => localStorage.getItem("token");
@@ -37,11 +40,13 @@ export default function OrderDetails() {
         const result = await response.json();
         if (response.ok) {
           setOrderDetails(result.orderDetails);
+          toast.success("訂單資料獲取成功！");
         } else {
-          setError(result.message || "無法獲取訂單資料");
+          toast.error(result.message || "無法獲取訂單資料");
         }
       } catch (error) {
-        setError("伺服器錯誤，無法獲取訂單資料");
+        toast.error("伺服器錯誤，無法獲取訂單資料");
+        setError(error.message);
       } finally {
         setLoading(false);
       }
@@ -50,8 +55,24 @@ export default function OrderDetails() {
     fetchOrderDetails(id);
   }, [router.isReady, id]);
 
-  if (loading) return <div className="text-center">載入中...</div>;
-  if (error) return <div className="text-red-500 text-center">{error}</div>;
+  const handleImageClick = (imageUrl) => {
+    setSelectedImage(imageUrl);
+    document.getElementById("image-modal").showModal();
+  };
+
+  const memoizedOrderDetails = useMemo(() => orderDetails, [orderDetails]);
+
+  if (loading) {
+    return <div className="text-center">載入中...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="text-center text-red-500">
+        {error}，請稍後重試或聯絡客服。
+      </div>
+    );
+  }
 
   return (
     <>
@@ -69,19 +90,25 @@ export default function OrderDetails() {
             </h2>
 
             <ul className="steps steps-vertical lg:steps-horizontal justify-center w-full">
-              <li className="step step-primary">訂單建立</li>
-              <li className="step step-primary">處理中</li>
-              <li
-                className={`step ${orderDetails.shipped ? "step-primary" : ""}`}
-              >
-                已出貨
+              <li className="step step-primary" data-content="✓">
+                訂單建立
+              </li>
+              <li className="step step-primary" data-content="✓">
+                處理中
               </li>
               <li
                 className={`step ${
-                  orderDetails.completed ? "step-primary" : ""
+                  memoizedOrderDetails.shipped ? "step-primary" : ""
                 }`}
               >
-                完成訂單
+                {memoizedOrderDetails.shipped ? "已出貨" : "等待出貨"}
+              </li>
+              <li
+                className={`step ${
+                  memoizedOrderDetails.completed ? "step-primary" : ""
+                }`}
+              >
+                {memoizedOrderDetails.completed ? "完成訂單" : "等待完成"}
               </li>
             </ul>
           </section>
@@ -103,7 +130,7 @@ export default function OrderDetails() {
                 </tr>
               </thead>
               <tbody>
-                {orderDetails.map((item) => (
+                {memoizedOrderDetails.map((item) => (
                   <tr key={item.orderdetail_id}>
                     <td>{item.product_name}</td>
                     <td>{item.product_id}</td>
@@ -114,7 +141,8 @@ export default function OrderDetails() {
                       <img
                         src={item.image_url}
                         alt={item.product_name}
-                        className="h-12 w-12"
+                        className="h-12 w-12 cursor-pointer"
+                        onClick={() => handleImageClick(item.image_url)}
                       />
                     </td>
                   </tr>
@@ -122,8 +150,61 @@ export default function OrderDetails() {
               </tbody>
             </table>
           </div>
+
+          {/* 評價區 */}
+          <div className="p-4">
+            <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4 text-center">
+              您的評價
+            </h3>
+            <div className="rating">
+              <input
+                type="radio"
+                name="rating-1"
+                className="mask mask-star-2 bg-orange-400"
+              />
+              <input
+                type="radio"
+                name="rating-1"
+                className="mask mask-star-2 bg-orange-400"
+                checked
+              />
+              <input
+                type="radio"
+                name="rating-1"
+                className="mask mask-star-2 bg-orange-400"
+              />
+              <input
+                type="radio"
+                name="rating-1"
+                className="mask mask-star-2 bg-orange-400"
+              />
+              <input
+                type="radio"
+                name="rating-1"
+                className="mask mask-star-2 bg-orange-400"
+              />
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* 圖片模態框 */}
+      <dialog id="image-modal" className="modal">
+        <div className="modal-box">
+          <img src={selectedImage} alt="商品大圖" className="w-full" />
+          <div className="modal-action">
+            <button
+              className="btn"
+              onClick={() => document.getElementById("image-modal").close()}
+            >
+              關閉
+            </button>
+          </div>
+        </div>
+      </dialog>
+
+      {/* ToastContainer for toast notifications */}
+      <ToastContainer />
       <Footer />
     </>
   );

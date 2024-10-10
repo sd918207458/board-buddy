@@ -42,7 +42,7 @@ export default function Navbar({
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
+    setIsLoggedIn(!!token); // 如果有 token，設置為登入狀態
   }, []);
 
   // 當 `avatarUrl` 或 `username` 變化時，更新頭像和使用者名稱
@@ -50,7 +50,7 @@ export default function Navbar({
     setUserData((prevData) => ({ ...prevData, avatar: avatarUrl, username }));
   }, [avatarUrl, username]);
 
-  // 登出邏輯，清除token，並保留在原本的頁面
+  // 登出邏輯，清除 token，並保留在原本的頁面
   const handleLogout = async () => {
     try {
       await fetch("http://localhost:3005/api/auth/logout", {
@@ -68,10 +68,11 @@ export default function Navbar({
     }
   };
 
-  // 當上傳頭像時，更新 Navbar 中的頭像
+  // 當上傳頭像時，更新 Navbar 中的頭像，並添加時間戳以避免快取問題
   const handleUploadAvatar = (newAvatarUrl) => {
-    setUserData((prevData) => ({ ...prevData, avatar: newAvatarUrl }));
-    onAvatarUpdate(newAvatarUrl); // 傳遞新頭像 URL 給父組件 (NavbarSwitcher)
+    const updatedAvatarUrl = `${newAvatarUrl}?t=${new Date().getTime()}`;
+    setUserData((prevData) => ({ ...prevData, avatar: updatedAvatarUrl }));
+    onAvatarUpdate(updatedAvatarUrl); // 傳遞新頭像 URL 給父組件 (NavbarSwitcher)
   };
 
   return (
@@ -119,8 +120,9 @@ export default function Navbar({
               className=" w-12 rounded-full avatar flex flex-col items-center"
             >
               {/* 顯示使用者 avatar 和 username */}
-              <div className="ring-primary ring-offset-base-100 w-12 rounded-full ring ring-offset-2 ">
+              <div className="ring-primary ring-offset-base-100 w-12 rounded-full ring ring-offset-2">
                 <img
+                  key={userData.avatar} // 添加 key 屬性以強制重新渲染圖片
                   src={
                     userData.avatar
                       ? `http://localhost:3005/avatar/${userData.avatar}`
@@ -139,13 +141,6 @@ export default function Navbar({
               tabIndex={0}
               className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
             >
-              {/* <li>
-                <Link href="/profile-settings" legacyBehavior>
-                  <a className="btn btn-ghost text-black flex items-center">
-                    會員中心
-                  </a>
-                </Link>
-              </li> */}
               <li>
                 <Link href="/profile-settings/personal-info" legacyBehavior>
                   <a className="btn btn-ghost text-black flex items-center">
@@ -181,7 +176,6 @@ export default function Navbar({
                   </a>
                 </Link>
               </li>
-
               <li>
                 <a
                   className="btn btn-ghost text-black flex items-center"
