@@ -59,9 +59,14 @@ export const CartProvider = ({ children }) => {
   );
   // 計算購物車內所有商品的總價
   const totalPrice = cartItems.reduce((total, item) => {
-    const itemPrice = parseFloat(item.price.replace(/,/g, "")); // 去除價格中的逗號，並轉換為數字
-    return total + itemPrice * item.quantity; // 將每個商品的價格乘以數量，並累加到總價
-  }, 0); // 初始總價為 0
+    // 如果 price 是字符串，則移除逗號，否則直接轉換為數字
+    const itemPrice =
+      typeof item.price === "string"
+        ? parseFloat(item.price.replace(/,/g, ""))
+        : parseFloat(item.price);
+
+    return total + itemPrice * item.quantity;
+  }, 0);
   const handleQuantityChange = (index, amount) => {
     const newCartItems = [...cartItems];
     if (newCartItems[index].quantity + amount > 0) {

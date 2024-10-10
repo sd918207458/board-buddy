@@ -5,8 +5,9 @@ import Footer from "@/components/footer";
 import Pagination from "@/components/pagination/Pagination";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ProductSearch from "@/components/ProductSearch/ProductSearch";
+import { useCart } from "@/hooks/useCart"; // 引入購物車 Context
 
-const ProductList = ({ cartItems, setCartItems }) => {
+const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [favorites, setFavorites] = useState({}); // 保存每個產品的收藏狀態
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -18,6 +19,13 @@ const ProductList = ({ cartItems, setCartItems }) => {
   // 分頁相關狀態
   const [currentPage, setCurrentPage] = useState(1); // 當前頁面
   const [productsPerPage] = useState(12); // 每頁顯示的產品數量
+
+  // 引入購物車 Context
+  const { addToCart } = useCart(); // 從 useCart 中獲取 addToCart 函數
+  // 在商品列表中使用 addToCart 函數
+  const handleAddToCart = (product) => {
+    addToCart(product); // 添加商品到購物車
+  };
 
   // Fetch 商品数据
   useEffect(() => {
@@ -33,27 +41,6 @@ const ProductList = ({ cartItems, setCartItems }) => {
     };
     fetchProducts();
   }, []);
-
-  // 添加商品到購物車的函數
-  const addToCart = (product) => {
-    const existingProduct = cartItems.find(
-      (item) => item.product_id === product.product_id
-    );
-
-    let updatedCart;
-    if (existingProduct) {
-      updatedCart = cartItems.map((item) =>
-        item.product_id === product.product_id
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      );
-    } else {
-      updatedCart = [...cartItems, { ...product, quantity: 1 }];
-    }
-
-    setCartItems(updatedCart);
-    localStorage.setItem("cartItems", JSON.stringify(updatedCart));
-  };
 
   // 切換收藏狀態
   const toggleFavorite = (productId) => {
@@ -133,7 +120,7 @@ const ProductList = ({ cartItems, setCartItems }) => {
                 product={product}
                 toggleFavorite={toggleFavorite}
                 isFavorite={favorites[product.product_id]}
-                addToCart={addToCart}
+                addToCart={() => addToCart(product)} // 使用 useCart 中的 addToCart
               />
             ))}
           </div>
