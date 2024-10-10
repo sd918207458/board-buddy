@@ -1,24 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useCart } from "@/hooks/useCart"; // 引入共享的購物車邏輯
 import styles from "./Sidecart.module.css";
 
 const Sidecart = () => {
-  // 狀態管理購物車內容和總價
-  const [cartItems, setCartItems] = useState([]);
-  const [totalPrice, setTotalPrice] = useState(0);
+  // 使用 useCart hook 來管理購物車狀態和邏輯
+  const { cartItems, totalPrice, isMounted } = useCart(); // 共享購物車數據
   const shippingCost = 130; // 固定運費
 
-  // 在頁面加載時從 localStorage 取得購物車內容
-  useEffect(() => {
-    const storedCartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
-    setCartItems(storedCartItems);
-
-    // 計算總價
-    const storedTotalPrice = storedCartItems.reduce((total, item) => {
-      const itemPrice = parseFloat(item.price.replace(/,/g, "")); // 移除逗號並轉換為數字
-      return total + itemPrice * item.quantity;
-    }, 0);
-    setTotalPrice(storedTotalPrice);
-  }, []);
+  if (!isMounted) {
+    return null; // 防止伺服器渲染不一致
+  }
+  console.log("Sidecart Items:", cartItems); // 打印購物車內容，檢查是否同步更新
+  console.log("Total Price:", totalPrice); // 打印總價，檢查是否正確更新
 
   return (
     <div className={styles.parentContainer}>
@@ -48,7 +41,6 @@ const Sidecart = () => {
           <span>應付總額</span>
           <span>NT${(totalPrice + shippingCost).toLocaleString()}</span>
         </div>
-        <button className={styles.checkoutButton}>結帳</button>
       </aside>
     </div>
   );

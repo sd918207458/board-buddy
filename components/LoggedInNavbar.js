@@ -21,7 +21,7 @@ export default function Navbar({
   });
 
   // 購物車START
-
+  const router = useRouter();
   const toggleCart = () => {
     console.log("購物車按鈕被點擊"); // 測試是否觸發了此函數
     console.log(cartItems); // 檢查 cartItems 是否正確傳遞
@@ -280,10 +280,7 @@ export default function Navbar({
                     onClick={() => {
                       router.push({
                         pathname: "/checkout",
-                        query: {
-                          cart: JSON.stringify(cartItems),
-                          total: totalPrice,
-                        },
+                        query: { total: totalPrice }, // 只傳遞必要的參數
                       });
                     }}
                   >

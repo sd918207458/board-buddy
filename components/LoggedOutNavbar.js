@@ -209,10 +209,7 @@ export default function LoggedOutNavbar({
                     onClick={() => {
                       router.push({
                         pathname: "/checkout",
-                        query: {
-                          cart: JSON.stringify(cartItems),
-                          total: totalPrice,
-                        }, // 傳遞購物車資訊
+                        query: { total: totalPrice }, // 只傳遞必要的參數
                       });
                     }}
                   >

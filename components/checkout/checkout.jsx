@@ -1,81 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import React from "react";
+import { useCart } from "@/hooks/useCart"; // 引入共享的購物車邏輯
 import styles from "./Checkout.module.css"; // 引入結帳區的 CSS 模組
 
 const Checkout = () => {
-  // state to manage which radio is selected
-  const [selectedOption, setSelectedOption] = useState("default");
-
-  // handle radio button change
-  const handleOptionChange = (e) => {
-    setSelectedOption(e.target.value);
-  };
-
-  // v1 購物車
-  const router = useRouter();
-  const [cartItems, setCartItems] = useState([]);
-  const [totalPrice, setTotalPrice] = useState(0);
-  const [isMounted, setIsMounted] = useState(false); // 判斷是否加載完畢
-
-  useEffect(() => {
-    // 確保只在客戶端加載購物車數據
-    setIsMounted(true);
-    if (typeof window !== "undefined") {
-      const storedCartItems =
-        JSON.parse(localStorage.getItem("cartItems")) || [];
-      setCartItems(storedCartItems);
-
-      // 計算總價
-      const storedTotalPrice = storedCartItems.reduce((total, item) => {
-        const itemPrice = parseFloat(item.price.replace(/,/g, "")); // 移除逗號並轉換為數字
-        return total + itemPrice * item.quantity;
-      }, 0);
-      setTotalPrice(storedTotalPrice);
-    }
-  }, []);
+  // 使用 useCart hook 來管理購物車狀態和邏輯
+  const {
+    cartItems, // 購物車商品數據
+    totalPrice, // 總價
+    handleQuantityChange, // 更新商品數量的函數
+    handleRemoveItem, // 移除商品的函數
+    isMounted, // 判斷組件是否加載完成
+  } = useCart();
 
   if (!isMounted) {
     return null; // 防止伺服器渲染不一致
   }
 
-  // 更新商品數量
-  const handleQuantityChange = (index, amount) => {
-    const newCartItems = [...cartItems];
-    if (newCartItems[index].quantity + amount > 0) {
-      newCartItems[index].quantity += amount;
-      setCartItems(newCartItems);
-
-      // 更新 localStorage 中的購物車
-      localStorage.setItem("cartItems", JSON.stringify(newCartItems));
-      updateTotalPrice(newCartItems);
-    }
-  };
-
-  // 移除商品
-  const handleRemoveItem = (index) => {
-    const newCartItems = cartItems.filter((_, i) => i !== index);
-    setCartItems(newCartItems);
-
-    // 更新 localStorage 中的購物車
-    localStorage.setItem("cartItems", JSON.stringify(newCartItems));
-    updateTotalPrice(newCartItems);
-  };
-
-  // 更新總價
-  const updateTotalPrice = (items = []) => {
-    // 確保 items 是一個有效的陣列
-    if (!Array.isArray(items)) {
-      return;
-    }
-
-    const total = items.reduce((sum, item) => {
-      const itemPrice = parseFloat(item.price.replace(/,/g, "")); // 移除價格中的逗號並轉為數字
-      return sum + itemPrice * item.quantity;
-    }, 0);
-
-    setTotalPrice(total);
-  };
-  // 這裡是結帳購物車內容
   return (
     <>
       <section className={`${styles.cartContent} max-w-4xl`}>
