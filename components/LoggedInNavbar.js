@@ -30,10 +30,15 @@ export default function Navbar({ avatarUrl, username, onAvatarUpdate }) {
   };
 
   const totalPrice = cartItems.reduce((total, item) => {
-    const itemPrice = parseFloat(item.price.replace(/,/g, "")); // 移除價格中的逗號，然後轉換為數字
+    const itemPrice =
+      typeof item.price === "string"
+        ? parseFloat(item.price.replace(/,/g, ""))
+        : parseFloat(item.price); // 如果是數字，直接轉換為數字
+
     if (isNaN(itemPrice)) {
       return total; // 如果價格不是數字，跳過該項
     }
+
     return total + itemPrice * item.quantity;
   }, 0);
 
