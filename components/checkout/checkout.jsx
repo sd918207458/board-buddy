@@ -58,9 +58,11 @@ const Checkout = () => {
                   {/* 移除逗號並計算小計，並加上千位逗號 */}
                   <td>
                     NT$
-                    {(
-                      parseFloat(item.price.replace(/,/g, "")) * item.quantity
-                    ).toLocaleString()}
+                    {(typeof item.price === "string"
+                      ? parseFloat(item.price.replace(/,/g, ""))
+                      : parseFloat(item.price)) * // 如果是數字，直接轉換為數字
+                      item.quantity}
+                    .toLocaleString()
                   </td>
 
                   <td>
