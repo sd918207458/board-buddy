@@ -152,7 +152,7 @@ export default function OrderDetails() {
           </div>
 
           {/* 評價區 */}
-          <div className="p-4">
+          {/* <div className="p-4">
             <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4 text-center">
               您的評價
             </h3>
@@ -184,7 +184,7 @@ export default function OrderDetails() {
                 className="mask mask-star-2 bg-orange-400"
               />
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 

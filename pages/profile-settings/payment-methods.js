@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import CouponSelector from "@/components/payment/Coupon";
@@ -109,14 +109,43 @@ export default function PaymentMethods() {
     setErrors((prev) => ({ ...prev, [name]: error }));
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setCurrentMethod((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    validateField(name, value);
-  };
+  const handleChange = useCallback(
+    (e) => {
+      const { name, value } = e.target;
+
+      if (name === "expiryDate") {
+        // 限制只允許數字輸入
+        let formattedValue = value.replace(/\D/g, "");
+
+        // 自動插入 `/` 符號當輸入 4 位數時
+        if (formattedValue.length >= 3) {
+          formattedValue = `${formattedValue.slice(
+            0,
+            2
+          )}/${formattedValue.slice(2, 4)}`;
+        }
+
+        // 設定最新的狀態
+        setCurrentMethod((prev) => ({
+          ...prev,
+          [name]: formattedValue,
+        }));
+
+        // 只有在滿足 4 位數字時才進行驗證
+        if (formattedValue.length === 5) {
+          validateField(name, formattedValue);
+        }
+      } else {
+        // 處理其他欄位的變更
+        setCurrentMethod((prev) => ({
+          ...prev,
+          [name]: value,
+        }));
+        validateField(name, value);
+      }
+    },
+    [setCurrentMethod]
+  );
 
   const validateForm = () => {
     const newErrors = {};
@@ -361,7 +390,7 @@ export default function PaymentMethods() {
                   >
                     <option value="creditCard">信用卡付款</option>
                     <option value="cash">現金付款</option>
-                    <option value="onlinePayment">線上付款</option>
+                    {/* <option value="onlinePayment">線上付款</option> */}
                   </select>
                 </div>
 
