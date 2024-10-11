@@ -145,17 +145,6 @@ export default function PersonalInfo() {
     }
   };
 
-<<<<<<< HEAD
-  if (!isMounted || loading) {
-    return <div>加載中...</div>; // 加載中的提示
-  }
-
-
-  return (
-    <>
-      <Navbar />
-      <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52]">
-=======
   return (
     <>
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] relative">
@@ -171,7 +160,6 @@ export default function PersonalInfo() {
             {submitMessage ? submitMessage : errorMessage}
           </div>
         )}
->>>>>>> Login
 
         <div className="card w-full max-w-lg mx-auto bg-white shadow-lg lg:max-w-4xl rounded-lg">
           <section className="p-6">
@@ -269,12 +257,7 @@ export default function PersonalInfo() {
 
                 {/* 常玩時段 */}
                 <div className="form-control">
-<<<<<<< HEAD
-
-                  <label className="label" htmlFor="playTime">
-=======
                   <label className="label" htmlFor="preferred_play_times">
->>>>>>> Login
                     常玩時段
                   </label>
                   <select
@@ -306,28 +289,6 @@ export default function PersonalInfo() {
                 {isSubmitting ? "提交中..." : "保存修改"}
               </button>
 
-<<<<<<< HEAD
-
-              {/* 提交按鈕 */}
-              <div className="form-control mt-6">
-                <button
-                  type="submit"
-                  className={`btn btn-primary w-full bg-[#036672] hover:bg-[#024c52] ${
-                    isSubmitting ? "loading" : ""
-                  }`}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "提交中..." : "保存修改"}
-                </button>
-              </div>
-
-              {/* 錯誤/成功訊息 */}
-              {errorMessage && (
-                <p className="text-red-500 mt-4">{errorMessage}</p>
-              )}
-              {submitMessage && (
-                <p className="text-green-500 mt-4">{submitMessage}</p>
-=======
               {showMessage && (
                 <div className="mt-4">
                   {submitMessage && (
@@ -337,7 +298,6 @@ export default function PersonalInfo() {
                     <p className="text-red-500">{errorMessage}</p>
                   )}
                 </div>
->>>>>>> Login
               )}
 
             </form>
