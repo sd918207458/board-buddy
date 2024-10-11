@@ -44,7 +44,7 @@ const AddressFormProduct = () => {
   const [error, setError] = useState(null);
 
   // 引入購物車 hook，確保在組件頂層調用
-  const { cartItems, setCartItems } = useCart();
+  const { cartItems, setCartItems, totalPrice } = useCart();
   const router = useRouter();
 
   // 7-11 Hooks
@@ -219,6 +219,18 @@ const AddressFormProduct = () => {
   if (error) {
     return <div>{error}</div>;
   }
+
+  //ECPay
+  // 導向至ECPay付款頁面
+
+  const goECPay = () => {
+    //  const total = localStorage.getItem("total"); // 從 localStorage 取得價錢
+
+    if (window.confirm("確認要導向至ECPay進行付款?")) {
+      // 將 total 作為 amount 傳遞給後端
+      window.location.href = `http://localhost:3005/api/ecpay-test-only?amount=${totalPrice}`;
+    }
+  };
 
   return (
     <div>
@@ -425,6 +437,19 @@ const AddressFormProduct = () => {
         </form>
         <ToastContainer />
       </section>
+      {/* test ecpay */}
+      <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
+        <div className="bg-white p-8 rounded-lg shadow-md text-center">
+          <h1 className="text-3xl font-bold mb-4">確認付款</h1>
+          <p className="text-lg mb-6">點擊下方按鈕以導向至ECPay進行付款。</p>
+          <button
+            onClick={goECPay}
+            className="bg-green-500 text-white px-6 py-3 rounded hover:bg-green-600"
+          >
+            前往ECPay付款
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
