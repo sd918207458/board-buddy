@@ -7,20 +7,19 @@ import { CSSTransition, TransitionGroup } from "react-transition-group";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-// Helper function to get token
-const getToken = () => localStorage.getItem("token");
-
-// Helper function to make authenticated fetch requests
+// 常量提取
+const API_BASE_URL = "http://localhost:3005/api";
 const fetchWithAuth = async (url, options = {}) => {
+  const token = localStorage.getItem("token");
   const headers = {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${getToken()}`,
+    Authorization: `Bearer ${token}`,
     ...options.headers,
   };
   return fetch(url, { ...options, headers, credentials: "include" });
 };
 
-// Initial form data function
+// 初始表單數據函數
 const initialFormData = (userData = {}) => ({
   username: userData.username || "",
   phone: userData.phone_number || "",
@@ -50,8 +49,8 @@ export default function ShippingAddress() {
 
   useEffect(() => {
     if (userData) {
-      setFormData((prevFormData) => ({
-        ...prevFormData,
+      setFormData((prev) => ({
+        ...prev,
         username: userData.username,
         phone: userData.phone_number,
       }));
@@ -60,52 +59,65 @@ export default function ShippingAddress() {
 
   const fetchUserInfo = async () => {
     try {
-      const response = await fetchWithAuth(
-        "http://localhost:3005/api/users/check"
-      );
-      const userDataResponse = await response.json();
-      if (userDataResponse?.data?.user) {
-        setUserData(userDataResponse.data.user);
+      const response = await fetchWithAuth(`${API_BASE_URL}/users/check`);
+      const result = await response.json();
+      if (response.ok && result?.data?.user) {
+        setUserData(result.data.user);
+      } else {
+        handleError("無法加載用戶資料");
       }
     } catch (error) {
-      console.error("無法加載用戶資料:", error);
-      toast.error("無法加載用戶資料");
+      handleError("無法加載用戶資料", error);
     }
   };
 
   const fetchAddresses = async () => {
     try {
       const response = await fetchWithAuth(
-        "http://localhost:3005/api/shipment/addresses"
+        `${API_BASE_URL}/shipment/addresses`
       );
-      const data = await response.json();
+      const result = await response.json();
       if (response.ok) {
-        setAddresses(data.data || []);
+        setAddresses(result.data || []);
       } else {
-        toast.error(data.message || "無法加載地址數據");
+        handleError(result.message || "無法加載地址數據");
       }
     } catch (error) {
-      console.error("Error fetching addresses:", error);
-      toast.error("無法加載地址數據");
+      handleError("無法加載地址數據", error);
     }
+  };
+
+  const handleError = (message, error = null) => {
+    console.error(message, error);
+    toast.error(message);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+
     const method = isEditing ? "PUT" : "POST";
     const url = isEditing
-      ? `http://localhost:3005/api/shipment/addresses/${formData.address_id}`
-      : "http://localhost:3005/api/shipment/addresses";
+      ? `${API_BASE_URL}/shipment/addresses/${formData.address_id}`
+      : `${API_BASE_URL}/shipment/addresses`;
+
+    // 確保 storeName 和 storeAddress 包含在發送的數據中
+    const requestData = {
+      ...formData,
+      storeName: formData.storeName || "",
+      storeAddress: formData.storeAddress || "",
+    };
+
+    console.log("提交的資料：", requestData);
 
     try {
       const response = await fetchWithAuth(url, {
         method,
-        body: JSON.stringify(formData),
+        body: JSON.stringify(requestData),
       });
       const result = await response.json();
-      if (!response.ok)
-        throw new Error(result.message || "Failed to submit address");
+
+      if (!response.ok) throw new Error(result.message || "提交地址失敗");
 
       setAddresses((prevAddresses) =>
         isEditing
@@ -118,8 +130,7 @@ export default function ShippingAddress() {
       closeModal();
       toast.success("地址已成功保存！");
     } catch (error) {
-      console.error("Error submitting address:", error);
-      toast.error(error.message || "提交地址失敗");
+      handleError("提交地址失敗", error);
     } finally {
       setIsLoading(false);
     }
@@ -127,10 +138,7 @@ export default function ShippingAddress() {
 
   const handleEdit = (address) => {
     setIsEditing(true);
-    setFormData({
-      ...initialFormData(userData),
-      ...address,
-    });
+    setFormData({ ...initialFormData(userData), ...address });
     openModal();
   };
 
@@ -138,20 +146,17 @@ export default function ShippingAddress() {
     setIsLoading(true);
     try {
       const response = await fetchWithAuth(
-        `http://localhost:3005/api/shipment/addresses/${addressId}`,
-        {
-          method: "DELETE",
-        }
+        `${API_BASE_URL}/shipment/addresses/${addressId}`,
+        { method: "DELETE" }
       );
-      if (!response.ok) throw new Error("Failed to delete address");
+      if (!response.ok) throw new Error("刪除地址失敗");
 
       setAddresses((prevAddresses) =>
         prevAddresses.filter((addr) => addr.address_id !== addressId)
       );
       toast.success("地址已成功刪除！");
     } catch (error) {
-      console.error("Error deleting address:", error);
-      toast.error(error.message || "刪除地址失敗");
+      handleError("刪除地址失敗", error);
     } finally {
       setIsLoading(false);
     }
@@ -160,12 +165,10 @@ export default function ShippingAddress() {
   const handleSetDefault = async (addressId) => {
     try {
       const response = await fetchWithAuth(
-        `http://localhost:3005/api/shipment/addresses/${addressId}/default`,
-        {
-          method: "PUT",
-        }
+        `${API_BASE_URL}/shipment/addresses/${addressId}/default`,
+        { method: "PUT" }
       );
-      if (!response.ok) throw new Error("Failed to set default address");
+      if (!response.ok) throw new Error("設定預設地址失敗");
 
       setAddresses((prevAddresses) =>
         prevAddresses.map((addr) => ({
@@ -175,8 +178,7 @@ export default function ShippingAddress() {
       );
       toast.success("預設地址已設定！");
     } catch (error) {
-      console.error("Error setting default address:", error);
-      toast.error(error.message || "設定預設地址失敗");
+      handleError("設定預設地址失敗", error);
     }
   };
 

@@ -60,6 +60,7 @@ const AddressFormProduct = () => {
   // 使用 useShip711StoreCallback 來接收選擇的 7-11 門市資訊
   useShip711StoreCallback((storeInfo) => {
     if (storeInfo) {
+      console.log("Store information received from 7-11:", storeInfo);
       setFormData((prevData) => ({
         ...prevData,
         store_name: storeInfo.storename,
@@ -74,6 +75,7 @@ const AddressFormProduct = () => {
   // 從後端獲取地址列表
   const fetchAddresses = async () => {
     try {
+      console.log("Fetching addresses...");
       const response = await fetchWithAuth(
         "http://localhost:3005/api/shipment/addresses"
       );
@@ -81,12 +83,16 @@ const AddressFormProduct = () => {
         throw new Error("Failed to fetch addresses");
       }
       const data = await response.json();
+      console.log("Addresses fetched:", data);
       setAddresses(data.data || []);
 
       // 獲取預設地址
       const defaultAddress = data.data?.find((address) => address.isDefault);
       if (defaultAddress) {
+        console.log("Default address found:", defaultAddress);
         updateFormDataWithDefaultAddress(defaultAddress);
+      } else {
+        console.log("No default address found.");
       }
       setLoading(false);
     } catch (error) {
@@ -98,6 +104,7 @@ const AddressFormProduct = () => {
 
   // 更新表單資料的函數
   const updateFormDataWithDefaultAddress = (defaultAddress) => {
+    console.log("Updating form data with default address:", defaultAddress);
     if (defaultAddress.deliveryMethod === "homeDelivery") {
       setFormData((prevData) => ({
         ...prevData,
@@ -123,6 +130,7 @@ const AddressFormProduct = () => {
   // 從後端獲取付款方式
   const fetchPaymentMethods = async () => {
     try {
+      console.log("Fetching payment methods...");
       const response = await fetchWithAuth(
         "http://localhost:3005/api/payment-methods"
       );
@@ -130,9 +138,11 @@ const AddressFormProduct = () => {
         throw new Error("Failed to fetch payment methods");
       }
       const data = await response.json();
+      console.log("Payment methods fetched:", data);
       setPaymentMethods(data.data || []);
       const defaultPayment = data.data.find((method) => method.is_default);
       if (defaultPayment) {
+        console.log("Default payment method found:", defaultPayment);
         setSelectedPaymentMethod(defaultPayment);
         setFormData((prevData) => ({
           ...prevData,
@@ -140,6 +150,8 @@ const AddressFormProduct = () => {
           cardName: defaultPayment.card_type || "",
           expiryDate: defaultPayment.expiration_date || "",
         }));
+      } else {
+        console.log("No default payment method found.");
       }
     } catch (error) {
       console.error("Fetch payment methods error: ", error);
@@ -148,6 +160,7 @@ const AddressFormProduct = () => {
 
   const handleOptionChange = (e) => {
     const selectedMethod = e.target.value;
+    console.log("Selected delivery method:", selectedMethod);
     setIsConvenienceStore(selectedMethod === "convenience_store");
     if (selectedMethod === "convenience_store") {
       setFormData((prevData) => ({
@@ -167,6 +180,7 @@ const AddressFormProduct = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log(`Field changed: ${name} = ${value}`);
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -175,6 +189,7 @@ const AddressFormProduct = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    console.log("Form data being submitted:", formData);
 
     if (
       !isConvenienceStore &&
@@ -224,6 +239,7 @@ const AddressFormProduct = () => {
 
     if (typeof window !== "undefined") {
       const storedOrders = JSON.parse(localStorage.getItem("orders")) || [];
+      console.log("Current stored orders:", storedOrders);
       storedOrders.push(orderData);
       localStorage.setItem("orders", JSON.stringify(storedOrders));
 
