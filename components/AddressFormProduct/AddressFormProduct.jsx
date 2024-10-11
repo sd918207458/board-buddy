@@ -270,25 +270,25 @@ const AddressFormProduct = () => {
             >
               請選擇取貨門市
             </button>
-            {formData.store_name && (
+            {store711.storename && (
               <div className="mt-4">
                 <label className="block text-gray-700">7-11 門市名稱</label>
                 <input
                   type="text"
                   name="store_name"
-                  value={formData.store_name}
+                  value={store711.storename}
                   className="w-full px-4 py-2 mt-2 border rounded-md"
                   readOnly
                 />
               </div>
             )}
-            {formData.store_address && (
+            {store711.storeaddress && (
               <div className="mt-4">
                 <label className="block text-gray-700">7-11 門市地址</label>
                 <input
                   type="text"
                   name="store_address"
-                  value={formData.store_address}
+                  value={store711.storeaddress}
                   className="w-full px-4 py-2 mt-2 border rounded-md"
                   readOnly
                 />
