@@ -20,6 +20,9 @@ export function useShip711StoreOpener(
     keyLocalStorage = "store711", // localStorage中的key
   } = {}
 ) {
+  // 除錯用
+  //console.log(serverCallbackUrl, title, h, w, autoCloseMins, enableLocalStorage,keyLocalStorage )
+
   const [storedValue, setValue] = useLocalStorage(keyLocalStorage, {
     storeid: "",
     storename: "",
@@ -52,7 +55,7 @@ export function useShip711StoreOpener(
     if (storedValue && storedValue.storeid && enableLocalStorage) {
       setStore711(storedValue);
     }
-  }, [storedValue, enableLocalStorage]);
+  }, []);
 
   useEffect(() => {
     subscribe("stop-countdown", (e) => setStartCountDown(false));
@@ -63,6 +66,7 @@ export function useShip711StoreOpener(
 
     subscribe("cancel", (e) => {
       setStartCountDown(false);
+      // reset countdown
       setContDown(60 * autoCloseMins);
       console.warn("錯誤:001-因為跳出視窗關閉無法取值");
     });
@@ -71,12 +75,16 @@ export function useShip711StoreOpener(
       unsubscribe("set-store");
       unsubscribe("stop-countdown");
     };
-  }, [autoCloseMins]);
+  }, []);
 
+  // 倒數計時，每秒檢查
   useInterval(
     () => {
+      //console.log(countDown)
+      // 如果偵測到付款跳出視窗關閉
       if (newWindow.current.closed) {
         setStartCountDown(false);
+        // reset countdown
         setContDown(60 * autoCloseMins);
 
         publish("stop-countdown");
@@ -85,12 +93,15 @@ export function useShip711StoreOpener(
         console.warn("錯誤:002-因為跳出視窗關閉無法取值");
       }
 
+      // 倒數計時結束
       if (countDown === 0) {
         setStartCountDown(false);
+        // reset countdown
         setContDown(60 * autoCloseMins);
 
         publish("cancel");
         console.warn("錯誤:003-因為倒數時間已到無法取值");
+        // FIXME: mobile browser(maybe CORS problem)
         newWindow.current.close();
         return;
       }
@@ -114,9 +125,11 @@ export function useShip711StoreOpener(
       h
     );
 
+    // 啟動計時器
     setStartCountDown(true);
   };
 
+  // 關閉視窗
   const closeWindow = () => {
     newWindow.current.close();
     setStartCountDown(false);
@@ -144,28 +157,29 @@ export function useShip711StoreCallback(keyLocalStorage = "store711") {
   useEffect(() => {
     if (router.isReady) {
       try {
-        // 確保父視窗存在且未關閉
         if (window.opener && !window.opener.closed) {
-          // 通知母視窗關閉倒數計時
-          window.opener.document.dispatchEvent(
-            new CustomEvent("stop-countdown")
-          );
+          console.log("Router query:", router.query); // 查看回傳的 query 資料
 
-          // 通知母視窗已完成，回送值
+          const storeInfo = {
+            storeid: router.query.storeid,
+            storename: decodeURIComponent(router.query.storename),
+            storeaddress: decodeURIComponent(router.query.storeaddress),
+          };
+
+          // 確保這些值被傳回母視窗
+          console.log("Transmitting store info to parent:", storeInfo);
+
+          // 通知母視窗
           window.opener.document.dispatchEvent(
             new CustomEvent("set-store", {
-              detail: {
-                storeid: router.query.storeid,
-                storename: decodeURIComponent(router.query.storename),
-                storeaddress: decodeURIComponent(router.query.storeaddress),
-              },
+              detail: storeInfo,
             })
           );
 
-          // 設定到 localStorage
-          setValue(router.query);
+          // 儲存到 localStorage
+          setValue(storeInfo);
 
-          // 關閉自己視窗
+          // 關閉視窗
           window.close();
         } else {
           console.warn("無法訪問父視窗，可能已關閉或不存在");

@@ -6,7 +6,7 @@ const AddressCard = ({
   handleDelete,
   handleSetDefault,
 }) => {
-  if (!address) return null; // 防止 address 無效
+  if (!address) return null;
 
   return (
     <div className="card bg-base-100 shadow-xl mb-4">
@@ -15,15 +15,15 @@ const AddressCard = ({
 
         {address.isDefault && <span className="badge badge-primary">預設</span>}
 
-        {/* 根據 deliveryMethod 和 storeType 顯示不同的地址信息 */}
-        {address.deliveryMethod === "convenienceStore" &&
-        address.storeType === "7-11" ? (
+        {address.deliveryMethod === "convenienceStore" ? (
           <>
-            <p>7-11 門市名稱: {address.storeName}</p>
-            <p>7-11 門市地址: {address.storeAddress}</p>
+            <p>配送方式: 超商取貨 - {address.storeType}</p>
+            <p>門市名稱: {address.storeName}</p>
+            <p>門市地址: {address.storeAddress}</p>
           </>
         ) : (
           <>
+            <p>配送方式: 宅配到府</p>
             <p>{`${address.city} ${address.area} ${address.street} ${address.detailed_address}`}</p>
             <p>手機號碼: {address.phone}</p>
           </>

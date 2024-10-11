@@ -6,7 +6,7 @@ import {
 import { useRouter } from "next/router";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useCart } from "@/hooks/useCart"; // 引入購物車 hook
+import { useCart } from "@/hooks/useCart";
 
 // 從 localStorage 中獲取 token
 const getToken = () =>
@@ -16,7 +16,7 @@ const getToken = () =>
 const fetchWithAuth = async (url, options = {}) => {
   const headers = {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${getToken()}`, // 添加授權 token
+    Authorization: `Bearer ${getToken()}`,
     ...options.headers,
   };
   return fetch(url, { ...options, headers, credentials: "include" });
@@ -43,7 +43,6 @@ const AddressFormProduct = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // 引入購物車 hook，確保在組件頂層調用
   const { cartItems, setCartItems } = useCart();
   const router = useRouter();
 
@@ -63,8 +62,11 @@ const AddressFormProduct = () => {
     if (storeInfo) {
       setFormData((prevData) => ({
         ...prevData,
-        store_name: storeInfo.storeName,
-        store_address: storeInfo.storeAddress,
+        store_name: storeInfo.storename,
+        store_address: storeInfo.storeaddress,
+        address: "",
+        city: "",
+        district: "",
       }));
     }
   });
@@ -80,21 +82,41 @@ const AddressFormProduct = () => {
       }
       const data = await response.json();
       setAddresses(data.data || []);
-      const defaultAddress = data.data?.find((address) => address.is_default);
+
+      // 獲取預設地址
+      const defaultAddress = data.data?.find((address) => address.isDefault);
       if (defaultAddress) {
-        setFormData((prevData) => ({
-          ...prevData,
-          address: defaultAddress.detailed_address || "",
-          city: defaultAddress.city || "",
-          district: defaultAddress.area || "",
-          is_default: defaultAddress.is_default,
-        }));
+        updateFormDataWithDefaultAddress(defaultAddress);
       }
       setLoading(false);
     } catch (error) {
       console.error("Fetch addresses error: ", error);
       setError("無法獲取地址");
       setLoading(false);
+    }
+  };
+
+  // 更新表單資料的函數
+  const updateFormDataWithDefaultAddress = (defaultAddress) => {
+    if (defaultAddress.deliveryMethod === "homeDelivery") {
+      setFormData((prevData) => ({
+        ...prevData,
+        address:
+          `${defaultAddress.city} ${defaultAddress.area} ${defaultAddress.street} ${defaultAddress.detailed_address}` ||
+          "",
+        city: defaultAddress.city || "",
+        district: defaultAddress.area || "",
+        is_default: defaultAddress.isDefault,
+      }));
+    } else if (defaultAddress.deliveryMethod === "convenienceStore") {
+      setFormData((prevData) => ({
+        ...prevData,
+        store_name: defaultAddress.storeName || "",
+        store_address: defaultAddress.storeAddress || "",
+        store_type: defaultAddress.storeType || "7-11",
+        is_default: defaultAddress.isDefault,
+      }));
+      setIsConvenienceStore(true);
     }
   };
 
@@ -125,8 +147,9 @@ const AddressFormProduct = () => {
   };
 
   const handleOptionChange = (e) => {
-    setIsConvenienceStore(e.target.value === "convenience_store");
-    if (e.target.value === "convenience_store") {
+    const selectedMethod = e.target.value;
+    setIsConvenienceStore(selectedMethod === "convenience_store");
+    if (selectedMethod === "convenience_store") {
       setFormData((prevData) => ({
         ...prevData,
         address: "",
@@ -137,13 +160,7 @@ const AddressFormProduct = () => {
     } else {
       const defaultAddress = addresses.find((address) => address.is_default);
       if (defaultAddress) {
-        setFormData((prevData) => ({
-          ...prevData,
-          address: defaultAddress.detailed_address || "",
-          city: defaultAddress.city || "",
-          district: defaultAddress.area || "",
-          is_default: defaultAddress.is_default,
-        }));
+        updateFormDataWithDefaultAddress(defaultAddress);
       }
     }
   };
@@ -159,8 +176,19 @@ const AddressFormProduct = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    if (!formData.city || !formData.district || !formData.address) {
+    if (
+      !isConvenienceStore &&
+      (!formData.city || !formData.district || !formData.address)
+    ) {
       toast.error("請填寫完整的地址資訊");
+      return;
+    }
+
+    if (
+      isConvenienceStore &&
+      (!formData.store_name || !formData.store_address)
+    ) {
+      toast.error("請選擇超商取貨門市");
       return;
     }
 
@@ -181,7 +209,8 @@ const AddressFormProduct = () => {
         (total, item) => total + item.price * item.quantity,
         0
       ),
-      address: formData.address,
+      address: formData.address || formData.store_address,
+      storeName: formData.store_name || "",
       paymentInfo: {
         cardNumber: formData.cardNumber,
         cardName: formData.cardName,
@@ -305,6 +334,7 @@ const AddressFormProduct = () => {
                 onChange={handleChange}
                 className="block w-full px-4 py-2 mt-2 border rounded-md"
                 placeholder="請輸入縣市"
+                disabled={isConvenienceStore}
               />
             </div>
             <div>
@@ -322,6 +352,7 @@ const AddressFormProduct = () => {
                 onChange={handleChange}
                 className="block w-full px-4 py-2 mt-2 border rounded-md"
                 placeholder="請輸入鄉鎮市區"
+                disabled={isConvenienceStore}
               />
             </div>
             <div>
@@ -339,6 +370,7 @@ const AddressFormProduct = () => {
                 onChange={handleChange}
                 className="block w-full px-4 py-2 mt-2 border rounded-md"
                 placeholder="請輸入詳細地址"
+                disabled={isConvenienceStore}
               />
             </div>
           </div>

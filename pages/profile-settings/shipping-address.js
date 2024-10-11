@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
-
 import AddressCard from "@/components/address/AddressCard";
 import AddressForm from "@/components/address/AddressForm";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
@@ -21,6 +20,22 @@ const fetchWithAuth = async (url, options = {}) => {
   return fetch(url, { ...options, headers, credentials: "include" });
 };
 
+// Initial form data function
+const initialFormData = (userData = {}) => ({
+  username: userData.username || "",
+  phone: userData.phone_number || "",
+  city: "",
+  area: "",
+  street: "",
+  detailed_address: "",
+  isDefault: false,
+  address_id: null,
+  deliveryMethod: "homeDelivery",
+  storeType: "",
+  storeName: "",
+  storeAddress: "",
+});
+
 export default function ShippingAddress() {
   const [addresses, setAddresses] = useState([]);
   const [formData, setFormData] = useState(initialFormData());
@@ -28,11 +43,20 @@ export default function ShippingAddress() {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Load user info and addresses on component mount
   useEffect(() => {
     fetchUserInfo();
     fetchAddresses();
   }, []);
+
+  useEffect(() => {
+    if (userData) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        username: userData.username,
+        phone: userData.phone_number,
+      }));
+    }
+  }, [userData]);
 
   const fetchUserInfo = async () => {
     try {
@@ -42,11 +66,6 @@ export default function ShippingAddress() {
       const userDataResponse = await response.json();
       if (userDataResponse?.data?.user) {
         setUserData(userDataResponse.data.user);
-        setFormData((prevFormData) => ({
-          ...prevFormData,
-          username: userDataResponse.data.user.username || "",
-          phone: userDataResponse.data.user.phone_number || "",
-        }));
       }
     } catch (error) {
       console.error("無法加載用戶資料:", error);
@@ -60,7 +79,11 @@ export default function ShippingAddress() {
         "http://localhost:3005/api/shipment/addresses"
       );
       const data = await response.json();
-      setAddresses(data.data || []); // 修正錯誤處理
+      if (response.ok) {
+        setAddresses(data.data || []);
+      } else {
+        toast.error(data.message || "無法加載地址數據");
+      }
     } catch (error) {
       console.error("Error fetching addresses:", error);
       toast.error("無法加載地址數據");
@@ -81,7 +104,8 @@ export default function ShippingAddress() {
         body: JSON.stringify(formData),
       });
       const result = await response.json();
-      if (!response.ok) throw new Error("Failed to submit address");
+      if (!response.ok)
+        throw new Error(result.message || "Failed to submit address");
 
       setAddresses((prevAddresses) =>
         isEditing
@@ -91,12 +115,11 @@ export default function ShippingAddress() {
           : [...prevAddresses, result.data]
       );
       resetForm();
-
       closeModal();
       toast.success("地址已成功保存！");
     } catch (error) {
       console.error("Error submitting address:", error);
-      toast.error("提交地址失敗");
+      toast.error(error.message || "提交地址失敗");
     } finally {
       setIsLoading(false);
     }
@@ -105,10 +128,8 @@ export default function ShippingAddress() {
   const handleEdit = (address) => {
     setIsEditing(true);
     setFormData({
-      ...formData,
+      ...initialFormData(userData),
       ...address,
-      username: address.username || userData?.username,
-      phone: address.phone || userData?.phone_number,
     });
     openModal();
   };
@@ -130,7 +151,7 @@ export default function ShippingAddress() {
       toast.success("地址已成功刪除！");
     } catch (error) {
       console.error("Error deleting address:", error);
-      toast.error("刪除地址失敗");
+      toast.error(error.message || "刪除地址失敗");
     } finally {
       setIsLoading(false);
     }
@@ -155,15 +176,13 @@ export default function ShippingAddress() {
       toast.success("預設地址已設定！");
     } catch (error) {
       console.error("Error setting default address:", error);
-      toast.error("設定預設地址失敗");
+      toast.error(error.message || "設定預設地址失敗");
     }
   };
-
 
   const resetForm = () => {
     setFormData(initialFormData(userData));
     setIsEditing(false);
-
   };
 
   const openModal = () => document.getElementById("my_modal_1").showModal();
@@ -177,7 +196,6 @@ export default function ShippingAddress() {
           <h2 className="text-lg font-semibold text-gray-700 capitalize dark:text-white mb-4">
             我的地址
           </h2>
-
           <section className="max-w-4xl mx-auto grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
             {addresses.length > 0 ? (
               <TransitionGroup component={null}>
@@ -224,29 +242,13 @@ export default function ShippingAddress() {
               handleSubmit={handleSubmit}
               isEditing={isEditing}
               isLoading={isLoading}
+              closeModal={closeModal}
             />
           </div>
         </dialog>
       </div>
       <Footer />
-
-      {/* ToastContainer for notifications */}
       <ToastContainer />
     </div>
   );
 }
-
-// Initial form data function
-const initialFormData = (userData = {}) => ({
-  username: userData.username || "",
-  phone: userData.phone_number || "",
-  city: "",
-  area: "",
-  street: "",
-  detailed_address: "",
-  isDefault: false,
-  address_id: null,
-  deliveryMethod: "homeDelivery",
-  storeType: "",
-  storeName: "",
-});

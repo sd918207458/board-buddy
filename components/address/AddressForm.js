@@ -1,11 +1,9 @@
-
 import React, { useState, useEffect } from "react";
 import taiwanDistricts from "@/public/taiwan_districts.json";
 import {
   useShip711StoreCallback,
   useShip711StoreOpener,
-} from "@/hooks/use-ship-711-store"; // 引入7-11運送商店的回傳和開啟勾子
-
+} from "@/hooks/use-ship-711-store";
 
 const AddressForm = ({
   formData,
@@ -14,37 +12,32 @@ const AddressForm = ({
   isEditing,
   isLoading,
   closeModal,
-
 }) => {
   const cities = taiwanDistricts.map((city) => city.name);
   const [areas, setAreas] = useState([]);
 
-  // useShip711StoreOpener的使用
-  const { store711, openWindow, closeWindow } = useShip711StoreOpener(
-    "http://localhost:3005/api/shipment/711", // 使用你在伺服器設置的 callback URL
+  const { store711, openWindow } = useShip711StoreOpener(
+    "http://localhost:3005/api/shipment/711",
     { autoCloseMins: 3 }
   );
 
-  // 回傳門市資訊的勾子，處理選擇 7-11 門市後的資料
   useShip711StoreCallback((storeInfo) => {
-    console.log("7-11 門市資訊：", storeInfo); // 查看回傳的門市資訊
-    if (storeInfo) {
+    if (storeInfo && storeInfo.storename && storeInfo.storeaddress) {
       handleChange({
         target: {
           name: "storeName",
-          value: storeInfo.storeName,
+          value: storeInfo.storename,
         },
       });
       handleChange({
         target: {
           name: "storeAddress",
-          value: storeInfo.storeAddress,
+          value: storeInfo.storeaddress,
         },
       });
     }
   });
 
-  // 更新區域選項根據城市
   useEffect(() => {
     const selectedCity = taiwanDistricts.find(
       (city) => city.name === formData.city
@@ -92,7 +85,6 @@ const AddressForm = ({
                 required
               />
             </div>
-
             <div className="form-control">
               <label className="label" htmlFor="phone">
                 <span className="label-text">聯絡電話</span>
@@ -108,7 +100,6 @@ const AddressForm = ({
                 required
               />
             </div>
-
             <div className="form-control">
               <label className="label" htmlFor="city">
                 <span className="label-text">城市</span>
@@ -128,7 +119,6 @@ const AddressForm = ({
                 ))}
               </select>
             </div>
-
             <div className="form-control">
               <label className="label" htmlFor="area">
                 <span className="label-text">區域</span>
@@ -149,7 +139,6 @@ const AddressForm = ({
                 ))}
               </select>
             </div>
-
             <div className="form-control">
               <label className="label" htmlFor="street">
                 <span className="label-text">街道</span>
@@ -165,7 +154,6 @@ const AddressForm = ({
                 required
               />
             </div>
-
             <div className="form-control">
               <label className="label" htmlFor="detailed_address">
                 <span className="label-text">詳細地址</span>
@@ -204,50 +192,44 @@ const AddressForm = ({
             </div>
 
             {formData.storeType === "7-11" && (
-              <>
+              <div className="form-control mt-4">
+                <label className="label">
+                  <span className="label-text">選擇7-11門市</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => openWindow()}
+                  className="btn btn-primary w-full"
+                >
+                  選擇門市
+                </button>
+                <div className="form-control mt-4">
+                  <label className="label">
+                    <span className="label-text">門市名稱</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="storeName"
+                    value={store711.storename || formData.storeName || ""}
+                    placeholder="請選擇店鋪"
+                    className="input input-bordered w-full text-black"
+                    readOnly
+                  />
+                </div>
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text">選擇7-11門市</span>
+                    <span className="label-text">門市地址</span>
                   </label>
-                  <button
-                    type="button"
-                    onClick={() => openWindow()}
-                    className="btn btn-primary w-full"
-                  >
-                    選擇門市
-                  </button>
-
-                  <div className="form-control mt-4">
-                    <label className="label">
-                      <span className="label-text">門市名稱</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="storeName"
-                      value={store711.storeName || formData.storeName || ""}
-                      placeholder="請選擇店鋪"
-                      className="input input-bordered w-full text-black"
-                      readOnly
-                    />
-                  </div>
-
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text">門市地址</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="storeAddress"
-                      value={
-                        store711.storeAddress || formData.storeAddress || ""
-                      }
-                      placeholder="請選擇店鋪"
-                      className="input input-bordered w-full text-black"
-                      readOnly
-                    />
-                  </div>
+                  <input
+                    type="text"
+                    name="storeAddress"
+                    value={store711.storeaddress || formData.storeAddress || ""}
+                    placeholder="請選擇店鋪"
+                    className="input input-bordered w-full text-black"
+                    readOnly
+                  />
                 </div>
-              </>
+              </div>
             )}
           </>
         )}
