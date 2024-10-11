@@ -69,6 +69,10 @@ const ProductDetailTest = () => {
   if (error) {
     return <p>{error}</p>; // 錯誤信息顯示
   }
+  // 依據搜尋結果進行篩選
+  if (searchQuery && !product.product_name.includes(searchQuery)) {
+    return null;
+  }
 
   return (
     product && (
