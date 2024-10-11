@@ -62,7 +62,6 @@ const Checkout = () => {
                       ? parseFloat(item.price.replace(/,/g, ""))
                       : parseFloat(item.price)) * // 如果是數字，直接轉換為數字
                       item.quantity}
-                    .toLocaleString()
                   </td>
 
                   <td>
