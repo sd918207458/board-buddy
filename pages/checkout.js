@@ -15,10 +15,10 @@ export default function CheckoutPage() {
         </div>
 
         {/* Checkout 部分不被 Sidecart 擋住，並居中排列 */}
-        <div className="flex-1 max-w-3xl  ml-[23rem] p-3  shadow-lg ">
-          <h1>購物車內容</h1>
+        <div className="flex-1 max-w-3xl  ml-[23rem] p-3  ">
+          {/* <h1>購物車內容</h1> */}
           <Checkout />
-          <h1>地址資訊</h1>
+          {/* <h1>地址資訊</h1> */}
           <AddressFormProduct />
         </div>
       </div>

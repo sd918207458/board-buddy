@@ -88,6 +88,13 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem("cartItems", JSON.stringify(updatedItems)); // 保存更新到 localStorage
   };
 
+  /**
+   * 清空整個購物車
+   */
+  const clearCart = () => {
+    setCartItems([]);
+  };
+
   return (
     <CartContext.Provider
       value={{
@@ -102,6 +109,7 @@ export const CartProvider = ({ children }) => {
         handleQuantityChange,
         isMounted,
         handleRemoveItem,
+        clearCart,
       }}
     >
       {children}
