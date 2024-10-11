@@ -13,6 +13,9 @@ const OrderRow = ({ order }) => {
     Canceled: "bg-red-200 text-red-800",
   };
 
+  // 提取第一筆商品的圖片
+  const firstItemImage = order.items[0]?.image;
+
   return (
     <tr
       className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 ease-in-out"
@@ -21,28 +24,34 @@ const OrderRow = ({ order }) => {
     >
       <td className="text-left py-4">
         <div className="text-gray-800 dark:text-gray-200 font-bold">
-          {order.orderNumber}
+          {order.orderId}
         </div>
         <div className="text-sm text-gray-500 dark:text-gray-300">
-          {order.date}
+          {new Date(order.date).toLocaleString()} {/* 格式化日期 */}
         </div>
       </td>
       <td className="text-center">
-        <span className={`px-2 py-1 rounded ${statusColors[order.status]}`}>
-          {order.status}
-        </span>
+        {/* 只顯示第一筆商品圖片 */}
+        {firstItemImage ? (
+          <img
+            src={firstItemImage}
+            alt={`商品圖片`}
+            className="w-12 h-12 object-cover rounded-md"
+          />
+        ) : (
+          <div className="text-sm text-gray-500">無圖片</div>
+        )}
       </td>
-      <td className="text-center">{order.totalItems}</td>
-      <td className="text-left">{order.shippingAddress}</td>
-      <td className="text-right">{`NT$${order.totalAmount}`}</td>
+      <td className="text-left">{order.address}</td>
+      <td className="text-right">{`NT$${order.total}`}</td>
       <th className="flex gap-2 justify-center m-3">
-        <Link href={`/my-orders/${order.id}`} legacyBehavior>
-          <a className="btn btn-primary btn-xs  bg-[#003E52] transition-transform hover:scale-105">
+        <Link href={`/my-orders/${order.orderId}`} legacyBehavior>
+          <a className="btn btn-primary btn-xs bg-[#003E52] transition-transform hover:scale-105">
             訂單詳情
           </a>
         </Link>
         {isCancellable && (
-          <Link href={`/my-orders/${order.id}/request`} legacyBehavior>
+          <Link href={`/my-orders/${order.orderId}/request`} legacyBehavior>
             <a className="btn btn-secondary btn-xs transition-transform hover:scale-105">
               退貨處理
             </a>
@@ -50,9 +59,8 @@ const OrderRow = ({ order }) => {
         )}
         {isHovered && (
           <div className="absolute p-4 left-56 bg-white dark:bg-gray-700 shadow-md rounded-lg">
-            <p>訂單編號: {order.orderNumber}</p>
-            <p>狀態: {order.status}</p>
-            <p>總金額: NT${order.totalAmount}</p>
+            <p>訂單編號: {order.orderId}</p>
+            <p>總金額: NT${order.total}</p>
           </div>
         )}
       </th>
@@ -68,8 +76,7 @@ const OrderTable = ({ orders }) => {
         <thead className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
           <tr>
             <th className="text-left py-4">訂單編號</th>
-            <th className="text-center">訂單狀態</th>
-            <th className="text-center">商品總數</th>
+            <th className="text-center">商品圖片</th>
             <th className="text-left">運送地址</th>
             <th className="text-right">合計</th>
             <th className="text-center"></th>
@@ -78,7 +85,7 @@ const OrderTable = ({ orders }) => {
         <tbody>
           {/* 動態生成表格行 */}
           {orders.map((order) => (
-            <OrderRow key={order.id} order={order} />
+            <OrderRow key={order.orderId} order={order} />
           ))}
         </tbody>
       </table>

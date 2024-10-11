@@ -9,7 +9,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { useCart } from "@/hooks/useCart"; // 引入購物車 hook
 
 // 從 localStorage 中獲取 token
-const getToken = () => localStorage.getItem("token");
+const getToken = () =>
+  typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
 // 包含授權標頭的 fetch 請求
 const fetchWithAuth = async (url, options = {}) => {
@@ -21,239 +22,213 @@ const fetchWithAuth = async (url, options = {}) => {
   return fetch(url, { ...options, headers, credentials: "include" });
 };
 
-// 當用戶選擇地址時，將地址的值填入表單
-const handleAddressSelect = (address, setFormData, formData) => {
-  if (address && address.city && address.area && address.street) {
-    // 更新 formData 狀態，填入選中的地址資料
-    setFormData({
-      ...formData,
-      address: address.street,
-      city: address.city,
-      district: address.area,
-    });
-  } else {
-    console.error("選中的地址數據不完整", address);
-  }
-};
-
 const AddressFormProduct = () => {
-  // 7-11 START
-  const { store711, openWindow, closeWindow } = useShip711StoreOpener(
-    "http://localhost:3005/api/shipment/711",
-    { autoCloseMins: 3 }
-  );
-
+  // useState Hooks
   const [areas, setAreas] = useState([]);
   const [isConvenienceStore, setIsConvenienceStore] = useState(false);
   const [formData, setFormData] = useState({
     city: "",
-    store_name: "", // 修改為資料庫欄位名稱
-    store_address: "", // 修改為資料庫欄位名稱
+    store_name: "",
+    store_address: "",
     address: "",
     cardNumber: "",
     cardName: "",
     expiryDate: "",
     cvc: "",
-    is_default: false, // 修改為資料庫欄位名稱
-    store_type: "", // 修改為資料庫欄位名稱
+    is_default: false,
+    store_type: "",
     district: "",
     address: "",
   });
-  // 7-11
+  const [addresses, setAddresses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [message, setMessage] = useState("");
+
+  // 引入購物車 hook，確保在組件頂層調用
+  const { cartItems, setCartItems } = useCart();
+  const router = useRouter();
+
+  // 7-11 Hooks
+  const { store711, openWindow, closeWindow } = useShip711StoreOpener(
+    "http://localhost:3005/api/shipment/711",
+    { autoCloseMins: 3 }
+  );
 
   useEffect(() => {
-    const handleStoreUpdate = (event) => {
-      const { storename, storeaddress } = event.detail;
-      setFormData((prevData) => ({
-        ...prevData,
-        store_name: storename, // 修改為資料庫欄位名稱
-        store_address: storeaddress, // 修改為資料庫欄位名稱
-      }));
-    };
-
-    document.addEventListener("set-store", handleStoreUpdate);
-
-    return () => {
-      document.removeEventListener("set-store", handleStoreUpdate);
-    };
+    fetchAddresses(); // 一進入頁面時呼叫 fetchAddresses
   }, []);
+
   // 使用 useShip711StoreCallback 來接收選擇的 7-11 門市資訊
   useShip711StoreCallback((storeInfo) => {
-    console.log("7-11 門市資訊回傳: ", storeInfo); // 檢查回傳的資料
+    console.log("7-11 門市資訊回傳: ", storeInfo);
     if (storeInfo) {
       setFormData((prevData) => ({
         ...prevData,
-        store_name: storeInfo.storeName, // 修改為資料庫欄位名稱
-        store_address: storeInfo.storeAddress, // 修改為資料庫欄位名稱
+        store_name: storeInfo.storeName,
+        store_address: storeInfo.storeAddress,
       }));
     }
   });
 
   useEffect(() => {
-    // 當門市選擇完成時，接收資料
     const handleStoreUpdate = (event) => {
       const { storename, storeaddress } = event.detail;
-      console.log("接收到的門市名稱和地址: ", storename, storeaddress); // 確認接收到的資料
       setFormData((prevData) => ({
         ...prevData,
-        store_name: storename, // 使用正確名稱更新狀態
+        store_name: storename,
         store_address: storeaddress,
       }));
     };
 
-    // 監聽從子視窗傳回的 "set-store" 事件
     document.addEventListener("set-store", handleStoreUpdate);
-
-    // 清理事件監聽器
     return () => {
       document.removeEventListener("set-store", handleStoreUpdate);
     };
   }, []);
-
-  const handleOptionChange = (e) => {
-    if (e.target.value === "convenience_store") {
-      setIsConvenienceStore(true);
-      // 清空表單的地址信息，因為選擇了 7-11 門市
-      setFormData((prevData) => ({
-        ...prevData,
-        address: "",
-        city: "",
-        district: "",
-        store_type: "7-11", // 設置商店類型為7-11
-      }));
-    } else {
-      setIsConvenienceStore(false);
-      // 如果選擇宅配，重新填充預設地址
-      const defaultAddress = addresses.find((address) => address.is_default); // 修改為資料庫欄位名稱
-      if (defaultAddress) {
-        setFormData((prevData) => ({
-          ...prevData,
-          address: defaultAddress.detailed_address || "",
-          city: defaultAddress.city || "",
-          district: defaultAddress.area || "",
-          is_default: defaultAddress.is_default, // 設置是否為預設地址
-        }));
-      }
-    }
-  };
-  //7-11//
-  useEffect(() => {
-    // 確保只有在客戶端渲染時才初始化表單數據
-    if (typeof window !== "undefined") {
-      const storedAddress = localStorage.getItem("addressData");
-      if (storedAddress) {
-        setFormData(JSON.parse(storedAddress));
-      }
-    }
-  }, []);
-  // 處理輸入表單變化的函數
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value, // 根據 name 更新對應的表單值
-    }));
-  };
-
-  // 當用戶選擇一個地址時，將其值填入表單
-
-  // 用來選擇地址的處理函數
-  const handleAddressSelect = (address) => {
-    if (address && address.city && address.area && address.street) {
-      setFormData({
-        city: address.city,
-        district: address.area, // 更新鄉鎮市區
-        address: address.detailed_address, // 更新詳細地址
-      });
-    } else {
-      console.error("選中的地址數據不完整", address); // 如果地址不完整，打印錯誤
-    }
-  };
-  console.log(formData);
 
   // 從後端獲取地址列表
   const fetchAddresses = async () => {
     try {
       const response = await fetchWithAuth(
         "http://localhost:3005/api/shipment/addresses"
-      ); // 使用你在伺服器設置的 callback URL
+      );
       if (!response.ok) {
         throw new Error("Failed to fetch addresses");
       }
       const data = await response.json();
-
-      if (!data || !data.data) {
-        throw new Error("No address data found");
-      }
-
-      setAddresses(data.data); // 假設你的 API 回傳 data 是地址的數組
-
-      // 獲取預設地址並填充表單
-      const defaultAddress = data.data.find((address) => address.is_default); // 修改為資料庫欄位名稱
+      setAddresses(data.data || []);
+      const defaultAddress = data.data?.find((address) => address.is_default);
       if (defaultAddress) {
         setFormData((prevData) => ({
           ...prevData,
           address: defaultAddress.detailed_address || "",
           city: defaultAddress.city || "",
           district: defaultAddress.area || "",
-          is_default: defaultAddress.is_default, // 設置是否為預設地址
+          is_default: defaultAddress.is_default,
         }));
       }
-
       setLoading(false);
     } catch (error) {
-      console.error("Fetch addresses error: ", error); // 在前端控制台打印詳細錯誤
+      console.error("Fetch addresses error: ", error);
       setError("無法獲取地址");
       setLoading(false);
     }
   };
 
-  // 更新 setDefaultAddress 函數
-
-  // 設定預設地址的函數
-  const setDefaultAddress = async (addressId) => {
-    try {
-      const response = await fetchWithAuth(
-        `http://localhost:3005/api/shipment/addresses/${addressId}/default`,
-        {
-          method: "PUT",
-        }
-      );
-      if (!response.ok) {
-        throw new Error("設置預設地址失敗");
+  const handleOptionChange = (e) => {
+    setIsConvenienceStore(e.target.value === "convenience_store");
+    if (e.target.value === "convenience_store") {
+      setFormData((prevData) => ({
+        ...prevData,
+        address: "",
+        city: "",
+        district: "",
+        store_type: "7-11",
+      }));
+    } else {
+      const defaultAddress = addresses.find((address) => address.is_default);
+      if (defaultAddress) {
+        setFormData((prevData) => ({
+          ...prevData,
+          address: defaultAddress.detailed_address || "",
+          city: defaultAddress.city || "",
+          district: defaultAddress.area || "",
+          is_default: defaultAddress.is_default,
+        }));
       }
-
-      const result = await response.json();
-      setMessage(result.message);
-
-      // 找到設為預設的地址並填入表單
-      const selectedAddress = addresses.find(
-        (address) => address.address_id === addressId
-      );
-      if (selectedAddress) {
-        setFormData({
-          ...formData,
-          address: `${selectedAddress.street}, ${selectedAddress.area}, ${selectedAddress.city}`,
-          city: selectedAddress.city,
-          district: selectedAddress.area,
-        });
-      }
-
-      fetchAddresses(); // 重新獲取地址列表
-    } catch (error) {
-      setMessage(error.message);
     }
   };
 
-  //defaultAddress
-  const [addresses, setAddresses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [message, setMessage] = useState(""); // 用來顯示設置預設地址的結果
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
 
-  useEffect(() => {
-    fetchAddresses();
-  }, []); // 一進入頁面時呼叫 fetchAddresses
+  // 當用戶按下送出按鈕時提交訂單
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    // 驗證必填欄位
+    if (!formData.city || !formData.district || !formData.address) {
+      toast.error("請填寫完整的地址資訊", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+
+    if (
+      !formData.cardNumber ||
+      !formData.cardName ||
+      !formData.expiryDate ||
+      !formData.cvc
+    ) {
+      toast.error("請填寫完整的信用卡資訊", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+
+    if (cartItems.length === 0) {
+      toast.error("購物車內無商品", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+
+    // 訂單資料
+    const orderData = {
+      orderId: new Date().getTime(),
+      items: cartItems,
+      total: cartItems.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
+      ),
+      address: formData.address,
+      paymentInfo: {
+        cardNumber: formData.cardNumber,
+        cardName: formData.cardName,
+        expiryDate: formData.expiryDate,
+        cvc: formData.cvc,
+      },
+      date: new Date().toISOString(),
+    };
+
+    // 打印訂單資料以供檢查
+    console.log("Order Data:", orderData);
+
+    // 檢查是否在瀏覽器環境中
+    if (typeof window !== "undefined") {
+      // 保存訂單到 LocalStorage
+      const storedOrders = JSON.parse(localStorage.getItem("orders")) || [];
+      storedOrders.push(orderData);
+      localStorage.setItem("orders", JSON.stringify(storedOrders));
+
+      // 打印已儲存的訂單資料
+      console.log("Stored Orders:", JSON.parse(localStorage.getItem("orders")));
+
+      // 清空購物車
+      setCartItems([]);
+      localStorage.removeItem("cart");
+
+      // 顯示完成訂單的通知
+      toast.success("訂單已完成", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+
+      // 3秒後跳轉到產品列表頁面
+      setTimeout(() => {
+        router.push("/product/product-list");
+      }, 3000);
+    }
+  };
 
   if (loading) {
     return <div>加載中...</div>;
@@ -262,117 +237,6 @@ const AddressFormProduct = () => {
   if (error) {
     return <div>{error}</div>;
   }
-
-  // 以下為新增邏輯
-  const { cartItems, setCartItems } = useCart(); // 引入購物車 hook
-  const router = useRouter();
-
-  // 當用戶按下送出按鈕時提交訂單
-  const handleSubmit = (event) => {
-    // 阻止表單的預設提交行為
-    event.preventDefault();
-    // 驗證必填欄位
-    if (!formData.city) {
-      toast.error("請填寫縣市名稱", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-      return;
-    }
-
-    if (!formData.district) {
-      toast.error("請填寫鄉鎮市區名稱", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-      return;
-    }
-
-    if (!formData.address) {
-      toast.error("請填寫詳細地址", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-      return;
-    }
-
-    if (!formData.cardNumber) {
-      toast.error("請填寫信用卡卡號", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-      return;
-    }
-
-    if (!formData.cardName) {
-      toast.error("請填寫持卡人姓名", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-      return;
-    }
-
-    if (!formData.expiryDate) {
-      toast.error("請填寫到期日", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-      return;
-    }
-
-    if (!formData.cvc) {
-      toast.error("請填寫CVC安全碼", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-      return;
-    }
-    if (cartItems.length === 0) {
-      toast.error("購物車內無商品", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-      return; // 如果購物車為空，顯示錯誤提示並返回
-    }
-
-    // 訂單資料
-    const orderData = {
-      orderId: new Date().getTime(), // 生成訂單ID
-      items: cartItems, // 購物車內容
-      total: cartItems.reduce(
-        (total, item) => total + item.price * item.quantity,
-        0
-      ), // 計算總價
-      address: formData.address, // 地址
-      paymentInfo: {
-        cardNumber: formData.cardNumber, // 信用卡卡號
-        cardName: formData.cardName, // 持卡人姓名
-        expiryDate: formData.expiryDate, // 信用卡到期日
-        cvc: formData.cvc, // CVC 安全碼
-      },
-      date: new Date().toISOString(), // 訂單日期
-    };
-
-    // 保存訂單到 LocalStorage
-    const storedOrders = JSON.parse(localStorage.getItem("orders")) || [];
-    storedOrders.push(orderData); // 添加新的訂單
-    localStorage.setItem("orders", JSON.stringify(storedOrders)); // 更新 LocalStorage 中的訂單
-
-    // 清空購物車
-    setCartItems([]);
-    localStorage.removeItem("cart"); // 從 LocalStorage 中移除購物車內容
-
-    // 顯示完成訂單的通知
-    toast.success("訂單已完成", {
-      position: "top-right",
-      autoClose: 3000,
-    });
-
-    // 3秒後跳轉到產品列表頁面
-    setTimeout(() => {
-      router.push("/product/product-list"); // 跳轉到產品列表頁面
-    }, 3000);
-  };
 
   //test
 

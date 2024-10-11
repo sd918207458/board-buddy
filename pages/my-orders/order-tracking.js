@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -6,110 +5,21 @@ import OrderTable from "@/components/table"; // 訂單表格組件
 
 export default function OrderTracking() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortKey, setSortKey] = useState("orderNumber");
+  const [sortKey, setSortKey] = useState("orderId");
   const [sortOrder, setSortOrder] = useState("asc");
   const [filteredData, setFilteredData] = useState([]); // 篩選後的數據
   const [statusFilter, setStatusFilter] = useState(""); // 訂單狀態篩選條件
   const [minAmount, setMinAmount] = useState(""); // 金額範圍篩選
   const [maxAmount, setMaxAmount] = useState(""); // 金額範圍篩選
+  const [orders, setOrders] = useState([]); // 保存所有訂單的狀態
 
-  const sampleOrders = [
-    {
-      id: 1,
-      orderNumber: "ORD001",
-      date: "2024-10-01",
-      status: "Pending",
-      totalAmount: 1500,
-      totalItems: 3,
-      shippingAddress: "台北市中山區南京東路100號",
-    },
-    {
-      id: 2,
-      orderNumber: "ORD002",
-      date: "2024-10-02",
-      status: "Shipped",
-      totalAmount: 2500,
-      totalItems: 5,
-      shippingAddress: "台北市大安區忠孝東路50號",
-    },
-    {
-      id: 3,
-      orderNumber: "ORD003",
-      date: "2024-09-15",
-      status: "Delivered",
-      totalAmount: 3500,
-      totalItems: 2,
-      shippingAddress: "台中市西區民生路123號",
-    },
-    {
-      id: 4,
-      orderNumber: "ORD004",
-      date: "2024-09-25",
-      status: "Canceled",
-      totalAmount: 800,
-      totalItems: 1,
-      shippingAddress: "高雄市新興區中山一路200號",
-    },
-    {
-      id: 5,
-      orderNumber: "ORD005",
-      date: "2024-10-05",
-      status: "Pending",
-      totalAmount: 1200,
-      totalItems: 4,
-      shippingAddress: "台北市大同區延平北路300號",
-    },
-    {
-      id: 6,
-      orderNumber: "ORD006",
-      date: "2024-09-30",
-      status: "Delivered",
-      totalAmount: 4200,
-      totalItems: 7,
-      shippingAddress: "台北市信義區松高路50號",
-    },
-    {
-      id: 7,
-      orderNumber: "ORD007",
-      date: "2024-10-06",
-      status: "Shipped",
-      totalAmount: 2750,
-      totalItems: 5,
-      shippingAddress: "台南市東區中華東路200號",
-    },
-    {
-      id: 8,
-      orderNumber: "ORD008",
-      date: "2024-10-03",
-      status: "Canceled",
-      totalAmount: 950,
-      totalItems: 2,
-      shippingAddress: "桃園市中壢區中正路100號",
-    },
-    {
-      id: 9,
-      orderNumber: "ORD009",
-      date: "2024-10-04",
-      status: "Pending",
-      totalAmount: 1650,
-      totalItems: 3,
-      shippingAddress: "新北市板橋區文化路150號",
-    },
-    {
-      id: 10,
-      orderNumber: "ORD010",
-      date: "2024-10-02",
-      status: "Delivered",
-      totalAmount: 2900,
-      totalItems: 6,
-      shippingAddress: "台北市中正區忠孝東路60號",
-    },
-  ];
-
-  // 初始化並恢復上次的搜尋與排序狀態
   useEffect(() => {
+    const storedOrders = JSON.parse(localStorage.getItem("orders")) || [];
+    console.log("Loaded stored orders:", storedOrders);
+    setOrders(storedOrders);
+
     const savedSearchTerm = localStorage.getItem("searchTerm") || "";
-    const savedSortKey = localStorage.getItem("sortKey") || "orderNumber";
+    const savedSortKey = localStorage.getItem("sortKey") || "orderId";
     const savedSortOrder = localStorage.getItem("sortOrder") || "asc";
     const savedStatusFilter = localStorage.getItem("statusFilter") || "";
     const savedMinAmount = localStorage.getItem("minAmount") || "";
@@ -123,6 +33,7 @@ export default function OrderTracking() {
     setMaxAmount(savedMaxAmount);
 
     filterAndSortOrders(
+      storedOrders,
       savedSearchTerm,
       savedSortKey,
       savedSortOrder,
@@ -132,13 +43,12 @@ export default function OrderTracking() {
     );
   }, []);
 
-  // 保存搜尋與排序狀態到 LocalStorage
   const saveState = (key, value) => {
     localStorage.setItem(key, value);
   };
 
-  // 篩選與排序訂單
   const filterAndSortOrders = (
+    orders,
     search,
     sortKey,
     sortOrder,
@@ -146,8 +56,8 @@ export default function OrderTracking() {
     minAmt,
     maxAmt
   ) => {
-    let filtered = sampleOrders.filter((order) =>
-      order.orderNumber.includes(search)
+    let filtered = orders.filter((order) =>
+      String(order.orderId).includes(search)
     );
 
     if (status) {
@@ -155,15 +65,11 @@ export default function OrderTracking() {
     }
 
     if (minAmt) {
-      filtered = filtered.filter(
-        (order) => order.totalAmount >= Number(minAmt)
-      );
+      filtered = filtered.filter((order) => order.total >= Number(minAmt));
     }
 
     if (maxAmt) {
-      filtered = filtered.filter(
-        (order) => order.totalAmount <= Number(maxAmt)
-      );
+      filtered = filtered.filter((order) => order.total <= Number(maxAmt));
     }
 
     const sorted = filtered.sort((a, b) => {
@@ -174,15 +80,16 @@ export default function OrderTracking() {
       }
     });
 
+    console.log("Filtered and sorted orders:", sorted);
     setFilteredData(sorted);
   };
 
-  // 搜尋框輸入處理
   const handleSearch = (e) => {
     const search = e.target.value;
     setSearchTerm(search);
     saveState("searchTerm", search);
     filterAndSortOrders(
+      orders,
       search,
       sortKey,
       sortOrder,
@@ -192,7 +99,6 @@ export default function OrderTracking() {
     );
   };
 
-  // 切換排序方式
   const handleSort = (key) => {
     const newOrder = sortKey === key && sortOrder === "asc" ? "desc" : "asc";
     setSortKey(key);
@@ -200,6 +106,7 @@ export default function OrderTracking() {
     saveState("sortKey", key);
     saveState("sortOrder", newOrder);
     filterAndSortOrders(
+      orders,
       searchTerm,
       key,
       newOrder,
@@ -209,12 +116,12 @@ export default function OrderTracking() {
     );
   };
 
-  // 篩選條件處理
   const handleFilter = () => {
     saveState("statusFilter", statusFilter);
     saveState("minAmount", minAmount);
     saveState("maxAmount", maxAmount);
     filterAndSortOrders(
+      orders,
       searchTerm,
       sortKey,
       sortOrder,
@@ -224,7 +131,6 @@ export default function OrderTracking() {
     );
   };
 
-  // 渲染訂單表格
   const renderTable = () =>
     filteredData.length > 0 ? (
       <OrderTable orders={filteredData} />
@@ -245,7 +151,6 @@ export default function OrderTracking() {
             </h2>
           </section>
 
-          {/* 搜尋與篩選區塊 */}
           <div className="p-6 flex flex-col gap-4">
             <input
               type="text"
@@ -255,7 +160,7 @@ export default function OrderTracking() {
               className="input input-bordered"
             />
             <div className="flex gap-4">
-              <select
+              {/* <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="select select-bordered"
@@ -265,7 +170,7 @@ export default function OrderTracking() {
                 <option value="Shipped">已出貨</option>
                 <option value="Delivered">已送達</option>
                 <option value="Canceled">取消訂單</option>
-              </select>
+              </select> */}
               <input
                 type="number"
                 placeholder="最低金額"
@@ -282,14 +187,13 @@ export default function OrderTracking() {
               />
               <button
                 onClick={handleFilter}
-                className="btn btn-primary  bg-[#003E52]"
+                className="btn btn-primary bg-[#003E52]"
               >
                 篩選
               </button>
             </div>
           </div>
 
-          {/* 排序方式 */}
           <div className="p-6 flex justify-between relative z-10">
             <div className="dropdown dropdown-end">
               <label tabIndex={0} className="btn m-1">
@@ -303,7 +207,7 @@ export default function OrderTracking() {
                   <button onClick={() => handleSort("date")}>按日期排序</button>
                 </li>
                 <li>
-                  <button onClick={() => handleSort("totalAmount")}>
+                  <button onClick={() => handleSort("total")}>
                     按金額排序
                   </button>
                 </li>
@@ -316,7 +220,6 @@ export default function OrderTracking() {
             </div>
           </div>
 
-          {/* 表格 */}
           {renderTable()}
         </div>
       </div>
