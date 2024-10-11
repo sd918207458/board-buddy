@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link"; // 引入 Next.js 的 Link 組件
 import { useCart } from "@/hooks/useCart"; // 引入購物車上下文
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const Card = ({ product }) => {
+const Card = ({ product, searchQuery }) => {
   const { totalPrice } = useCart(); // 總價
   const { addToCart } = useCart(); // 從購物車上下文中獲取 addToCart 函數
   const [isFavorite, setIsFavorite] = useState(false); // 初始化收藏狀態
@@ -51,6 +53,10 @@ const Card = ({ product }) => {
     };
     addToCart(productWithQuantity); // 將商品加入購物車
   };
+  // 如果產品名稱不包含搜尋內容，則不顯示該產品
+  if (searchQuery && !product.product_name.includes(searchQuery)) {
+    return null; // 不顯示該產品
+  }
   return (
     <Link
       href={`/product/${product.product_id}`} // 使用動態路由
@@ -74,15 +80,27 @@ const Card = ({ product }) => {
           ${product.price}
         </p>
         <div className="flex space-x-2">
+
           <button
             onClick={(e) => {
               e.preventDefault(); // 防止跳轉到商品詳細頁面
-              handleAddToCart();
+              console.log("Before add to cart");
+              handleAddToCart(); // 調用加入購物車的邏輯
+              toast.success("商品已加入購物車！", {
+                position: "top-right",
+                autoClose: 2000, // 2秒後自動關閉
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              });
             }}
             className="py-1.5 px-4 text-white border border-white rounded-lg hover:bg-white hover:text-[#003E52] transition-all"
           >
             加入購物車
           </button>
+
           <button
             onClick={(e) => {
               e.preventDefault(); // 防止跳轉到商品詳細頁面
