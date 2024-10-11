@@ -6,15 +6,16 @@ import {
 import { useRouter } from "next/router";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useCart } from "@/hooks/useCart"; // 引入購物車 hook
 
-// Helper function to get token
+// 從 localStorage 中獲取 token
 const getToken = () => localStorage.getItem("token");
 
-// Helper function to make authenticated fetch requests
+// 包含授權標頭的 fetch 請求
 const fetchWithAuth = async (url, options = {}) => {
   const headers = {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${getToken()}`,
+    Authorization: `Bearer ${getToken()}`, // 添加授權 token
     ...options.headers,
   };
   return fetch(url, { ...options, headers, credentials: "include" });
@@ -37,9 +38,9 @@ const handleAddressSelect = (address, setFormData, formData) => {
 
 const AddressFormProduct = () => {
   // 7-11 START
-  const { store711, closeWindow } = useShip711StoreOpener(
+  const { store711, openWindow, closeWindow } = useShip711StoreOpener(
     "http://localhost:3005/api/shipment/711",
-    { autoCloseMins: 3 } // x分鐘沒完成選擇會自動關閉，預設5分鐘。
+    { autoCloseMins: 3 }
   );
 
   const [areas, setAreas] = useState([]);
@@ -59,10 +60,6 @@ const AddressFormProduct = () => {
     address: "",
   });
   // 7-11
-  const { openWindow } = useShip711StoreOpener(
-    "http://localhost:3005/api/shipment/711",
-    { autoCloseMins: 3 }
-  );
 
   useEffect(() => {
     const handleStoreUpdate = (event) => {
@@ -80,8 +77,9 @@ const AddressFormProduct = () => {
       document.removeEventListener("set-store", handleStoreUpdate);
     };
   }, []);
-
+  // 使用 useShip711StoreCallback 來接收選擇的 7-11 門市資訊
   useShip711StoreCallback((storeInfo) => {
+    console.log("7-11 門市資訊回傳: ", storeInfo); // 檢查回傳的資料
     if (storeInfo) {
       setFormData((prevData) => ({
         ...prevData,
@@ -90,6 +88,27 @@ const AddressFormProduct = () => {
       }));
     }
   });
+
+  useEffect(() => {
+    // 當門市選擇完成時，接收資料
+    const handleStoreUpdate = (event) => {
+      const { storename, storeaddress } = event.detail;
+      console.log("接收到的門市名稱和地址: ", storename, storeaddress); // 確認接收到的資料
+      setFormData((prevData) => ({
+        ...prevData,
+        store_name: storename, // 使用正確名稱更新狀態
+        store_address: storeaddress,
+      }));
+    };
+
+    // 監聽從子視窗傳回的 "set-store" 事件
+    document.addEventListener("set-store", handleStoreUpdate);
+
+    // 清理事件監聽器
+    return () => {
+      document.removeEventListener("set-store", handleStoreUpdate);
+    };
+  }, []);
 
   const handleOptionChange = (e) => {
     if (e.target.value === "convenience_store") {
@@ -117,41 +136,42 @@ const AddressFormProduct = () => {
       }
     }
   };
-  //7-11
+  //7-11//
+  useEffect(() => {
+    // 確保只有在客戶端渲染時才初始化表單數據
+    if (typeof window !== "undefined") {
+      const storedAddress = localStorage.getItem("addressData");
+      if (storedAddress) {
+        setFormData(JSON.parse(storedAddress));
+      }
+    }
+  }, []);
+  // 處理輸入表單變化的函數
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,
+      [name]: value, // 根據 name 更新對應的表單值
     }));
   };
 
   // 當用戶選擇一個地址時，將其值填入表單
 
+  // 用來選擇地址的處理函數
   const handleAddressSelect = (address) => {
     if (address && address.city && address.area && address.street) {
       setFormData({
         city: address.city,
-        district: address.area, // 確保正確地使用 area 替代 district
-        address: address.detailed_address,
+        district: address.area, // 更新鄉鎮市區
+        address: address.detailed_address, // 更新詳細地址
       });
     } else {
-      console.error("選中的地址數據不完整", address);
+      console.error("選中的地址數據不完整", address); // 如果地址不完整，打印錯誤
     }
   };
   console.log(formData);
 
-  // const handleAddressSelect = (address) => {
-  //   setFormData({
-  //     ...formData,
-  //     address: `${address.street}, ${address.area}, ${address.city}`,
-  //     city: address.city,
-  //     district: address.area,
-  //   });
-  // };
-  // 在組件加載時從後端獲取地址
-
-  // 獲取地址列表的函數
+  // 從後端獲取地址列表
   const fetchAddresses = async () => {
     try {
       const response = await fetchWithAuth(
@@ -188,30 +208,9 @@ const AddressFormProduct = () => {
     }
   };
 
-  // const handleSubmit = async () => {
-  //   try {
-  //     const response = await fetchWithAuth(
-  //       "http://localhost:3005/api/shipment/addresses",
-  //       {
-  //         method: "POST", // 根據需要也可以是 PUT
-  //         body: JSON.stringify(formData),
-  //       }
-  //     );
-
-  //     if (!response.ok) {
-  //       throw new Error("提交表單失敗");
-  //     }
-
-  //     const result = await response.json();
-  //     console.log("表單提交成功：", result);
-  //     setMessage(result.message); // 顯示成功訊息
-  //     fetchAddresses(); // 重新加載地址列表
-  //   } catch (error) {
-  //     console.error("表單提交錯誤：", error);
-  //     setMessage("表單提交失敗");
-  //   }
-  // };
   // 更新 setDefaultAddress 函數
+
+  // 設定預設地址的函數
   const setDefaultAddress = async (addressId) => {
     try {
       const response = await fetchWithAuth(
@@ -263,49 +262,107 @@ const AddressFormProduct = () => {
   if (error) {
     return <div>{error}</div>;
   }
-  //送出
+
+  // 以下為新增邏輯
+  const { cartItems, setCartItems } = useCart(); // 引入購物車 hook
   const router = useRouter();
 
-  // const handleSubmit = () => {
-  //   // 顯示 Toast 提示
-  //   toast.success("完成訂單", {
-  //     position: "top-right",
-  //     autoClose: 3000, // 自動關閉時間
-  //     hideProgressBar: false,
-  //     closeOnClick: true,
-  //     pauseOnHover: true,
-  //     draggable: true,
-  //     progress: undefined,
-  //   });
+  // 當用戶按下送出按鈕時提交訂單
+  const handleSubmit = (event) => {
+    // 阻止表單的預設提交行為
+    event.preventDefault();
+    // 驗證必填欄位
+    if (!formData.city) {
+      toast.error("請填寫縣市名稱", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return;
+    }
 
-  //   // 在 3 秒後跳轉到 /product/product-list 頁面
-  //   setTimeout(() => {
-  //     router.push("/product/product-list");
-  //   }, 3000); // 等待3秒後跳轉
-  // };
-  //
-  //test
-  const handleSubmit = () => {
-    // 模擬訂單資訊
+    if (!formData.district) {
+      toast.error("請填寫鄉鎮市區名稱", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+
+    if (!formData.address) {
+      toast.error("請填寫詳細地址", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+
+    if (!formData.cardNumber) {
+      toast.error("請填寫信用卡卡號", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+
+    if (!formData.cardName) {
+      toast.error("請填寫持卡人姓名", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+
+    if (!formData.expiryDate) {
+      toast.error("請填寫到期日", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+
+    if (!formData.cvc) {
+      toast.error("請填寫CVC安全碼", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+    if (cartItems.length === 0) {
+      toast.error("購物車內無商品", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return; // 如果購物車為空，顯示錯誤提示並返回
+    }
+
+    // 訂單資料
     const orderData = {
-      orderId: new Date().getTime(), // 簡單的生成訂單ID
-      items: cartItems,
+      orderId: new Date().getTime(), // 生成訂單ID
+      items: cartItems, // 購物車內容
       total: cartItems.reduce(
         (total, item) => total + item.price * item.quantity,
         0
-      ),
-      date: new Date().toISOString(),
+      ), // 計算總價
+      address: formData.address, // 地址
+      paymentInfo: {
+        cardNumber: formData.cardNumber, // 信用卡卡號
+        cardName: formData.cardName, // 持卡人姓名
+        expiryDate: formData.expiryDate, // 信用卡到期日
+        cvc: formData.cvc, // CVC 安全碼
+      },
+      date: new Date().toISOString(), // 訂單日期
     };
 
-    // 保存訂單到LocalStorage（儲存到訂單歷史記錄中）
+    // 保存訂單到 LocalStorage
     const storedOrders = JSON.parse(localStorage.getItem("orders")) || [];
-    storedOrders.push(orderData);
-    localStorage.setItem("orders", JSON.stringify(storedOrders));
+    storedOrders.push(orderData); // 添加新的訂單
+    localStorage.setItem("orders", JSON.stringify(storedOrders)); // 更新 LocalStorage 中的訂單
 
     // 清空購物車
-    localStorage.removeItem("cart");
+    setCartItems([]);
+    localStorage.removeItem("cart"); // 從 LocalStorage 中移除購物車內容
 
-    // 顯示完成訂單的Toast
+    // 顯示完成訂單的通知
     toast.success("訂單已完成", {
       position: "top-right",
       autoClose: 3000,
@@ -313,9 +370,11 @@ const AddressFormProduct = () => {
 
     // 3秒後跳轉到產品列表頁面
     setTimeout(() => {
-      router.push("/product/product-list");
+      router.push("/product/product-list"); // 跳轉到產品列表頁面
     }, 3000);
   };
+
+  //test
 
   //test
   return (
@@ -477,9 +536,10 @@ const AddressFormProduct = () => {
                   type="text"
                   name="city"
                   value={formData.city}
-                  onChange={(e) =>
-                    setFormData({ ...formData, city: e.target.value })
-                  } // 更新狀態
+                  // onChange={(e) =>
+                  //   setFormData({ ...formData, city: e.target.value })
+                  // } // 更新狀態
+                  onChange={handleChange}
                   className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
                   placeholder="請輸入縣市"
                 />
@@ -497,9 +557,10 @@ const AddressFormProduct = () => {
                   type="text"
                   name="district"
                   value={formData.district}
-                  onChange={(e) =>
-                    setFormData({ ...formData, district: e.target.value })
-                  } // 更新狀態
+                  // onChange={(e) =>
+                  //   setFormData({ ...formData, district: e.target.value })
+                  // } // 更新狀態
+                  onChange={handleChange}
                   className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
                   placeholder="請輸入鄉鎮市區"
                 />
@@ -516,9 +577,10 @@ const AddressFormProduct = () => {
                   type="text"
                   name="address"
                   value={formData.address}
-                  onChange={(e) =>
-                    setFormData({ ...formData, district: e.target.value })
-                  } // 更新狀態
+                  // onChange={(e) =>
+                  //   setFormData({ ...formData, district: e.target.value })
+                  // } // 更新狀態
+                  onChange={handleChange}
                   className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
                   placeholder="請輸入詳細地址"
                 />
@@ -541,7 +603,9 @@ const AddressFormProduct = () => {
                   type="text"
                   name="cardNumber"
                   value={formData.cardNumber}
-                  onChange={handleChange}
+                  onChange={(e) =>
+                    setFormData({ ...formData, cardNumber: e.target.value })
+                  }
                   className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
                   placeholder="請輸入信用卡卡號"
                 />
@@ -559,7 +623,9 @@ const AddressFormProduct = () => {
                   type="text"
                   name="cardName"
                   value={formData.cardName}
-                  onChange={handleChange}
+                  onChange={(e) =>
+                    setFormData({ ...formData, cardName: e.target.value })
+                  }
                   className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
                   placeholder="請輸入持卡人姓名"
                 />
@@ -577,7 +643,9 @@ const AddressFormProduct = () => {
                   type="text"
                   name="expiryDate"
                   value={formData.expiryDate}
-                  onChange={handleChange}
+                  onChange={(e) =>
+                    setFormData({ ...formData, expiryDate: e.target.value })
+                  }
                   className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
                   placeholder="MM/YY"
                 />
@@ -595,7 +663,9 @@ const AddressFormProduct = () => {
                   type="text"
                   name="cvc"
                   value={formData.cvc}
-                  onChange={handleChange}
+                  onChange={(e) =>
+                    setFormData({ ...formData, cvc: e.target.value })
+                  }
                   className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
                   placeholder="三位數安全碼"
                 />
