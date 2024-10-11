@@ -81,6 +81,13 @@ export const CartProvider = ({ children }) => {
     console.log("Total price in useCart:", totalPrice);
   }, [cartItems, totalPrice]);
 
+  // 定義 handleRemoveItem 函數
+  const handleRemoveItem = (index) => {
+    const updatedItems = cartItems.filter((_, i) => i !== index); // 使用 cartItems 而不是 items
+    setCartItems(updatedItems); // 更新購物車狀態
+    localStorage.setItem("cartItems", JSON.stringify(updatedItems)); // 保存更新到 localStorage
+  };
+
   return (
     <CartContext.Provider
       value={{
@@ -94,6 +101,7 @@ export const CartProvider = ({ children }) => {
         totalItems, // 返回購物車內所有商品的總數
         handleQuantityChange,
         isMounted,
+        handleRemoveItem,
       }}
     >
       {children}
