@@ -143,27 +143,36 @@ export function useShip711StoreCallback(keyLocalStorage = "store711") {
 
   useEffect(() => {
     if (router.isReady) {
-      // 確保父視窗存在且未關閉
-      if (window.opener && !window.opener.closed) {
-        // 通知母視窗關閉倒數計時
-        window.opener.document.dispatchEvent(new CustomEvent("stop-countdown"));
+      try {
+        // 確保父視窗存在且未關閉
+        if (window.opener && !window.opener.closed) {
+          // 通知母視窗關閉倒數計時
+          window.opener.document.dispatchEvent(
+            new CustomEvent("stop-countdown")
+          );
 
-        // 通知母視窗已完成，回送值
-        window.opener.document.dispatchEvent(
-          new CustomEvent("set-store", {
-            detail: router.query,
-          })
-        );
+          // 通知母視窗已完成，回送值
+          window.opener.document.dispatchEvent(
+            new CustomEvent("set-store", {
+              detail: {
+                storeid: router.query.storeid,
+                storename: decodeURIComponent(router.query.storename),
+                storeaddress: decodeURIComponent(router.query.storeaddress),
+              },
+            })
+          );
 
-        // 設定到localStorage
-        setValue(router.query);
+          // 設定到 localStorage
+          setValue(router.query);
 
-        // 關閉自己視窗
-        window.close();
-      } else {
-        console.warn("無法訪問父視窗，可能已關閉或不存在");
+          // 關閉自己視窗
+          window.close();
+        } else {
+          console.warn("無法訪問父視窗，可能已關閉或不存在");
+        }
+      } catch (error) {
+        console.error("錯誤: 無法訪問父視窗或傳遞數據", error);
       }
     }
-    // eslint-disable-next-line
   }, [router.isReady, setValue, router.query]);
 }

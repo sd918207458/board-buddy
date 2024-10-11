@@ -2,8 +2,17 @@ import React, { useEffect, useState } from "react";
 import LoggedInNavbar from "@/components/LoggedInNavbar";
 import LoggedOutNavbar from "@/components/LoggedOutNavbar";
 import { useRouter } from "next/router";
+import { useCart } from "@/hooks/useCart";
 
 const NavbarSwitcher = () => {
+  const {
+    cartItems,
+    totalItems,
+    isCartVisible,
+    setIsCartVisible,
+    updateCartItems,
+    onUsernameRetrieved // 新增一个 prop 来暴露 username
+  } = useCart();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // 控制載入狀態
   const [avatarUrl, setAvatarUrl] = useState(""); // 用來管理頭像 URL
@@ -25,6 +34,9 @@ const NavbarSwitcher = () => {
             setIsLoggedIn(true);
             setAvatarUrl(data.data.user.avatar); // 設置初始頭像
             setUsername(data.data.user.username); // 設置初始使用者名稱
+            if (onUsernameRetrieved) {
+              onUsernameRetrieved(data.data.user.username); // 调用 prop 将 username 暴露出去
+            }
           } else {
             // 如果 token 無效，清理 localStorage
             localStorage.removeItem("token");
@@ -43,7 +55,7 @@ const NavbarSwitcher = () => {
       setIsLoggedIn(false);
       setIsLoading(false);
     }
-  }, [router]);
+  }, [router, onUsernameRetrieved]);
 
   const handleAvatarUpdate = (newAvatarUrl) => {
     setAvatarUrl(newAvatarUrl); // 更新頭像
@@ -57,7 +69,11 @@ const NavbarSwitcher = () => {
     <LoggedInNavbar
       avatarUrl={avatarUrl}
       username={username}
-      onAvatarUpdate={handleAvatarUpdate}
+      onAvatarUpdate={handleAvatarUpdate} // 傳遞更新頭像回調函數
+      cartItems={cartItems} // 傳遞購物車內容
+      totalItems={totalItems} // 傳遞購物車商品總數
+      isCartVisible={isCartVisible} // 傳遞購物車顯示狀態
+      updateCartItems={updateCartItems} // 傳遞購物車更新函數
     />
   ) : (
     <LoggedOutNavbar />

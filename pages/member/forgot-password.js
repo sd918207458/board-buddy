@@ -1,13 +1,10 @@
 import React, { useState } from "react";
-<<<<<<< HEAD
-
-import Navbar from "@/components/LoggedInNavbar";
-=======
->>>>>>> Login
 import Footer from "@/components/footer";
 import { CSSTransition } from "react-transition-group";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
-import { useRouter } from "next/router"; // 引入 useRouter
+import { useRouter } from "next/router";
+import { ToastContainer, toast } from "react-toastify"; // 引入 react-toastify
+import "react-toastify/dist/ReactToastify.css"; // 引入 react-toastify 樣式
 
 // 可重用的輸入欄位組件
 const InputField = ({ label, type, id, placeholder, value, onChange }) => (
@@ -27,14 +24,13 @@ const InputField = ({ label, type, id, placeholder, value, onChange }) => (
 );
 
 export default function ForgotPassword() {
-  const router = useRouter(); // 初始化 useRouter
+  const router = useRouter();
   const [showVerificationCode, setShowVerificationCode] = useState(false);
   const [showNewPasswordFields, setShowNewPasswordFields] = useState(false);
   const [email, setEmail] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -48,10 +44,9 @@ export default function ForgotPassword() {
 
   const handleGetVerificationCode = async () => {
     if (!validateEmail(email)) {
-      setErrorMessage("請輸入有效的電子信箱");
+      toast.error("請輸入有效的電子信箱");
       return;
     }
-    setErrorMessage("");
     setIsLoading(true);
 
     try {
@@ -69,37 +64,31 @@ export default function ForgotPassword() {
       const result = await response.json();
       if (result.status === "success") {
         setShowVerificationCode(true);
-        setErrorMessage(""); // 清空錯誤信息
+        toast.success("驗證碼已發送至您的信箱");
       } else {
-        setErrorMessage(result.message || "無法發送驗證碼，請重試。");
+        toast.error(result.message || "無法發送驗證碼，請重試。");
       }
     } catch (error) {
-      setErrorMessage("伺服器錯誤，請稍後再試。");
+      toast.error("伺服器錯誤，請稍後再試。");
     } finally {
       setIsLoading(false);
-<<<<<<< HEAD
-      setShowVerificationCode(true);
-    }, 1500);
-
-=======
     }
->>>>>>> Login
   };
 
   const handleSubmitVerificationCode = () => {
 
     if (!validateVerificationCode()) {
-      setErrorMessage("請輸入有效的6位數驗證碼");
+      toast.error("請輸入有效的6位數驗證碼");
       return;
     }
-    setErrorMessage("");
     setShowNewPasswordFields(true);
+    toast.success("驗證碼正確，請輸入新密碼");
   };
 
   const handleSubmitNewPassword = async () => {
     const passwordError = validatePasswords();
     if (passwordError) {
-      setErrorMessage(passwordError);
+      toast.error(passwordError);
       return;
     }
 
@@ -123,8 +112,7 @@ export default function ForgotPassword() {
 
       const result = await response.json();
       if (result.status === "success") {
-        alert("密碼重置成功！");
-
+        toast.success("密碼重置成功！");
         // 清除表單資料
         setEmail("");
         setVerificationCode("");
@@ -135,12 +123,10 @@ export default function ForgotPassword() {
         // 跳轉到登入頁面
         router.push("/member/login");
       } else {
-        console.error("重置密碼失敗:", result);
-        setErrorMessage(result.message || "重置密碼失敗，請重試！");
+        toast.error(result.message || "重置密碼失敗，請重試！");
       }
     } catch (error) {
-      console.error("伺服器錯誤:", error);
-      setErrorMessage(`${error.message || "伺服器錯誤"} - 請稍後再試。`);
+      toast.error("伺服器錯誤，請稍後再試。");
     } finally {
       setIsLoading(false);
     }
@@ -154,27 +140,12 @@ export default function ForgotPassword() {
         <div className="card max-w-sm lg:max-w-4xl bg-white shadow-xl">
           <div className="card-body w-full px-6 py-8">
             <div className="flex justify-center">
-              <img
-                className="w-auto h-8"
-                src="https://merakiui.com/images/logo.svg"
-                alt="Logo"
-              />
+              <img className="w-auto h-8" src="/logo.jfif" alt="Logo" />
             </div>
 
             <h2 className="text-center text-2xl font-bold text-[#003E52] mt-4">
               忘記密碼
             </h2>
-
-<<<<<<< HEAD
-
-            {/* 錯誤提示 */}
-=======
->>>>>>> Login
-            {errorMessage && (
-              <div className="text-red-500 text-center mt-4">
-                {errorMessage}
-              </div>
-            )}
 
             <InputField
               label="電子信箱"
@@ -306,6 +277,9 @@ export default function ForgotPassword() {
           </div>
         </div>
       </div>
+
+      {/* ToastContainer for toast notifications */}
+      <ToastContainer />
       <Footer />
     </>
   );

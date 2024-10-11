@@ -1,0 +1,33 @@
+[
+    {
+      "title": "個人資料",
+      "description": "編輯登入、姓名和行動電話等資料",
+      "href": "./profile-settings/personal-info"
+    },
+    {
+      "title": "我的訂單",
+      "description": "追蹤、退換貨、取消訂單和再次購買",
+      "href": "./my-orders/order-tracking"
+    },
+    {
+      "title": "我的付款",
+      "description": "查看所有交易、管理付款方式和設定",
+      "href": "./profile-settings/payment-methods"
+    },
+    {
+      "title": "我的地址",
+      "description": "編輯、移除或設定預設地址",
+      "href": "./profile-settings/shipping-address"
+    },
+    {
+      "title": "我的收藏",
+      "description": "檢視及管理已收藏的商品或店家",
+      "href": "./my-favorites/wishlist"
+    },
+    {
+      "title": "常見問題",
+      "description": "幫助用戶快速解決常見問題",
+      "href": "./profile-settings/FAQ"
+    }
+  ]
+  

@@ -2,24 +2,9 @@
 import React, { useState, useEffect } from "react";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import CouponSelector from "@/components/payment/Coupon"; // 引入 CouponSelector 組件
-
-// Toast 通知組件
-const Toast = ({ message, type, onClose }) => (
-  <div
-    className={`fixed top-4 right-4 z-50 flex items-center p-4 space-x-4 text-white rounded-lg shadow-lg ${
-      type === "success" ? "bg-green-500" : "bg-red-500"
-    }`}
-  >
-    <span>{message}</span>
-    <button
-      className="text-white font-bold focus:outline-none"
-      onClick={onClose}
-    >
-      &times;
-    </button>
-  </div>
-);
+import CouponSelector from "@/components/payment/Coupon";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Helper function to get token from localStorage
 const getToken = () => localStorage.getItem("token");
@@ -67,19 +52,11 @@ export default function PaymentMethods() {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [toast, setToast] = useState(null);
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetchPaymentMethods();
   }, []);
-
-  const showToast = (message, type) => {
-    setToast({ message, type });
-    setTimeout(() => {
-      setToast(null);
-    }, 3000);
-  };
 
   const fetchPaymentMethods = async () => {
     try {
@@ -90,7 +67,7 @@ export default function PaymentMethods() {
         setPaymentMethods(result.data);
       }
     } catch (error) {
-      showToast(error.message, "error");
+      toast.error(error.message);
     }
   };
 
@@ -101,24 +78,23 @@ export default function PaymentMethods() {
         "PUT"
       );
       if (result.status === "success") {
-        showToast("已設置為預設付款方式", "success");
+        toast.success("已設置為預設付款方式");
         fetchPaymentMethods();
       }
     } catch (error) {
-      showToast("設置預設付款方式失敗", "error");
+      toast.error("設置預設付款方式失敗");
     }
   };
 
   // 優惠券應用邏輯
   const applyCoupon = (coupon) => {
     setAppliedCoupon(coupon);
-    showToast(
+    toast.success(
       `優惠券已成功應用: ${
         coupon.discount_type === "percent"
           ? `${coupon.discount_value}% 折扣`
           : `NT$${coupon.discount_value} 折抵`
-      }`,
-      "success"
+      }`
     );
   };
 
@@ -172,7 +148,7 @@ export default function PaymentMethods() {
     let paymentData;
     if (currentMethod.type === "creditCard") {
       if (!/^\d{16}$/.test(currentMethod.cardNumber)) {
-        showToast("信用卡號碼格式錯誤，請輸入16位數字", "error");
+        toast.error("信用卡號碼格式錯誤，請輸入16位數字");
         setIsLoading(false);
         return;
       }
@@ -186,7 +162,7 @@ export default function PaymentMethods() {
       };
     } else if (currentMethod.type === "onlinePayment") {
       if (!currentMethod.onlinePaymentService) {
-        showToast("請選擇線上支付服務", "error");
+        toast.error("請選擇線上支付服務");
         setIsLoading(false);
         return;
       }
@@ -211,13 +187,13 @@ export default function PaymentMethods() {
     try {
       const result = await sendData(url, method, paymentData);
       if (result.status === "success") {
-        showToast("付款方式已成功保存", "success");
+        toast.success("付款方式已成功保存");
         fetchPaymentMethods();
         setIsModalOpen(false);
         resetForm();
       }
     } catch (error) {
-      showToast("伺服器錯誤，請稍後再試", "error");
+      toast.error("伺服器錯誤，請稍後再試");
     } finally {
       setIsLoading(false);
     }
@@ -249,13 +225,13 @@ export default function PaymentMethods() {
         "DELETE"
       );
       if (result.status === "success") {
-        showToast("付款方式已刪除", "success");
+        toast.success("付款方式已刪除");
         setPaymentMethods((prev) =>
           prev.filter((method) => method.payment_id !== id)
         );
       }
     } catch (error) {
-      showToast("伺服器錯誤，請稍後再試", "error");
+      toast.error("伺服器錯誤，請稍後再試");
     }
   };
 
@@ -300,42 +276,53 @@ export default function PaymentMethods() {
               {paymentMethods.map((method) => (
                 <div
                   key={method.payment_id}
-                  className="card bg-base-100 shadow-xl mb-4"
+                  className="card bg-base-100 shadow-xl mb-4 relative"
                 >
                   <div className="card-body">
                     <h2 className="card-title">付款方式</h2>
+                    {method.is_default && (
+                      <span className="badge badge-primary ">預設</span>
+                    )}
                     <p>付款方式: {method.payment_type}</p>
                     {method.card_number && <p>卡號: {method.card_number}</p>}
                     {method.expiration_date && (
                       <p>到期日: {method.expiration_date}</p>
                     )}
-                    <div className="flex justify-between">
-                      <button
-                        className="btn btn-primary"
-                        onClick={() => handleEdit(method)}
-                      >
-                        編輯
-                      </button>
-                      <button
-                        className="btn btn-error"
-                        onClick={() => handleDelete(method.payment_id)}
-                      >
-                        刪除
-                      </button>
-                      <button
-                        className="btn btn-secondary"
-                        onClick={() =>
-                          setDefaultPaymentMethod(method.payment_id)
-                        }
-                        disabled={method.is_default}
-                      >
-                        設為預設
-                      </button>
+
+                    <div className="flex justify-between mt-4">
+                      {/* 編輯與刪除按鈕 */}
+                      <div>
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => handleEdit(method)}
+                        >
+                          編輯
+                        </button>
+                        <button
+                          className="btn btn-error ml-2"
+                          onClick={() => handleDelete(method.payment_id)}
+                        >
+                          刪除
+                        </button>
+                      </div>
+
+                      {/* 設為預設按鈕，如果是預設的卡片，按鈕消失 */}
+                      {!method.is_default && (
+                        <button
+                          className="btn btn-primary ml-auto bg-blue-500"
+                          onClick={() =>
+                            setDefaultPaymentMethod(method.payment_id)
+                          }
+                        >
+                          設為預設
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
               ))}
 
+              {/* 新增付款方式按鈕 */}
               <div className="card bg-base-100 shadow-xl">
                 <div className="card-body flex justify-between">
                   <h2 className="card-title">新增錢包</h2>
@@ -482,13 +469,8 @@ export default function PaymentMethods() {
         </div>
       </div>
 
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
+      {/* ToastContainer for notifications */}
+      <ToastContainer />
       <Footer />
     </>
   );

@@ -5,9 +5,9 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import AddressCard from "@/components/address/AddressCard";
 import AddressForm from "@/components/address/AddressForm";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-<<<<<<< HEAD
-=======
 // Helper function to get token
 const getToken = () => localStorage.getItem("token");
 
@@ -20,7 +20,6 @@ const fetchWithAuth = async (url, options = {}) => {
   };
   return fetch(url, { ...options, headers, credentials: "include" });
 };
->>>>>>> Login
 
 export default function ShippingAddress() {
   const [addresses, setAddresses] = useState([]);
@@ -29,12 +28,6 @@ export default function ShippingAddress() {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [errorMessage, setErrorMessage] = useState("");
-
-<<<<<<< HEAD
-
-  const handleSubmit = (e) => {
-=======
   // Load user info and addresses on component mount
   useEffect(() => {
     fetchUserInfo();
@@ -57,7 +50,7 @@ export default function ShippingAddress() {
       }
     } catch (error) {
       console.error("無法加載用戶資料:", error);
-      setErrorMessage("無法加載用戶資料");
+      toast.error("無法加載用戶資料");
     }
   };
 
@@ -70,40 +63,18 @@ export default function ShippingAddress() {
       setAddresses(data.data || []); // 修正錯誤處理
     } catch (error) {
       console.error("Error fetching addresses:", error);
-      setErrorMessage("無法加載地址數據");
+      toast.error("無法加載地址數據");
     }
   };
 
   const handleSubmit = async (e) => {
->>>>>>> Login
     e.preventDefault();
     setIsLoading(true);
-    setErrorMessage("");
     const method = isEditing ? "PUT" : "POST";
     const url = isEditing
       ? `http://localhost:3005/api/shipment/addresses/${formData.address_id}`
       : "http://localhost:3005/api/shipment/addresses";
 
-<<<<<<< HEAD
-
-    if (!formData.username || !formData.phone || !formData.city) {
-      setErrorMessage("請填寫所有必填欄位");
-      setIsLoading(false);
-      return;
-    }
-
-
-    setTimeout(() => {
-      if (isEditing) {
-        setAddresses((prev) =>
-          prev.map((addr) => (addr.id === formData.id ? formData : addr))
-        );
-      } else {
-        setAddresses((prev) => [...prev, { ...formData, id: Date.now() }]);
-      }
-
-      setIsLoading(false);
-=======
     try {
       const response = await fetchWithAuth(url, {
         method,
@@ -119,35 +90,18 @@ export default function ShippingAddress() {
             )
           : [...prevAddresses, result.data]
       );
->>>>>>> Login
       resetForm();
 
       closeModal();
+      toast.success("地址已成功保存！");
     } catch (error) {
       console.error("Error submitting address:", error);
-      setErrorMessage("提交地址失敗");
+      toast.error("提交地址失敗");
     } finally {
       setIsLoading(false);
     }
   };
 
-<<<<<<< HEAD
-
-
-  const handleDelete = (id) => {
-    setAddresses((prev) => prev.filter((addr) => addr.id !== id));
-  };
-
-
-
-  const handleSetDefault = (id) => {
-    setAddresses((prev) =>
-      prev.map((addr) => ({
-        ...addr,
-        isDefault: addr.id === id,
-      }))
-    );
-=======
   const handleEdit = (address) => {
     setIsEditing(true);
     setFormData({
@@ -173,9 +127,10 @@ export default function ShippingAddress() {
       setAddresses((prevAddresses) =>
         prevAddresses.filter((addr) => addr.address_id !== addressId)
       );
+      toast.success("地址已成功刪除！");
     } catch (error) {
       console.error("Error deleting address:", error);
-      setErrorMessage("刪除地址失敗");
+      toast.error("刪除地址失敗");
     } finally {
       setIsLoading(false);
     }
@@ -197,53 +152,20 @@ export default function ShippingAddress() {
           isDefault: addr.address_id === addressId,
         }))
       );
+      toast.success("預設地址已設定！");
     } catch (error) {
       console.error("Error setting default address:", error);
-      setErrorMessage("設定預設地址失敗");
+      toast.error("設定預設地址失敗");
     }
->>>>>>> Login
   };
 
 
   const resetForm = () => {
-<<<<<<< HEAD
-
-    setFormData({
-      username: "",
-      phone: "",
-      city: "",
-      area: "",
-      street: "",
-      detailedAddress: "",
-      isDefault: false,
-      id: null,
-    });
-=======
     setFormData(initialFormData(userData));
->>>>>>> Login
     setIsEditing(false);
 
   };
 
-<<<<<<< HEAD
-  const openModal = () => {
-    document.getElementById("my_modal_1").showModal();
-  };
-
-  const closeModal = () => {
-    document.getElementById("my_modal_1").close();
-
-  };
-
-  return (
-    <>
-      <Navbar />
-
-      <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
-        <div className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-          <div className="px-6 py-4">
-            <Breadcrumbs />
-=======
   const openModal = () => document.getElementById("my_modal_1").showModal();
   const closeModal = () => document.getElementById("my_modal_1").close();
 
@@ -255,7 +177,6 @@ export default function ShippingAddress() {
           <h2 className="text-lg font-semibold text-gray-700 capitalize dark:text-white mb-4">
             我的地址
           </h2>
->>>>>>> Login
 
           <section className="max-w-4xl mx-auto grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
             {addresses.length > 0 ? (
@@ -274,14 +195,6 @@ export default function ShippingAddress() {
                         handleSetDefault(address.address_id)
                       }
                     />
-<<<<<<< HEAD
-                  </div>
-                </dialog>
-              </CSSTransition>
-            }
-          </TransitionGroup>
-
-=======
                   </CSSTransition>
                 ))}
               </TransitionGroup>
@@ -299,7 +212,6 @@ export default function ShippingAddress() {
               </div>
             </div>
           </section>
->>>>>>> Login
         </div>
 
         <dialog id="my_modal_1" className="modal">
@@ -312,13 +224,14 @@ export default function ShippingAddress() {
               handleSubmit={handleSubmit}
               isEditing={isEditing}
               isLoading={isLoading}
-              errorMessage={errorMessage}
-              closeModal={closeModal}
             />
           </div>
         </dialog>
       </div>
       <Footer />
+
+      {/* ToastContainer for notifications */}
+      <ToastContainer />
     </div>
   );
 }

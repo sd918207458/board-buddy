@@ -7,12 +7,16 @@ import "@/styles/payment.css";
 import "@/styles/address.css";
 import NavbarSwitcher from "@/components/NavbarSwitcher"; // 引入 NavbarSwitcher 組件
 import { AuthProvider } from "@/hooks/use-auth";
+import { CartProvider } from "@/hooks/useCart"; // 使用 CartProvider 來包裹應用
 
 export default function App({ Component, pageProps }) {
   return (
     <AuthProvider>
-      <NavbarSwitcher />
-      <Component {...pageProps} />
+      <CartProvider>
+        <NavbarSwitcher />
+
+        <Component {...pageProps} />
+      </CartProvider>
     </AuthProvider>
   );
 }

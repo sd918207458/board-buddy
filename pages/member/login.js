@@ -4,66 +4,60 @@ import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/use-auth";
 import Footer from "@/components/footer";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
-import { CSSTransition } from "react-transition-group";
-
-
-// Toast 通知組件
-const Toast = ({ message, type, onClose }) => {
-  return (
-    <div
-      className={`fixed top-4 right-4 z-50 flex items-center p-4 space-x-4 text-white rounded-lg shadow-lg ${
-        type === "success" ? "bg-green-500" : "bg-red-500"
-      }`}
-    >
-      <span>{message}</span>
-      <button
-        className="text-white font-bold focus:outline-none"
-        onClick={onClose}
-      >
-        &times;
-      </button>
-    </div>
-  );
-};
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import useFirebase from "@/hooks/use-firebase"; // 引入自定義的 useFirebase hook
 
 export default function Login() {
   const [email, setEmail] = useState(""); // 使用 email 而不是 username
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [toast, setToast] = useState(null); // 新增 Toast 狀態管理
   const router = useRouter();
   const { setAuth } = useAuth();
+  const { loginGoogle } = useFirebase(); // 使用 Firebase Google 登入方法
 
-  const parseJwt = (token) => {
+  // 將 Firebase 登入結果傳遞到後端
+
+  // Google 登入處理
+  const handleGoogleLogin = async () => {
     try {
-      const base64Url = token.split(".")[1];
-      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split("")
-          .map(function (c) {
-            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-          })
-          .join("")
-      );
-      return JSON.parse(jsonPayload);
+      loginGoogle(async (user) => {
+        const { uid, displayName, email, photoURL } = user;
+
+        const response = await fetch("http://localhost:3005/api/google-login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            providerId: "google.com",
+            uid,
+            displayName,
+            email,
+            photoURL,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          console.log("Google 登入成功:", data);
+          localStorage.setItem("token", data.data.accessToken);
+          router.push("/");
+        } else {
+          toast.error(data.message || "Google 登入失敗");
+        }
+      });
     } catch (error) {
-      console.error("JWT解析錯誤:", error);
-      return null;
+      console.error("Google 登入錯誤:", error);
+      toast.error("Google 登入失敗，請稍後再試");
     }
   };
 
-  const handleGoogleLogin = () => {
-    // 觸發 Google 登入流程，將用戶重定向到後端 Google 認證路由
-    window.open("http://localhost:3005/api/google-login", "_self");
-  };
-
+  // 本地登入邏輯保持不變
   const handleLogin = async (e) => {
     e.preventDefault();
-    setErrorMessage("");
     setIsLoading(true);
 
     try {
@@ -93,25 +87,17 @@ export default function Login() {
 
           router.push("/");
         } else {
-          showToast("無效的存取令牌", "error");
+          toast.error("無效的存取令牌");
         }
       } else {
-        showToast(data.message || "登入失敗", "error");
+        toast.error(data.message || "登入失敗");
       }
     } catch (error) {
       console.error("錯誤:", error);
-      showToast("登入失敗，請稍後再試", "error");
+      toast.error("登入失敗，請稍後再試");
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // 顯示 Toast 通知
-  const showToast = (message, type) => {
-    setToast({ message, type });
-    setTimeout(() => {
-      setToast(null); // 5秒後自動關閉
-    }, 5000);
   };
 
   return (
@@ -122,17 +108,12 @@ export default function Login() {
           <div
             className="hidden bg-cover lg:block lg:w-1/2"
             style={{
-              backgroundImage:
-                'url("https://images.unsplash.com/photo-1606660265514-358ebbadc80d?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1575&q=80")',
+              backgroundImage: 'url("/home_assets/首頁大圖.png")',
             }}
           />
           <div className="w-full px-6 py-8 md:px-8 lg:w-1/2">
             <div className="flex justify-center mx-auto">
-              <img
-                className="w-auto h-7 sm:h-8"
-                src="https://merakiui.com/images/logo.svg"
-                alt="Logo"
-              />
+              <img className="w-auto h-7 sm:h-8" src="/logo.jfif" alt="Logo" />
             </div>
 
             <p className="mt-3 text-xl text-center text-gray-600 dark:text-gray-200">
@@ -252,15 +233,8 @@ export default function Login() {
         </div>
       </div>
 
-      {/* Toast 彈出通知 */}
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
-
+      {/* ToastContainer for react-toastify notifications */}
+      <ToastContainer />
       <Footer />
     </>
   );

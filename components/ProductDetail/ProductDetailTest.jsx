@@ -5,8 +5,12 @@ import { CiHeart } from "react-icons/ci"; // 空心愛心
 import { FaHeart } from "react-icons/fa"; // 實心愛心
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useRouter } from "next/router"; // 用來捕獲動態路由參數
 
 const ProductDetailTest = () => {
+  const router = useRouter();
+  const { id } = router.query; // 使用 useRouter 獲取 URL 中的 id
+
   const [product, setProduct] = useState(null); // 存儲 API 返回的產品數據
   const [liked, setLiked] = useState(false); // 收藏狀態
   const [quantity, setQuantity] = useState(1); // 數量狀態
@@ -18,8 +22,8 @@ const ProductDetailTest = () => {
     const fetchProduct = async () => {
       try {
         const response = await fetch(
-          "http://localhost:3005/api/productsGame/1"
-        ); // 替換為實際 API 地址和產品 ID
+          `http://localhost:3005/api/productsGame/${id}` // 動態 API 地址，根據 id 替換
+        );
         const result = await response.json();
         if (result.status === "success") {
           setProduct(result.data); // 設置產品數據到正確的資料結構
@@ -34,7 +38,7 @@ const ProductDetailTest = () => {
     };
 
     fetchProduct();
-  }, []);
+  }, [id]);
 
   // 切換收藏狀態
   const toggleLike = () => {

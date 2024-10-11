@@ -3,17 +3,52 @@ import { GiHouse, GiThreeFriends, GiShoppingBag, GiTalk } from "react-icons/gi";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import UploadAvatar from "./personal-info/upload_avatar";
+import Image from "next/image"; // 確保引入了 Image 組件
+import { useCart } from "@/hooks/useCart";
 
 export default function Navbar({ avatarUrl, username, onAvatarUpdate }) {
+  const {
+    cartItems,
+    totalItems,
+    isCartVisible,
+    setIsCartVisible,
+    updateCartItems,
+  } = useCart();
+  const [cartVisible, setCartVisible] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState({
     avatar: avatarUrl,
     username: username,
   });
 
+  // 購物車START
+  const router = useRouter();
+  const toggleCart = () => {
+    console.log("購物車按鈕被點擊"); // 測試是否觸發了此函數
+    console.log(cartItems); // 檢查 cartItems 是否正確傳遞
+    setCartVisible((prevState) => !prevState);
+  };
+
+  const totalPrice = cartItems.reduce((total, item) => {
+    const itemPrice =
+      typeof item.price === "string"
+        ? parseFloat(item.price.replace(/,/g, ""))
+        : parseFloat(item.price); // 如果是數字，直接轉換為數字
+
+    if (isNaN(itemPrice)) {
+      return total; // 如果價格不是數字，跳過該項
+    }
+
+    return total + itemPrice * item.quantity;
+  }, 0);
+
+  // 不再從 localStorage 獲取 cartItems，直接使用父層傳遞的值
+
+  // 購物車END
+
   useEffect(() => {
     const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
+    setIsLoggedIn(!!token); // 如果有 token，設置為登入狀態
   }, []);
 
   // 當 `avatarUrl` 或 `username` 變化時，更新頭像和使用者名稱
@@ -21,7 +56,7 @@ export default function Navbar({ avatarUrl, username, onAvatarUpdate }) {
     setUserData((prevData) => ({ ...prevData, avatar: avatarUrl, username }));
   }, [avatarUrl, username]);
 
-  // 登出邏輯，清除token，並保留在原本的頁面
+  // 登出邏輯，清除 token，並保留在原本的頁面
   const handleLogout = async () => {
     try {
       await fetch("http://localhost:3005/api/auth/logout", {
@@ -39,10 +74,11 @@ export default function Navbar({ avatarUrl, username, onAvatarUpdate }) {
     }
   };
 
-  // 當上傳頭像時，更新 Navbar 中的頭像
+  // 當上傳頭像時，更新 Navbar 中的頭像，並添加時間戳以避免快取問題
   const handleUploadAvatar = (newAvatarUrl) => {
-    setUserData((prevData) => ({ ...prevData, avatar: newAvatarUrl }));
-    onAvatarUpdate(newAvatarUrl); // 傳遞新頭像 URL 給父組件 (NavbarSwitcher)
+    const updatedAvatarUrl = `${newAvatarUrl}?t=${new Date().getTime()}`;
+    setUserData((prevData) => ({ ...prevData, avatar: updatedAvatarUrl }));
+    onAvatarUpdate(updatedAvatarUrl); // 傳遞新頭像 URL 給父組件 (NavbarSwitcher)
   };
 
   return (
@@ -60,13 +96,13 @@ export default function Navbar({ avatarUrl, username, onAvatarUpdate }) {
               <span>首頁</span>
             </a>
           </Link>
-          <Link href="/group" legacyBehavior>
+          <Link href="/game-index" legacyBehavior>
             <a className="btn btn-ghost text-white flex flex-col items-center">
               <GiThreeFriends className="w-6 h-6" />
               <span>揪團</span>
             </a>
           </Link>
-          <Link href="/shop" legacyBehavior>
+          <Link href="/product/product-list" legacyBehavior>
             <a className="btn btn-ghost text-white flex flex-col items-center">
               <GiShoppingBag className="w-6 h-6" />
               <span>商城</span>
@@ -90,8 +126,9 @@ export default function Navbar({ avatarUrl, username, onAvatarUpdate }) {
               className=" w-12 rounded-full avatar flex flex-col items-center"
             >
               {/* 顯示使用者 avatar 和 username */}
-              <div className="ring-primary ring-offset-base-100 w-12 rounded-full ring ring-offset-2 ">
+              <div className="ring-primary ring-offset-base-100 w-12 rounded-full ring ring-offset-2">
                 <img
+                  key={userData.avatar} // 添加 key 屬性以強制重新渲染圖片
                   src={
                     userData.avatar
                       ? `http://localhost:3005/avatar/${userData.avatar}`
@@ -110,13 +147,6 @@ export default function Navbar({ avatarUrl, username, onAvatarUpdate }) {
               tabIndex={0}
               className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
             >
-              {/* <li>
-                <Link href="/profile-settings" legacyBehavior>
-                  <a className="btn btn-ghost text-black flex items-center">
-                    會員中心
-                  </a>
-                </Link>
-              </li> */}
               <li>
                 <Link href="/profile-settings/personal-info" legacyBehavior>
                   <a className="btn btn-ghost text-black flex items-center">
@@ -152,7 +182,6 @@ export default function Navbar({ avatarUrl, username, onAvatarUpdate }) {
                   </a>
                 </Link>
               </li>
-
               <li>
                 <a
                   className="btn btn-ghost text-black flex items-center"
@@ -170,9 +199,15 @@ export default function Navbar({ avatarUrl, username, onAvatarUpdate }) {
             </Link>
           </div>
         )}
-
+        {/* /////////////購物車//////////// */}
+        {/* 購物車 icon*/}
         <div className="dropdown dropdown-end">
-          <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
+          <div
+            tabIndex={0}
+            role="button"
+            className="btn btn-ghost btn-circle"
+            onClick={toggleCart} // 加上事件處理器
+          >
             <div className="indicator">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -188,23 +223,72 @@ export default function Navbar({ avatarUrl, username, onAvatarUpdate }) {
                   d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                 />
               </svg>
-              <span className="badge badge-sm indicator-item">8</span>
+              <span className="badge badge-sm indicator-item">
+                {totalItems}
+              </span>
             </div>
           </div>
-          <div
-            tabIndex={0}
-            className="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-52 shadow"
-          >
-            <div className="card-body">
-              <span className="text-lg font-bold">8 Items</span>
-              <span className="text-info">Subtotal: $999</span>
-              <div className="card-actions">
-                <button className="btn btn-primary bg-[#003E52] btn-block">
-                  查看購物車
-                </button>
+
+          {/* 購物車內容顯示 */}
+          {cartVisible && (
+            <div
+              tabIndex={0}
+              className="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-52 shadow"
+            >
+              <div className="card-body">
+                {/* 顯示每個購物車商品 */}
+                {cartItems && cartItems.length > 0 ? (
+                  cartItems.map((product) => (
+                    <div
+                      key={product.product_id}
+                      className="flex items-center space-x-4"
+                    >
+                      {/* 圖片 */}
+                      <Image
+                        src={product.image}
+                        width={50}
+                        height={50}
+                        alt={product.product_name}
+                        className="rounded-lg"
+                      />
+                      {/* 商品名稱和數量 */}
+                      <div>
+                        <span className="block text-lg text-black font-bold">
+                          {product.product_name}
+                        </span>
+                        <span className="block text-lg text-black">
+                          數量: {product.quantity}
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-black">購物車是空的</p>
+                )}
+
+                {/* 小計 */}
+                {cartItems && cartItems.length > 0 && (
+                  <span className="block mt-4 text-black">
+                    小計: ${totalPrice}
+                  </span>
+                )}
+
+                {/* 查看購物車按鈕 */}
+                <div className="card-actions mt-4">
+                  <button
+                    className="btn btn-primary bg-[#003E52] btn-block hover:bg-black"
+                    onClick={() => {
+                      router.push({
+                        pathname: "/checkout",
+                      });
+                    }}
+                  >
+                    查看購物車
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

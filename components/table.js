@@ -1,62 +1,5 @@
 import React, { useState } from "react";
 import Link from "next/link";
-<<<<<<< HEAD
-
-import { CSSTransition, TransitionGroup } from "react-transition-group";
-
-
-// 定義表格行組件
-const TableRow = ({ user }) => {
-  return (
-
-    <CSSTransition key={user.id} timeout={300} classNames="fade">
-      <tr className="hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 ease-in-out">
-        <th>
-          <label>
-            <input type="checkbox" className="checkbox" />
-          </label>
-        </th>
-        <td>
-          <div className="flex items-center gap-3">
-            <div className="avatar">
-              <div className="mask mask-squircle h-12 w-12">
-                <img src={user.avatar} alt={`Avatar of ${user.name}`} />
-              </div>
-            </div>
-            <div>
-              <div className="font-bold text-gray-800 dark:text-gray-200">
-                {user.name}
-              </div>
-              <div className="text-sm text-gray-500 dark:text-gray-300">
-                {user.location}
-              </div>
-            </div>
-          </div>
-        </td>
-        <td>
-          <span className="text-gray-700 dark:text-gray-300">
-            {user.company}
-          </span>
-          <br />
-          <span className="badge badge-ghost badge-sm">{user.jobTitle}</span>
-        </td>
-        <td>{user.favoriteColor}</td>
-        <th>
-          <Link href="/my-orders/order-details" legacyBehavior>
-            <a className="btn btn-neutral bg-[#003E52] btn-xs transition-transform hover:scale-105">
-              訂單詳情
-            </a>
-          </Link>
-          <Link href="/my-orders/request" legacyBehavior>
-            <a className="btn btn-neutral bg-[#003E52] btn-xs transition-transform hover:scale-105">
-              退貨處理
-            </a>
-          </Link>
-        </th>
-      </tr>
-    </CSSTransition>
-
-=======
 
 const OrderRow = ({ order }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -114,7 +57,6 @@ const OrderRow = ({ order }) => {
         )}
       </th>
     </tr>
->>>>>>> Login
   );
 };
 
@@ -133,22 +75,12 @@ const OrderTable = ({ orders }) => {
             <th className="text-center"></th>
           </tr>
         </thead>
-<<<<<<< HEAD
-
-        <TransitionGroup component="tbody">
-=======
         <tbody>
->>>>>>> Login
           {/* 動態生成表格行 */}
           {orders.map((order) => (
             <OrderRow key={order.id} order={order} />
           ))}
-<<<<<<< HEAD
-        </TransitionGroup>
-
-=======
         </tbody>
->>>>>>> Login
       </table>
     </div>
   );
