@@ -1,6 +1,8 @@
 import React from "react";
 import { useCart } from "@/hooks/useCart"; // 引入共享的購物車邏輯
 import styles from "./Checkout.module.css"; // 引入結帳區的 CSS 模組
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 const Checkout = () => {
   // 使用 useCart hook 來管理購物車狀態和邏輯
@@ -11,6 +13,7 @@ const Checkout = () => {
     handleRemoveItem, // 移除商品的函數
     isMounted, // 判斷組件是否加載完成
   } = useCart();
+  const MySwal = withReactContent(Swal);
 
   return (
     <>
@@ -64,14 +67,30 @@ const Checkout = () => {
                       item.quantity}
                   </td>
 
-                  <td>
-                    <button
-                      className={styles.removeItem}
-                      onClick={() => handleRemoveItem(index)}
-                    >
-                      ×
-                    </button>
-                  </td>
+                  
+<td>
+  <button
+    className={styles.removeItem}
+    onClick={() => {
+      MySwal.fire({
+        title: '確定要刪除該商品?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: '確認',
+        cancelButtonText: '取消'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          handleRemoveItem(index); // 如果確認，則執行刪除操作
+          MySwal.fire('已刪除!', '商品已從購物車中移除。', 'success');
+        }
+      });
+    }}
+  >
+    ×
+  </button>
+</td>
                 </tr>
               ))
             ) : (

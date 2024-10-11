@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link"; // 引入 Next.js 的 Link 組件
 import { useCart } from "@/hooks/useCart"; // 引入購物車上下文
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Card = ({ product, searchQuery }) => {
   const { totalPrice } = useCart(); // 總價
@@ -78,15 +80,27 @@ const Card = ({ product, searchQuery }) => {
           ${product.price}
         </p>
         <div className="flex space-x-2">
+
           <button
             onClick={(e) => {
               e.preventDefault(); // 防止跳轉到商品詳細頁面
-              handleAddToCart();
+              console.log("Before add to cart");
+              handleAddToCart(); // 調用加入購物車的邏輯
+              toast.success("商品已加入購物車！", {
+                position: "top-right",
+                autoClose: 2000, // 2秒後自動關閉
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              });
             }}
             className="py-1.5 px-4 text-white border border-white rounded-lg hover:bg-white hover:text-[#003E52] transition-all"
           >
             加入購物車
           </button>
+
           <button
             onClick={(e) => {
               e.preventDefault(); // 防止跳轉到商品詳細頁面
