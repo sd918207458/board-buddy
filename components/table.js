@@ -52,7 +52,15 @@ const OrderRow = ({ order }) => {
         </Link>
         {isCancellable && (
           <Link href={`/my-orders/${order.orderId}/request`} legacyBehavior>
-            <a className="btn btn-secondary btn-xs transition-transform hover:scale-105">
+            <a
+              className="btn btn-secondary btn-xs transition-transform hover:scale-105"
+              onClick={() =>
+                localStorage.setItem(
+                  "selectedOrderForReturn",
+                  JSON.stringify(order)
+                )
+              }
+            >
               退貨處理
             </a>
           </Link>
@@ -72,7 +80,6 @@ const OrderTable = ({ orders }) => {
   return (
     <div className="overflow-x-auto shadow-md rounded-lg">
       <table className="table w-full border-separate border-spacing-y-2">
-        {/* 表頭 */}
         <thead className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
           <tr>
             <th className="text-left py-4">訂單編號</th>
@@ -83,7 +90,6 @@ const OrderTable = ({ orders }) => {
           </tr>
         </thead>
         <tbody>
-          {/* 動態生成表格行 */}
           {orders.map((order) => (
             <OrderRow key={order.orderId} order={order} />
           ))}

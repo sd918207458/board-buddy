@@ -12,6 +12,7 @@ const InputField = ({
   value,
   onChange,
   required,
+  readOnly = false,
 }) => (
   <div className="form-control">
     <label htmlFor={name} className="label text-gray-700 dark:text-gray-300">
@@ -26,6 +27,7 @@ const InputField = ({
       className="input input-bordered border-[#036672] focus:border-[#024c52]"
       placeholder={`請輸入${label}`}
       required={required}
+      readOnly={readOnly}
     />
   </div>
 );
@@ -44,63 +46,42 @@ export default function Request() {
     productQuantity: "",
     returnReason: "",
   });
-  const [orders, setOrders] = useState([]);
-  const [loadingOrders, setLoadingOrders] = useState(true);
-
-  // 獲取存取令牌
-  const getToken = () => localStorage.getItem("token");
-
-  const fetchWithToken = async (url, options = {}) => {
-    const token = getToken();
-    const headers = {
-      ...options.headers,
-      Authorization: `Bearer ${token}`,
-    };
-    return fetch(url, { ...options, headers, credentials: "include" });
-  };
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   useEffect(() => {
     setIsMounted(true);
 
-    const fetchOrders = async () => {
-      try {
-        setLoadingOrders(true);
-        const response = await fetchWithToken(
-          "http://localhost:3005/api/orders",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const result = await response.json();
-        if (response.ok) {
-          setOrders(result.data);
-        } else {
-          toast.error("無法載入訂單資料");
-        }
-      } catch (error) {
-        console.error("獲取訂單失敗:", error);
-        toast.error("無法載入訂單資料");
-      } finally {
-        setLoadingOrders(false);
-      }
-    };
+    // 從 LocalStorage 中讀取選中的訂單資料
+    const storedOrder = JSON.parse(
+      localStorage.getItem("selectedOrderForReturn")
+    );
 
-    fetchOrders();
+    if (storedOrder) {
+      setSelectedOrder(storedOrder);
+      setFormData({
+        ...formData,
+        orderNumber: storedOrder.orderId,
+        orderDate: new Date(storedOrder.date).toISOString().split("T")[0],
+        productName: storedOrder.items[0]?.product_name || "",
+        productModel: storedOrder.items[0]?.product_type || "",
+        productQuantity: storedOrder.items[0]?.quantity || 1,
+      });
+    }
   }, []);
 
-  const handleOrderChange = (e) => {
-    const selectedOrder = orders.find(
-      (order) => order.order_id === Number(e.target.value)
+  const handleProductChange = (e) => {
+    const selectedProduct = selectedOrder.items.find(
+      (item) => item.product_id === Number(e.target.value)
     );
-    setFormData({
-      ...formData,
-      orderNumber: selectedOrder.order_id,
-      orderDate: selectedOrder.order_date,
-      productName: selectedOrder.product_name,
-    });
+
+    if (selectedProduct) {
+      setFormData({
+        ...formData,
+        productName: selectedProduct.product_name,
+        productModel: selectedProduct.product_type,
+        productQuantity: selectedProduct.quantity,
+      });
+    }
   };
 
   const validateForm = () => {
@@ -145,43 +126,20 @@ export default function Request() {
     }
 
     try {
-      const response = await fetchWithToken(
-        "http://localhost:3005/api/request/create",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            order_id: formData.orderNumber,
-            member_id: 1,
-            order_date: formData.orderDate,
-            product_name: formData.productName,
-            product_model: formData.productModel,
-            product_quantity: formData.productQuantity,
-            reason: formData.returnReason,
-          }),
-        }
-      );
-
-      const result = await response.json();
-
-      if (response.ok) {
-        toast.success(result.message);
-        setFormData({
-          name: "",
-          email: "",
-          phone: "",
-          orderNumber: "",
-          orderDate: "",
-          productName: "",
-          productModel: "",
-          productQuantity: "",
-          returnReason: "",
-        });
-      } else {
-        toast.error(result.message);
-      }
+      // 模擬提交資料
+      toast.success("提交成功！");
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        orderNumber: "",
+        orderDate: "",
+        productName: "",
+        productModel: "",
+        productQuantity: "",
+        returnReason: "",
+      });
+      setSelectedOrder(null);
     } catch (error) {
       toast.error("提交失敗，請稍後重試。");
     } finally {
@@ -189,7 +147,7 @@ export default function Request() {
     }
   };
 
-  if (!isMounted || loadingOrders) return <div>載入訂單資料中...</div>;
+  if (!isMounted) return <div>載入訂單資料中...</div>;
 
   return (
     <>
@@ -243,32 +201,33 @@ export default function Request() {
                 }
                 required
               />
+            </div>
 
-              {/* 使用者選擇訂單 */}
-              <div className="form-control">
+            {selectedOrder && selectedOrder.items.length > 1 && (
+              <div className="form-control mt-4">
                 <label
-                  htmlFor="orderNumber"
+                  htmlFor="product"
                   className="label text-gray-700 dark:text-gray-300"
                 >
-                  <span className="label-text">訂單編號</span>
+                  <span className="label-text">選擇商品</span>
                 </label>
                 <select
-                  id="orderNumber"
-                  name="orderNumber"
-                  value={formData.orderNumber}
-                  onChange={handleOrderChange}
+                  id="product"
+                  name="product"
                   className="select select-bordered border-[#036672] focus:border-[#024c52]"
+                  onChange={handleProductChange}
                   required
                 >
-                  <option value="">請選擇訂單</option>
-                  {orders.map((order) => (
-                    <option key={order.order_id} value={order.order_id}>
-                      {`訂單編號: ${order.order_id} 日期: ${order.order_date}`}
+                  {selectedOrder.items.map((item) => (
+                    <option key={item.product_id} value={item.product_id}>
+                      {`${item.product_name} - ${
+                        item.product_model || "無型號"
+                      }`}
                     </option>
                   ))}
                 </select>
               </div>
-            </div>
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <InputField
@@ -276,18 +235,14 @@ export default function Request() {
                 name="orderDate"
                 type="date"
                 value={formData.orderDate}
-                onChange={(e) =>
-                  setFormData({ ...formData, [e.target.name]: e.target.value })
-                }
+                readOnly
                 required
               />
               <InputField
                 label="商品名稱"
                 name="productName"
                 value={formData.productName}
-                onChange={(e) =>
-                  setFormData({ ...formData, [e.target.name]: e.target.value })
-                }
+                readOnly
                 required
               />
             </div>
@@ -297,9 +252,7 @@ export default function Request() {
                 label="商品型號"
                 name="productModel"
                 value={formData.productModel}
-                onChange={(e) =>
-                  setFormData({ ...formData, [e.target.name]: e.target.value })
-                }
+                readOnly
                 required
               />
               <InputField
@@ -307,9 +260,7 @@ export default function Request() {
                 name="productQuantity"
                 type="number"
                 value={formData.productQuantity}
-                onChange={(e) =>
-                  setFormData({ ...formData, [e.target.name]: e.target.value })
-                }
+                readOnly
                 required
               />
             </div>

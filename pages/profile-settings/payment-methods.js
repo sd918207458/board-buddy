@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -34,6 +33,23 @@ const sendData = (url, method, data) =>
     body: JSON.stringify(data),
   });
 
+// Helper function to determine card type based on card number
+const determineCardType = (cardNumber) => {
+  if (/^4\d{12}(\d{3})?$/.test(cardNumber)) {
+    return "Visa";
+  } else if (
+    /^5[1-5]\d{14}$/.test(cardNumber) ||
+    /^2(2[2-9][1-9]|[3-6]\d|7[01])\d{12}$/.test(cardNumber)
+  ) {
+    return "MasterCard";
+  } else if (/^3[47]\d{13}$/.test(cardNumber)) {
+    return "Amex";
+  } else if (/^6(?:011|5\d{2}|4[4-9]\d)\d{12}$/.test(cardNumber)) {
+    return "Discover";
+  }
+  return "Unknown";
+};
+
 // Initial state for payment methods
 const initialMethodState = {
   id: null,
@@ -41,13 +57,11 @@ const initialMethodState = {
   cardNumber: "",
   expiryDate: "",
   cardType: "",
-  onlinePaymentService: "",
 };
-
 
 export default function PaymentMethods() {
   const [paymentMethods, setPaymentMethods] = useState([]);
-  const [appliedCoupon, setAppliedCoupon] = useState(null); // 用來追蹤應用的優惠券
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [currentMethod, setCurrentMethod] = useState(initialMethodState);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -86,7 +100,6 @@ export default function PaymentMethods() {
     }
   };
 
-  // 優惠券應用邏輯
   const applyCoupon = (coupon) => {
     setAppliedCoupon(coupon);
     toast.success(
@@ -116,6 +129,7 @@ export default function PaymentMethods() {
     setCurrentMethod((prev) => ({
       ...prev,
       [name]: value,
+      ...(name === "cardNumber" && { cardType: determineCardType(value) }),
     }));
     validateField(name, value);
   };
@@ -129,12 +143,6 @@ export default function PaymentMethods() {
       if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(currentMethod.expiryDate)) {
         newErrors.expiryDate = "到期日格式錯誤，請按照MM/YY格式";
       }
-    }
-    if (
-      currentMethod.type === "onlinePayment" &&
-      !currentMethod.onlinePaymentService
-    ) {
-      newErrors.onlinePaymentService = "請選擇線上支付服務";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -158,18 +166,6 @@ export default function PaymentMethods() {
         card_number: currentMethod.cardNumber,
         card_type: currentMethod.cardType,
         expiration_date: currentMethod.expiryDate,
-        is_default: currentMethod.isDefault || false,
-      };
-    } else if (currentMethod.type === "onlinePayment") {
-      if (!currentMethod.onlinePaymentService) {
-        toast.error("請選擇線上支付服務");
-        setIsLoading(false);
-        return;
-      }
-
-      paymentData = {
-        type: currentMethod.type,
-        online_payment_service: currentMethod.onlinePaymentService,
         is_default: currentMethod.isDefault || false,
       };
     } else if (currentMethod.type === "cash") {
@@ -207,14 +203,13 @@ export default function PaymentMethods() {
       cardNumber: method.card_number || "",
       cardType: method.card_type || "",
       expiryDate: method.expiration_date || "",
-      onlinePaymentService: method.online_payment_service || "",
     });
     setIsModalOpen(true);
   };
 
   const handleAddNew = () => {
     setIsEditing(false);
-    setCurrentMethod(initialMethodState); // 重置為空表單
+    setCurrentMethod(initialMethodState);
     setIsModalOpen(true);
   };
 
@@ -240,18 +235,17 @@ export default function PaymentMethods() {
     setIsEditing(false);
   };
 
-  // 模擬的可用優惠券
   const availableCoupons = [
     {
       coupon_id: 1,
       discount_type: "percent",
-      discount_value: 10, // 10% 折扣
+      discount_value: 10,
       expiry_date: "2024-12-31",
     },
     {
       coupon_id: 2,
       discount_type: "amount",
-      discount_value: 100, // NT$100 折抵
+      discount_value: 100,
       expiry_date: "2024-11-30",
     },
   ];
@@ -268,7 +262,6 @@ export default function PaymentMethods() {
               </h2>
             </section>
 
-
             <h3 className="text-l font-semibold text-gray-700 capitalize dark:text-white mb-6">
               常用錢包
             </h3>
@@ -281,16 +274,14 @@ export default function PaymentMethods() {
                   <div className="card-body">
                     <h2 className="card-title">付款方式</h2>
                     {method.is_default && (
-                      <span className="badge badge-primary ">預設</span>
+                      <span className="badge badge-primary">預設</span>
                     )}
                     <p>付款方式: {method.payment_type}</p>
                     {method.card_number && <p>卡號: {method.card_number}</p>}
                     {method.expiration_date && (
                       <p>到期日: {method.expiration_date}</p>
                     )}
-
                     <div className="flex justify-between mt-4">
-                      {/* 編輯與刪除按鈕 */}
                       <div>
                         <button
                           className="btn btn-primary"
@@ -305,8 +296,6 @@ export default function PaymentMethods() {
                           刪除
                         </button>
                       </div>
-
-                      {/* 設為預設按鈕，如果是預設的卡片，按鈕消失 */}
                       {!method.is_default && (
                         <button
                           className="btn btn-primary ml-auto bg-blue-500"
@@ -322,7 +311,6 @@ export default function PaymentMethods() {
                 </div>
               ))}
 
-              {/* 新增付款方式按鈕 */}
               <div className="card bg-base-100 shadow-xl">
                 <div className="card-body flex justify-between">
                   <h2 className="card-title">新增錢包</h2>
@@ -333,7 +321,6 @@ export default function PaymentMethods() {
               </div>
             </section>
 
-            {/* 優惠券區塊 */}
             <section className="max-w-4xl mx-auto mt-6">
               <h2 className="text-lg font-semibold text-gray-700 capitalize dark:text-white mb-4">
                 我的優惠券
@@ -351,10 +338,9 @@ export default function PaymentMethods() {
                 <h3 className="font-bold text-lg">
                   {isEditing ? "編輯錢包" : "新增錢包"}
                 </h3>
-
                 <div className="form-control mt-4">
                   <label className="label">
-                    <span className="label-text">選擇付款方式</span>
+                    <span className="label-text">付款方式</span>
                   </label>
                   <select
                     name="type"
@@ -364,7 +350,6 @@ export default function PaymentMethods() {
                   >
                     <option value="creditCard">信用卡付款</option>
                     <option value="cash">現金付款</option>
-                    <option value="onlinePayment">線上付款</option>
                   </select>
                 </div>
 
@@ -423,31 +408,10 @@ export default function PaymentMethods() {
                         <option value="Visa">Visa</option>
                         <option value="MasterCard">MasterCard</option>
                         <option value="Amex">Amex</option>
+                        <option value="Discover">Discover</option>
                       </select>
                     </div>
                   </>
-                )}
-
-                {currentMethod.type === "onlinePayment" && (
-                  <div className="form-control mt-4">
-                    <label className="label">
-                      <span className="label-text">選擇線上付款方式</span>
-                    </label>
-                    <select
-                      name="onlinePaymentService"
-                      value={currentMethod.onlinePaymentService}
-                      onChange={handleChange}
-                      className="select select-bordered"
-                    >
-                      <option value="Line Pay">Line Pay</option>
-                      <option value="ECPay">ECPay</option>
-                    </select>
-                    {errors.onlinePaymentService && (
-                      <p className="text-red-500">
-                        {errors.onlinePaymentService}
-                      </p>
-                    )}
-                  </div>
                 )}
 
                 <div className="modal-action">
@@ -465,11 +429,9 @@ export default function PaymentMethods() {
               </div>
             </dialog>
           )}
-
         </div>
       </div>
 
-      {/* ToastContainer for notifications */}
       <ToastContainer />
       <Footer />
     </>

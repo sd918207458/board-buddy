@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { useRouter } from "next/router";
@@ -6,10 +6,10 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function OrderDetails() {
-  const [orderDetails, setOrderDetails] = useState([]);
+  const [orderDetails, setOrderDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedImage, setSelectedImage] = useState(null); // 用來存儲點擊的圖片
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const router = useRouter();
   const { id } = router.query;
@@ -17,32 +17,24 @@ export default function OrderDetails() {
   // 獲取存取令牌
   const getToken = () => localStorage.getItem("token");
 
-  // 封裝帶有 token 的 fetch 請求函數
-  const fetchWithToken = async (url, options = {}) => {
-    const token = getToken();
-    const headers = {
-      ...options.headers,
-      Authorization: `Bearer ${token}`,
-    };
-    return fetch(url, { ...options, headers, credentials: "include" });
-  };
-
   // 請求訂單詳情
   useEffect(() => {
     if (!router.isReady || !id) return;
 
     const fetchOrderDetails = async (orderId) => {
       try {
-        const response = await fetchWithToken(
-          `http://localhost:3005/api/order-details/${orderId}`,
-          { method: "GET" }
+        // 從 LocalStorage 中獲取所有訂單資料
+        const storedOrders = JSON.parse(localStorage.getItem("orders")) || [];
+        // 根據 ID 找到對應的訂單
+        const selectedOrder = storedOrders.find(
+          (order) => order.orderId === Number(orderId)
         );
-        const result = await response.json();
-        if (response.ok) {
-          setOrderDetails(result.orderDetails);
+
+        if (selectedOrder) {
+          setOrderDetails(selectedOrder);
           toast.success("訂單資料獲取成功！");
         } else {
-          toast.error(result.message || "無法獲取訂單資料");
+          toast.error("找不到對應的訂單資料");
         }
       } catch (error) {
         toast.error("伺服器錯誤，無法獲取訂單資料");
@@ -60,8 +52,6 @@ export default function OrderDetails() {
     document.getElementById("image-modal").showModal();
   };
 
-  const memoizedOrderDetails = useMemo(() => orderDetails, [orderDetails]);
-
   if (loading) {
     return <div className="text-center">載入中...</div>;
   }
@@ -72,6 +62,10 @@ export default function OrderDetails() {
         {error}，請稍後重試或聯絡客服。
       </div>
     );
+  }
+
+  if (!orderDetails) {
+    return <div className="text-center">找不到訂單資料。</div>;
   }
 
   return (
@@ -96,19 +90,11 @@ export default function OrderDetails() {
               <li className="step step-primary" data-content="✓">
                 處理中
               </li>
-              <li
-                className={`step ${
-                  memoizedOrderDetails.shipped ? "step-primary" : ""
-                }`}
-              >
-                {memoizedOrderDetails.shipped ? "已出貨" : "等待出貨"}
+              <li className="step step-primary">
+                {orderDetails.shipped ? "已出貨" : "等待出貨"}
               </li>
-              <li
-                className={`step ${
-                  memoizedOrderDetails.completed ? "step-primary" : ""
-                }`}
-              >
-                {memoizedOrderDetails.completed ? "完成訂單" : "等待完成"}
+              <li className="step step-primary">
+                {orderDetails.completed ? "完成訂單" : "等待完成"}
               </li>
             </ul>
           </section>
@@ -130,60 +116,25 @@ export default function OrderDetails() {
                 </tr>
               </thead>
               <tbody>
-                {memoizedOrderDetails.map((item) => (
-                  <tr key={item.orderdetail_id}>
+                {orderDetails.items.map((item) => (
+                  <tr key={item.product_id}>
                     <td>{item.product_name}</td>
                     <td>{item.product_id}</td>
                     <td>NT${item.price}</td>
-                    <td>{item.number}</td>
-                    <td>NT${item.subtotal}</td>
+                    <td>{item.quantity}</td>
+                    <td>NT${item.price * item.quantity}</td>
                     <td>
                       <img
-                        src={item.image_url}
+                        src={item.image}
                         alt={item.product_name}
                         className="h-12 w-12 cursor-pointer"
-                        onClick={() => handleImageClick(item.image_url)}
+                        onClick={() => handleImageClick(item.image)}
                       />
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
-
-          {/* 評價區 */}
-          <div className="p-4">
-            <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4 text-center">
-              您的評價
-            </h3>
-            <div className="rating">
-              <input
-                type="radio"
-                name="rating-1"
-                className="mask mask-star-2 bg-orange-400"
-              />
-              <input
-                type="radio"
-                name="rating-1"
-                className="mask mask-star-2 bg-orange-400"
-                checked
-              />
-              <input
-                type="radio"
-                name="rating-1"
-                className="mask mask-star-2 bg-orange-400"
-              />
-              <input
-                type="radio"
-                name="rating-1"
-                className="mask mask-star-2 bg-orange-400"
-              />
-              <input
-                type="radio"
-                name="rating-1"
-                className="mask mask-star-2 bg-orange-400"
-              />
-            </div>
           </div>
         </div>
       </div>
