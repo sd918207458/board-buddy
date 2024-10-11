@@ -354,12 +354,10 @@ const AddressFormProduct = () => {
               />
             </div>
           </div>
-          <h2 className="text-lg font-semibold text-gray-700 capitalize dark:text-white mt-8">
-            信用卡資訊
-          </h2>
+
           {/* /////// */}
           {/* //////付款方式//// */}
-          <h1 className="text-xl font-bold mb-4">選擇付款方式</h1>
+          <h1 className="text-xl font-bold mb-4 mt-8">選擇付款方式</h1>
           <div className="flex space-x-4 mb-4">
             <div className="flex items-center">
               <input
