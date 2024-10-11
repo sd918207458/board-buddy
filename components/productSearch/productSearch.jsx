@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 const ProductSearch = ({
   filterTitle,
   setShowFilter,
@@ -7,7 +7,26 @@ const ProductSearch = ({
   setShowSearch,
   showSearch,
   handleFilterChange,
+  products,
+  onSearch, // 新增一個 props，讓父組件可以接收到搜尋結果
 }) => {
+  const [searchInput, setSearchInput] = useState(""); // 確認定義 searchInput 狀態
+  const [searchQuery, setSearchQuery] = useState(""); // 定義搜尋關鍵字的狀態
+
+  /// 處理搜尋輸入變更
+  const handleSearchChange = (e) => {
+    setSearchInput(e.target.value);
+  };
+
+  // 點擊搜尋按鈕時觸發的搜尋邏輯
+  const handleSearch = (input) => {
+    setSearchQuery(input); // 設定搜尋關鍵字
+    onSearch(input); // 呼叫父組件的搜尋處理函數
+  };
+
+  useEffect(() => {
+    handleSearch(searchInput); // 當搜尋輸入改變時觸發搜尋
+  }, [searchInput]);
   return (
     <nav className="w-full z-30 px-6 py-1  mt-8 relative">
       <div className="w-full container mx-auto flex flex-wrap items-center justify-between">
@@ -80,12 +99,23 @@ const ProductSearch = ({
               </svg>
             </button>
             {showSearch && (
-              <div className="ml-2">
+              <div className="ml-2 flex items-center space-x-2">
                 <input
                   type="text"
                   className="border rounded-full py-1 px-4 text-sm z-50"
                   placeholder="搜尋"
+                  value={searchInput}
+                  onChange={handleSearchChange} // 當使用者輸入時，更新 searchInput 狀態
                 />
+                {/* <button
+                  className="bg-blue-500 text-white rounded-full px-3 py-1 text-sm"
+                  onClick={() => {
+                    console.log("User searched for:", searchInput); // 在這裡抓取使用者輸入的內容
+                    handleSearch(searchInput); // 點擊搜尋按鈕觸發搜尋邏輯
+                  }}
+                >
+                  搜尋
+                </button> */}
               </div>
             )}
           </div>

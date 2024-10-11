@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link"; // 引入 Next.js 的 Link 組件
 import { useCart } from "@/hooks/useCart"; // 引入購物車上下文
 
-const Card = ({ product }) => {
+const Card = ({ product, searchQuery }) => {
   const { totalPrice } = useCart(); // 總價
   const { addToCart } = useCart(); // 從購物車上下文中獲取 addToCart 函數
   const [isFavorite, setIsFavorite] = useState(false); // 初始化收藏狀態
@@ -51,6 +51,10 @@ const Card = ({ product }) => {
     };
     addToCart(productWithQuantity); // 將商品加入購物車
   };
+  // 如果產品名稱不包含搜尋內容，則不顯示該產品
+  if (searchQuery && !product.product_name.includes(searchQuery)) {
+    return null; // 不顯示該產品
+  }
   return (
     <Link
       href={`/product/${product.product_id}`} // 使用動態路由

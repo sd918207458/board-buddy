@@ -112,6 +112,13 @@ const ProductList = () => {
             setShowSearch={setShowSearch}
             showSearch={showSearch}
             handleFilterChange={handleFilterChange}
+            products={filteredProducts}
+            onSearch={(query) => {
+              const filtered = products.filter((product) =>
+                product.product_name.toLowerCase().includes(query.toLowerCase())
+              );
+              setFilteredProducts(filtered); // 更新顯示的產品列表
+            }}
           />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
             {currentProducts.map((product) => (
