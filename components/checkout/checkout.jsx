@@ -18,7 +18,9 @@ const Checkout = () => {
   return (
     <>
       <section className={`${styles.cartContent} max-w-4xl`}>
-        <h2>購物車內容</h2>
+        <h2 className="text-lg font-semibold text-gray-700 capitalize dark:text-white">
+          購物車內容
+        </h2>
         <table className={styles.cartTable}>
           <thead>
             <tr>
@@ -67,30 +69,33 @@ const Checkout = () => {
                       item.quantity}
                   </td>
 
-                  
-<td>
-  <button
-    className={styles.removeItem}
-    onClick={() => {
-      MySwal.fire({
-        title: '確定要刪除該商品?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: '確認',
-        cancelButtonText: '取消'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          handleRemoveItem(index); // 如果確認，則執行刪除操作
-          MySwal.fire('已刪除!', '商品已從購物車中移除。', 'success');
-        }
-      });
-    }}
-  >
-    ×
-  </button>
-</td>
+                  <td>
+                    <button
+                      className={styles.removeItem}
+                      onClick={() => {
+                        MySwal.fire({
+                          title: "確定要刪除該商品?",
+                          icon: "warning",
+                          showCancelButton: true,
+                          confirmButtonColor: "#3085d6",
+                          cancelButtonColor: "#d33",
+                          confirmButtonText: "確認",
+                          cancelButtonText: "取消",
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+                            handleRemoveItem(index); // 如果確認，則執行刪除操作
+                            MySwal.fire(
+                              "已刪除!",
+                              "商品已從購物車中移除。",
+                              "success"
+                            );
+                          }
+                        });
+                      }}
+                    >
+                      ×
+                    </button>
+                  </td>
                 </tr>
               ))
             ) : (

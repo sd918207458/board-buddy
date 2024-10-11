@@ -38,12 +38,13 @@ const AddressFormProduct = () => {
     district: "",
   });
   const [addresses, setAddresses] = useState([]);
-  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [paymentMethod, setPaymentMethod] = useState("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const { cartItems, setCartItems } = useCart();
+  // 引入購物車 hook，確保在組件頂層調用
+  const { cartItems, setCartItems, totalPrice } = useCart();
   const router = useRouter();
 
   // 7-11 Hooks
@@ -265,9 +266,21 @@ const AddressFormProduct = () => {
     return <div>{error}</div>;
   }
 
+  //ECPay
+  // 導向至ECPay付款頁面
+
+  const goECPay = () => {
+    //  const total = localStorage.getItem("total"); // 從 localStorage 取得價錢
+
+    if (window.confirm("確認要導向至ECPay進行付款?")) {
+      // 將 total 作為 amount 傳遞給後端
+      window.location.href = `http://localhost:3005/api/ecpay-test-only?amount=${totalPrice}`;
+    }
+  };
+
   return (
     <div>
-      <section className="max-w-4xl p-6 mx-auto bg-white rounded-md shadow-md dark:bg-gray-800">
+      <section className="max-w-4xl p-6 mx-auto bg-white rounded-md shadow-md dark:bg-gray-800 mt-8">
         <h2 className="text-lg font-semibold text-gray-700 capitalize dark:text-white">
           運送方式
         </h2>
@@ -303,25 +316,25 @@ const AddressFormProduct = () => {
             >
               請選擇取貨門市
             </button>
-            {formData.store_name && (
+            {store711.storename && (
               <div className="mt-4">
                 <label className="block text-gray-700">7-11 門市名稱</label>
                 <input
                   type="text"
                   name="store_name"
-                  value={formData.store_name}
+                  value={store711.storename}
                   className="w-full px-4 py-2 mt-2 border rounded-md"
                   readOnly
                 />
               </div>
             )}
-            {formData.store_address && (
+            {store711.storeaddress && (
               <div className="mt-4">
                 <label className="block text-gray-700">7-11 門市地址</label>
                 <input
                   type="text"
                   name="store_address"
-                  value={formData.store_address}
+                  value={store711.storeaddress}
                   className="w-full px-4 py-2 mt-2 border rounded-md"
                   readOnly
                 />
@@ -391,88 +404,153 @@ const AddressFormProduct = () => {
             </div>
           </div>
 
-          <h2 className="text-lg font-semibold text-gray-700 capitalize dark:text-white mt-8">
-            信用卡資訊
-          </h2>
-          <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
-            <div>
-              <label
-                className="text-gray-700 dark:text-gray-200"
-                htmlFor="card_number"
-              >
-                信用卡卡號
-              </label>
+          {/* /////// */}
+          {/* //////付款方式//// */}
+          <h1 className="text-xl font-bold mb-4 mt-8">選擇付款方式</h1>
+          <div className="flex space-x-4 mb-4">
+            <div className="flex items-center">
               <input
-                id="card_number"
-                type="text"
-                name="cardNumber"
-                value={formData.cardNumber}
-                onChange={handleChange}
-                className="block w-full px-4 py-2 mt-2 border rounded-md"
-                placeholder="請輸入信用卡卡號"
+                type="radio"
+                id="creditCard"
+                name="paymentMethod"
+                className="radio"
+                value="creditCard"
+                onChange={() => setPaymentMethod("creditCard")}
               />
+              <label htmlFor="creditCard" className="ml-2">
+                信用卡付款
+              </label>
             </div>
-            <div>
-              <label
-                className="text-gray-700 dark:text-gray-200"
-                htmlFor="card_name"
-              >
-                持卡人姓名
-              </label>
+            <div className="flex items-center">
               <input
-                id="card_name"
-                type="text"
-                name="cardName"
-                value={formData.cardName}
-                onChange={handleChange}
-                className="block w-full px-4 py-2 mt-2 border rounded-md"
-                placeholder="請輸入持卡人姓名"
+                type="radio"
+                id="ecpay"
+                name="paymentMethod"
+                className="radio"
+                value="ecpay"
+                onChange={() => setPaymentMethod("ecpay")}
               />
-            </div>
-            <div>
-              <label
-                className="text-gray-700 dark:text-gray-200"
-                htmlFor="expiry_date"
-              >
-                到期日 (MM/YY)
+              <label htmlFor="ecpay" className="ml-2">
+                ECPay付款
               </label>
-              <input
-                id="expiry_date"
-                type="text"
-                name="expiryDate"
-                value={formData.expiryDate}
-                onChange={handleChange}
-                className="block w-full px-4 py-2 mt-2 border rounded-md"
-                placeholder="MM/YY"
-              />
-            </div>
-            <div>
-              <label className="text-gray-700 dark:text-gray-200" htmlFor="cvc">
-                CVC 安全碼
-              </label>
-              <input
-                id="cvc"
-                type="text"
-                name="cvc"
-                value={formData.cvc}
-                onChange={handleChange}
-                className="block w-full px-4 py-2 mt-2 border rounded-md"
-                placeholder="三位數安全碼"
-              />
             </div>
           </div>
 
-          <div className="flex justify-end mt-6">
-            <button
-              type="submit"
-              className="px-8 py-2.5 leading-5 text-white bg-gray-700 rounded-md hover:bg-gray-600"
-            >
-              送出
-            </button>
-          </div>
+          {/* //////付款方式//// */}
+          {/* //////// */}
+
+          {/* 顯示信用卡表單 */}
+          {paymentMethod === "creditCard" && (
+            <div>
+              <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
+                <div>
+                  <label
+                    className="text-gray-700 dark:text-gray-200"
+                    htmlFor="card_number"
+                  >
+                    信用卡卡號
+                  </label>
+                  <input
+                    id="card_number"
+                    type="text"
+                    name="cardNumber"
+                    value={formData.cardNumber}
+                    onChange={handleChange}
+                    className="block w-full px-4 py-2 mt-2 border rounded-md"
+                    placeholder="請輸入信用卡卡號"
+                  />
+                </div>
+                <div>
+                  <label
+                    className="text-gray-700 dark:text-gray-200"
+                    htmlFor="card_name"
+                  >
+                    持卡人姓名
+                  </label>
+                  <input
+                    id="card_name"
+                    type="text"
+                    name="cardName"
+                    value={formData.cardName}
+                    onChange={handleChange}
+                    className="block w-full px-4 py-2 mt-2 border rounded-md"
+                    placeholder="請輸入持卡人姓名"
+                  />
+                </div>
+                <div>
+                  <label
+                    className="text-gray-700 dark:text-gray-200"
+                    htmlFor="expiry_date"
+                  >
+                    到期日 (MM/YY)
+                  </label>
+                  <input
+                    id="expiry_date"
+                    type="text"
+                    name="expiryDate"
+                    value={formData.expiryDate}
+                    onChange={handleChange}
+                    className="block w-full px-4 py-2 mt-2 border rounded-md"
+                    placeholder="MM/YY"
+                  />
+                </div>
+                <div>
+                  <label
+                    className="text-gray-700 dark:text-gray-200"
+                    htmlFor="cvc"
+                  >
+                    CVC 安全碼
+                  </label>
+                  <input
+                    id="cvc"
+                    type="text"
+                    name="cvc"
+                    value={formData.cvc}
+                    onChange={handleChange}
+                    className="block w-full px-4 py-2 mt-2 border rounded-md"
+                    placeholder="三位數安全碼"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end mt-6">
+                <button
+                  type="submit"
+                  className="px-8 py-2.5 leading-5 text-white bg-gray-700 rounded-md hover:bg-gray-600"
+                >
+                  送出
+                </button>
+              </div>
+            </div>
+          )}
+          {/* 顯示ECPay付款按鈕 */}
+          {paymentMethod === "ecpay" && (
+            <div className="flex justify-end mt-6">
+              <button
+                onClick={goECPay}
+                className="bg-green-500 text-white px-6 py-3 rounded hover:bg-green-600"
+              >
+                前往ECPay付款
+              </button>
+            </div>
+          )}
         </form>
         <ToastContainer />
       </section>
+      {/* test ecpay */}
+
+      {/* <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
+        <div className="bg-white p-8 rounded-lg shadow-md text-center">
+          <h1 className="text-3xl font-bold mb-4">確認付款</h1>
+          <p className="text-lg mb-6">點擊下方按鈕以導向至ECPay進行付款。</p>
+          <button
+            onClick={goECPay}
+            className="bg-green-500 text-white px-6 py-3 rounded hover:bg-green-600"
+          >
+            前往ECPay付款
+          </button>
+        </div>
+      </div> */}
+      {/* test ecpay */}
     </div>
   );
 };
