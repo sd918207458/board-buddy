@@ -181,7 +181,11 @@ const AddressFormProduct = () => {
         (total, item) => total + item.price * item.quantity,
         0
       ),
-      address: formData.address,
+      address: {
+        address: formData.address,
+        city: formData.city,
+        district: formData.district,
+      },
       paymentInfo: {
         cardNumber: formData.cardNumber,
         cardName: formData.cardName,
@@ -261,7 +265,6 @@ const AddressFormProduct = () => {
             <span className="ml-2">超商取貨</span>
           </label>
         </div>
-
         {isConvenienceStore && (
           <div className="mt-4">
             <button
@@ -296,11 +299,38 @@ const AddressFormProduct = () => {
             )}
           </div>
         )}
-
+        {/* 地址資訊 */}
         <form onSubmit={handleSubmit}>
           <h2 className="text-lg font-semibold text-gray-700 capitalize dark:text-white mt-4">
             地址資訊
           </h2>
+
+          {/* 使用 flex 排版按鈕，並確保不影響下方的 grid */}
+          <div className="flex justify-start mb-2 mt-2">
+            <label className="inline-flex items-center mr-4">
+              <input
+                type="radio"
+                name="radio-2"
+                value="is_default"
+                className="radio"
+                defaultChecked
+                onChange={handleOptionChange}
+              />
+              <span className="ml-2">預設地址</span>
+            </label>
+            <label className="inline-flex items-center">
+              <input
+                type="radio"
+                name="radio-2"
+                value="customed_address"
+                className="radio"
+                onChange={handleOptionChange}
+              />
+              <span className="ml-2">自訂地址</span>
+            </label>
+          </div>
+
+          {/* 使用 grid 排版其他三個 input */}
           <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
             <div>
               <label
