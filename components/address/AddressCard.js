@@ -1,3 +1,4 @@
+// AddressCard.js
 import React from "react";
 
 const AddressCard = ({
@@ -18,8 +19,8 @@ const AddressCard = ({
         {address.deliveryMethod === "convenienceStore" ? (
           <>
             <p>配送方式: 超商取貨 - {address.storeType}</p>
-            <p>門市名稱: {address.storeName}</p>
-            <p>門市地址: {address.storeAddress}</p>
+            <p>門市名稱: {address.storeName || "未提供"}</p>
+            <p>門市地址: {address.storeAddress || "未提供"}</p>
           </>
         ) : (
           <>

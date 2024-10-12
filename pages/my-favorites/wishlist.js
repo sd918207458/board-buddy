@@ -3,47 +3,65 @@ import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 
 export default function Favorites() {
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState(null); // 初始為 null，以確保在有數據時設置合適的值
   const [loading, setLoading] = useState(false);
   const [favoriteProducts, setFavoriteProducts] = useState([]);
   const [favoriteStores, setFavoriteStores] = useState([]);
-  const [sortOption, setSortOption] = useState("date"); // 預設排序方式
+  const [sortOption, setSortOption] = useState("date");
 
-  // 保存原始數據的副本，用於恢復排序
   const [originalFavoriteProducts, setOriginalFavoriteProducts] = useState([]);
+  const [originalFavoriteStores, setOriginalFavoriteStores] = useState([]);
 
-  // 頁面掛載後讀取收藏的商品和店家數據
   useEffect(() => {
-    // 重新從 localStorage 讀取收藏商品
+    fetchFavoriteProducts();
+    fetchFavoriteStores();
+  }, []);
+
+  const fetchFavoriteProducts = () => {
     const storedFavoriteProducts =
       JSON.parse(localStorage.getItem("favoriteItems")) || [];
     const validProducts = storedFavoriteProducts.filter(
       (product) =>
         product && product.image && product.product_name && product.description
     );
+    console.log("Fetched favorite products from localStorage:", validProducts);
     setFavoriteProducts(validProducts);
-    setOriginalFavoriteProducts(validProducts); // 儲存原始商品列表
+    setOriginalFavoriteProducts(validProducts);
 
-    // 重新從 localStorage 讀取收藏店家
-    const storedFavoriteStores =
-      JSON.parse(localStorage.getItem("favoriteStores")) || [];
-    const validStores = storedFavoriteStores.filter(
-      (store) => store && store.image && store.name && store.description
-    );
-    setFavoriteStores(validStores);
-  }, []); // 空依賴陣列，確保只在組件掛載時執行一次
-
-  // 根據排序選項對收藏商品進行排序
-  const sortFavorites = (items, option) => {
-    if (option === "price") {
-      return items.sort((a, b) => a.price - b.price); // 依價格排序
-    } else if (option === "name") {
-      return items.sort((a, b) => a.product_name.localeCompare(b.product_name)); // 依名稱排序
+    // 根據商品收藏設置 activeTab
+    if (validProducts.length > 0) {
+      setActiveTab("all");
     }
-    return items; // 預設不排序
   };
 
-  // 監聽排序選項變更，並對收藏商品進行排序
+  const fetchFavoriteStores = async () => {
+    setLoading(true);
+    try {
+      console.log("Sending request to fetch favorite stores...");
+      const response = await fetch("http://localhost:3005/api/roomheart"); // GET 请求不需要 body
+      console.log("Response status:", response.status);
+
+      if (!response.ok) {
+        throw new Error(`無法獲取收藏的房間數據，狀態碼: ${response.status}`);
+      }
+
+      const stores = await response.json();
+      console.log("Fetched favorite stores from API:", stores);
+
+      setFavoriteStores(stores);
+      setOriginalFavoriteStores(stores);
+
+      // 如果沒有收藏的商品但有收藏的店家，設置 activeTab 為 "pending"
+      if (stores.length > 0 && favoriteProducts.length === 0) {
+        setActiveTab("pending");
+      }
+    } catch (error) {
+      console.error("獲取收藏房間失敗:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (activeTab === "all" && sortOption !== "date") {
       const sortedProducts = sortFavorites(
@@ -51,11 +69,26 @@ export default function Favorites() {
         sortOption
       );
       setFavoriteProducts(sortedProducts);
+    } else if (activeTab === "pending" && sortOption !== "date") {
+      const sortedStores = sortFavorites(
+        [...originalFavoriteStores],
+        sortOption
+      );
+      setFavoriteStores(sortedStores);
     } else {
-      // 若選擇的是 "date" 或初次加載，則恢復原始列表順序
       setFavoriteProducts([...originalFavoriteProducts]);
+      setFavoriteStores([...originalFavoriteStores]);
     }
-  }, [sortOption, activeTab]); // 僅在排序選項或選中的 Tab 改變時重新排序
+  }, [sortOption, activeTab]);
+
+  const sortFavorites = (items, option) => {
+    if (option === "price") {
+      return items.sort((a, b) => a.price - b.price);
+    } else if (option === "name") {
+      return items.sort((a, b) => a.product_name.localeCompare(b.product_name));
+    }
+    return items;
+  };
 
   const renderSortOptions = () => (
     <div className="flex justify-end p-4">
@@ -85,7 +118,7 @@ export default function Favorites() {
     }
 
     if (activeTab === "pending" && favoriteStores.length === 0) {
-      return <div className="text-center">尚無收藏的店家。</div>;
+      return <div className="text-center">尚無收藏的房間。</div>;
     }
 
     if (activeTab === "all") {
@@ -127,14 +160,14 @@ export default function Favorites() {
         <section className="max-w-4xl mx-auto grid grid-cols-2 gap-6 mt-4 sm:grid-cols-2">
           {favoriteStores.map((store, index) => (
             <div
-              key={store.id || index}
+              key={store.room_id || index}
               className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105 hover:shadow-lg"
             >
               <figure>
-                {store.image ? (
+                {store.img ? (
                   <img
-                    src={store.image}
-                    alt={store.name}
+                    src={store.img}
+                    alt={store.room_name}
                     className="rounded-t-lg h-48 w-full object-cover"
                   />
                 ) : (
@@ -144,11 +177,15 @@ export default function Favorites() {
                 )}
               </figure>
               <div className="card-body">
-                <h2 className="card-title">{store.name}</h2>
-                <p>{store.description}</p>
+                <h2 className="card-title">{store.room_name}</h2>
+                <p>{store.room_intro}</p>
+                <p>{store.location}</p>
+                <p>
+                  活動日期: {new Date(store.event_date).toLocaleDateString()}
+                </p>
                 <div className="card-actions justify-end">
                   <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
-                    瀏覽店家
+                    瀏覽詳情
                   </button>
                 </div>
               </div>
@@ -192,7 +229,7 @@ export default function Favorites() {
               }`}
               onClick={() => setActiveTab("pending")}
             >
-              收藏店家
+              收藏房間
             </button>
           </div>
 
