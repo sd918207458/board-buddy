@@ -4,8 +4,8 @@ import styles from "./Sidecart.module.css";
 
 const Sidecart = () => {
   // 使用 useCart hook 來管理購物車狀態和邏輯
-  const { cartItems, totalPrice, isMounted } = useCart(); // 共享購物車數據
-  const shippingCost = 130; // 固定運費
+  const { cartItems, totalPrice, isMounted, shippingCost } = useCart(); // 共享購物車數據
+
   // 檢查組件是否掛載並渲染購物車內容
   if (!isMounted) return <p>Loading...</p>;
 
