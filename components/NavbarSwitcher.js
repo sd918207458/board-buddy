@@ -4,14 +4,13 @@ import LoggedOutNavbar from "@/components/LoggedOutNavbar";
 import { useRouter } from "next/router";
 import { useCart } from "@/hooks/useCart";
 
-const NavbarSwitcher = () => {
+const NavbarSwitcher = ({onUsernameRetrieved}) => {
   const {
     cartItems,
     totalItems,
     isCartVisible,
     setIsCartVisible,
     updateCartItems,
-    onUsernameRetrieved // 新增一个 prop 来暴露 username
   } = useCart();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // 控制載入狀態
