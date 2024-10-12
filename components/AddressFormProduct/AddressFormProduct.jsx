@@ -200,14 +200,6 @@ const AddressFormProduct = () => {
       return;
     }
 
-    if (
-      isConvenienceStore &&
-      (!formData.store_name || !formData.store_address)
-    ) {
-      toast.error("請選擇超商取貨門市");
-      return;
-    }
-
     if (!formData.cardNumber || !formData.cardName || !formData.expiryDate) {
       toast.error("請填寫完整的信用卡資訊");
       return;
