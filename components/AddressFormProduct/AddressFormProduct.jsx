@@ -82,11 +82,21 @@ const AddressFormProduct = () => {
       setAddresses(data.data || []);
       const defaultAddress = data.data?.find((address) => address.isDefault);
       if (defaultAddress) {
+        const fullAddress = [
+          defaultAddress.city || "",
+          defaultAddress.area || "",
+          defaultAddress.street || "",
+          defaultAddress.detailed_address || "",
+        ]
+          .filter(Boolean)
+          .join(" ");
+
         setFormData((prevData) => ({
           ...prevData,
-          address: defaultAddress.detailed_address || "",
+          address: fullAddress, // 將完整地址組合存入 address 欄位
           city: defaultAddress.city || "",
           district: defaultAddress.area || "",
+          street: defaultAddress.street || "",
           is_default: defaultAddress.isDefault,
         }));
       }
@@ -115,12 +125,25 @@ const AddressFormProduct = () => {
 
       // 如果有預設地址，更新表單資料
       if (defaultAddress) {
+        // 將四個地址欄位合併成一個完整的地址
+        const fullAddress = [
+          defaultAddress.city || "",
+          defaultAddress.area || "", // 使用 'district' 或 'area'
+          defaultAddress.street || "",
+          defaultAddress.detailed_address || "",
+        ]
+          .filter(Boolean)
+          .join(" ");
+
         setFormData((prevData) => ({
           ...prevData,
+          address: fullAddress, // 將完整地址存入 address 欄位
           city: defaultAddress.city || "",
           district: defaultAddress.area || "",
-          address: defaultAddress.detailed_address || "",
+          street: defaultAddress.street || "",
+          detailed_address: defaultAddress.detailed_address || "",
         }));
+
         // toast.success("已獲取預設地址"); // 顯示成功消息
       } else {
         // toast.info("沒有設置預設地址"); // 沒有預設地址的情況
@@ -409,7 +432,7 @@ const AddressFormProduct = () => {
                 id="address"
                 type="text"
                 name="address"
-                value={formData.address}
+                value={formData.detailed_address}
                 onChange={handleChange}
                 className="block w-full px-4 py-2 mt-2 border rounded-md"
                 placeholder="請輸入詳細地址"
