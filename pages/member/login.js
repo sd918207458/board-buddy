@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/use-auth";
@@ -19,6 +18,24 @@ export default function Login() {
   const { loginGoogle } = useFirebase(); // 使用 Firebase Google 登入方法
 
   // 將 Firebase 登入結果傳遞到後端
+
+  // 用於解析 JWT 的函數
+  const parseJwt = (token) => {
+    try {
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+      return JSON.parse(jsonPayload);
+    } catch (error) {
+      console.error("無法解析 JWT", error);
+      return null;
+    }
+  };
 
   // Google 登入處理
   const handleGoogleLogin = async () => {
@@ -103,7 +120,6 @@ export default function Login() {
   return (
     <>
       <div className="flex items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
-
         <div className="flex w-full max-w-sm mx-auto overflow-hidden bg-white rounded-lg shadow-lg dark:bg-gray-800 lg:max-w-4xl">
           <div
             className="hidden bg-cover lg:block lg:w-1/2"
@@ -207,17 +223,13 @@ export default function Login() {
                 還沒有帳戶嗎?
                 <a
                   href="register"
-
                   className="ml-1 text-xs text-gray-500 uppercase dark:text-gray-400 hover:underline"
-
                 >
                   註冊
                 </a>
               </span>
 
               <span className="w-1/5 border-b dark:border-gray-600 lg:w-1/4" />
-
-
             </div>
 
             {/* Google 登入按鈕 */}
