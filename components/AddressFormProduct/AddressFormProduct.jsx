@@ -36,12 +36,14 @@ const AddressFormProduct = () => {
     is_default: false,
     store_type: "",
     district: "",
+    detailed_address: "",
   });
   const [addresses, setAddresses] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isEditable, setIsEditable] = useState(false); // 新增可編輯狀態
 
   // 引入購物車 hook，確保在組件頂層調用
   const { cartItems, setCartItems, totalPrice } = useCart();
@@ -80,14 +82,24 @@ const AddressFormProduct = () => {
       }
       const data = await response.json();
       setAddresses(data.data || []);
-      const defaultAddress = data.data?.find((address) => address.is_default);
+      const defaultAddress = data.data?.find((address) => address.isDefault);
       if (defaultAddress) {
+        const fullAddress = [
+          defaultAddress.city || "",
+          defaultAddress.area || "",
+          defaultAddress.street || "",
+          defaultAddress.detailed_address || "",
+        ]
+          .filter(Boolean)
+          .join(" ");
+
         setFormData((prevData) => ({
           ...prevData,
-          address: defaultAddress.detailed_address || "",
+          address: fullAddress, // 將完整地址組合存入 address 欄位
           city: defaultAddress.city || "",
           district: defaultAddress.area || "",
-          is_default: defaultAddress.is_default,
+          street: defaultAddress.street || "",
+          detailed_address: defaultAddress.detailed_address || "",
         }));
       }
       setLoading(false);
@@ -115,12 +127,25 @@ const AddressFormProduct = () => {
 
       // 如果有預設地址，更新表單資料
       if (defaultAddress) {
+        // 將四個地址欄位合併成一個完整的地址
+        const fullAddress = [
+          defaultAddress.city || "",
+          defaultAddress.area || "", // 使用 'district' 或 'area'
+          defaultAddress.street || "",
+          defaultAddress.detailed_address || "",
+        ]
+          .filter(Boolean)
+          .join(" ");
+
         setFormData((prevData) => ({
           ...prevData,
+          address: fullAddress, // 將完整地址存入 address 欄位
           city: defaultAddress.city || "",
           district: defaultAddress.area || "",
-          address: defaultAddress.detailed_address || "",
+          street: defaultAddress.street || "",
+          detailed_address: defaultAddress.detailed_address || "",
         }));
+        setIsEditable(false); // 設置為只讀
         // toast.success("已獲取預設地址"); // 顯示成功消息
       } else {
         // toast.info("沒有設置預設地址"); // 沒有預設地址的情況
@@ -129,6 +154,17 @@ const AddressFormProduct = () => {
       console.error("Fetch default address error: ", error);
       toast.error("無法獲取預設地址");
     }
+  };
+
+  const handleCustomAddressClick = () => {
+    setFormData((prevData) => ({
+      ...prevData,
+      city: "",
+      district: "",
+      detailed_address: "",
+      address: "", // 如果需要清空完整地址欄位
+    }));
+    setIsEditable(true); // 設置為可編輯狀態
   };
 
   // 從後端獲取付款方式
@@ -192,11 +228,15 @@ const AddressFormProduct = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    if (!formData.city || !formData.district || !formData.address) {
-      toast.error("請填寫完整的地址資訊");
-      return;
-    }
+    // 如果 7-11 的地址已經填寫，則不需要檢查其他地址
+    const isStore711AddressFilled = store711.storename && store711.storeaddress;
 
+    if (!isStore711AddressFilled) {
+      if (!formData.city || !formData.district || !formData.address) {
+        toast.error("請填寫完整的地址資訊");
+        return false;
+      }
+    }
     if (!formData.cardNumber || !formData.cardName || !formData.expiryDate) {
       toast.error("請填寫完整的信用卡資訊");
       return;
@@ -216,6 +256,8 @@ const AddressFormProduct = () => {
       ),
       address: {
         address: formData.address,
+        store_name: store711.storename,
+        store_address: store711.storeaddress,
         // city: formData.city,
         // district: formData.district,
       },
@@ -357,6 +399,7 @@ const AddressFormProduct = () => {
                 name="radio-2"
                 value="customed_address"
                 className="radio"
+                onClick={handleCustomAddressClick}
               />
               <span className="ml-2">自訂地址</span>
             </label>
@@ -377,6 +420,7 @@ const AddressFormProduct = () => {
                 name="city"
                 value={formData.city}
                 onChange={handleChange}
+                readOnly={!isEditable} // 根據可編輯狀態設置
                 className="block w-full px-4 py-2 mt-2 border rounded-md"
                 placeholder="請輸入縣市"
               />
@@ -394,6 +438,7 @@ const AddressFormProduct = () => {
                 name="district"
                 value={formData.district}
                 onChange={handleChange}
+                readOnly={!isEditable} // 根據可編輯狀態設置
                 className="block w-full px-4 py-2 mt-2 border rounded-md"
                 placeholder="請輸入鄉鎮市區"
               />
@@ -408,9 +453,10 @@ const AddressFormProduct = () => {
               <input
                 id="address"
                 type="text"
-                name="address"
-                value={formData.address}
+                name="detailed_address"
+                value={formData.detailed_address}
                 onChange={handleChange}
+                readOnly={!isEditable} // 根據可編輯狀態設置
                 className="block w-full px-4 py-2 mt-2 border rounded-md"
                 placeholder="請輸入詳細地址"
               />
