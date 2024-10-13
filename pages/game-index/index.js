@@ -122,15 +122,15 @@ export default function Gameindex() {
               </button>
 
               <button className="inline-flex items-center h-12 px-4 py-2 text-[24px] text-white text-center border-b-2 border-[#EFB880] bg-transparent sm:text-[24px] dark:border-gray-500 whitespace-nowrap cursor-base focus:outline-none hover:bg-[#EFB880] hover:text-white">
-                已成团
+                已成團
               </button>
 
               <button className="inline-flex items-center h-12 px-4 py-2 text-[24px] text-white text-center border-b-2 border-[#EFB880] bg-transparent sm:text-[24px] dark:border-gray-500 whitespace-nowrap cursor-base focus:outline-none hover:bg-[#EFB880] hover:text-white">
-                未成团
+                未成團
               </button>
 
               <button className="inline-flex items-center h-12 px-4 py-2 text-[24px] text-white text-center border-b-2 border-[#EFB880] bg-transparent sm:text-[24px] dark:border-gray-500 whitespace-nowrap cursor-base focus:outline-none hover:bg-[#EFB880] hover:text-white">
-                桌游店
+                桌遊店
               </button>
 
               <button className="inline-flex items-center h-12 px-4 py-2 text-[24px] text-white text-center border-b-2 border-[#EFB880] bg-transparent sm:text-[24px] dark:border-gray-500 whitespace-nowrap cursor-base focus:outline-none hover:bg-[#EFB880] hover:text-white">

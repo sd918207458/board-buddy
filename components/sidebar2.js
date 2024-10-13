@@ -5,8 +5,8 @@ import EditRoomModal from '@/components/edit_room'; // 确保路径正确
 // 假设这些是您的 API 路径
 const API_URLS = {
   favorites: 'http://localhost:3005/api/roomheart',
-  joinRecords: 'http://localhost:3005/api/joinRecords',
-  postRecords: 'http://localhost:3005/api/postRecords',
+  joinRecords: 'http://localhost:3005/api/roomhistory',
+  postRecords: 'http://localhost:3005/api/gamecreat',
 };
 
 
@@ -287,7 +287,7 @@ const handleSaveEdit = async (editedData) => {
                     <div key={item.id} className="card bg-base-100 shadow-xl w-full h-48">
                       <div className="flex h-full">
                         <figure className="w-2/5 h-full">
-                          <img src={item.imageUrl} alt="Random" className="object-cover w-full h-full" />
+                          <img src={item.img ? `http://localhost:3005/room/${item.img}` : "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1470&q=80"} alt="Random" className="object-cover w-full h-full" />
                         </figure>
                         <div className="card-body w-3/5 flex flex-col justify-between">
                           <h2 className="card-title">{item.room_name}</h2>
@@ -325,7 +325,7 @@ const handleSaveEdit = async (editedData) => {
                     <div key={record.id} className="card bg-base-100 shadow-xl w-full h-48">
                       <div className="flex h-full">
                         <figure className="w-2/5 h-full">
-                          <img src={record.imageUrl} alt="Random" className="object-cover w-full h-full" />
+                          <img src={record.img ? `http://localhost:3005/room/${record.img}` : "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1470&q=80"} alt="Random" className="object-cover w-full h-full" />
                         </figure>
                         <div className="card-body w-3/5 flex flex-col justify-between">
                           <h2 className="card-title">{record.room_name}</h2>
