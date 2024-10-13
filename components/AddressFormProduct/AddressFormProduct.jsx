@@ -97,6 +97,39 @@ const AddressFormProduct = () => {
       setLoading(false);
     }
   };
+  //////default address
+  const handleDefaultClick = async () => {
+    try {
+      // 從後端獲取地址列表
+      const response = await fetchWithAuth(
+        "http://localhost:3005/api/shipment/addresses"
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch addresses");
+      }
+
+      const data = await response.json();
+      console.log(data); // 確認這裡的資料結構
+      const defaultAddress = data.data.find((address) => address.isDefault);
+
+      // 如果有預設地址，更新表單資料
+      if (defaultAddress) {
+        setFormData((prevData) => ({
+          ...prevData,
+          city: defaultAddress.city || "",
+          district: defaultAddress.area || "",
+          address: defaultAddress.detailed_address || "",
+        }));
+        // toast.success("已獲取預設地址"); // 顯示成功消息
+      } else {
+        // toast.info("沒有設置預設地址"); // 沒有預設地址的情況
+      }
+    } catch (error) {
+      console.error("Fetch default address error: ", error);
+      toast.error("無法獲取預設地址");
+    }
+  };
 
   // 從後端獲取付款方式
   const fetchPaymentMethods = async () => {
@@ -183,8 +216,8 @@ const AddressFormProduct = () => {
       ),
       address: {
         address: formData.address,
-        city: formData.city,
-        district: formData.district,
+        // city: formData.city,
+        // district: formData.district,
       },
       paymentInfo: {
         cardNumber: formData.cardNumber,
@@ -313,8 +346,8 @@ const AddressFormProduct = () => {
                 name="radio-2"
                 value="is_default"
                 className="radio"
+                onClick={handleDefaultClick}
                 defaultChecked
-                onChange={handleOptionChange}
               />
               <span className="ml-2">預設地址</span>
             </label>
@@ -324,7 +357,6 @@ const AddressFormProduct = () => {
                 name="radio-2"
                 value="customed_address"
                 className="radio"
-                onChange={handleOptionChange}
               />
               <span className="ml-2">自訂地址</span>
             </label>
@@ -384,6 +416,68 @@ const AddressFormProduct = () => {
               />
             </div>
           </div>
+          {/* 
+          <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
+            <div>
+              <label
+                className="text-gray-700 dark:text-gray-200"
+                htmlFor="city"
+              >
+                縣市名稱
+              </label>
+              <input
+                id="city"
+                type="text"
+                name="city" // 繼續使用固定的 name
+                value={
+                  addresses.find((address) => address.is_default)?.city || "" // 只有在 is_default 為 true 時顯示對應的 city 值
+                }
+                onChange={handleChange}
+                className="block w-full px-4 py-2 mt-2 border rounded-md"
+                placeholder="請輸入縣市"
+              />
+            </div>
+            <div>
+              <label
+                className="text-gray-700 dark:text-gray-200"
+                htmlFor="district"
+              >
+                鄉鎮市區名稱
+              </label>
+              <input
+                id="district"
+                type="text"
+                name="district" // 繼續使用固定的 name
+                value={
+                  addresses.find((address) => address.is_default)?.district ||
+                  "" // 只有在 is_default 為 true 時顯示對應的 district 值
+                }
+                onChange={handleChange}
+                className="block w-full px-4 py-2 mt-2 border rounded-md"
+                placeholder="請輸入鄉鎮市區"
+              />
+            </div>
+            <div>
+              <label
+                className="text-gray-700 dark:text-gray-200"
+                htmlFor="address"
+              >
+                地址
+              </label>
+              <input
+                id="address"
+                type="text"
+                name="address" // 繼續使用固定的 name
+                value={
+                  addresses.find((address) => address.is_default)
+                    ?.detailed_address || "" // 只有在 is_default 為 true 時顯示對應的 detailed_address 值
+                }
+                onChange={handleChange}
+                className="block w-full px-4 py-2 mt-2 border rounded-md"
+                placeholder="請輸入詳細地址"
+              />
+            </div>
+          </div> */}
 
           {/* /////// */}
           {/* //////付款方式//// */}
