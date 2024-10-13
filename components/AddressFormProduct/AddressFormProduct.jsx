@@ -43,6 +43,7 @@ const AddressFormProduct = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isEditable, setIsEditable] = useState(false); // 新增可編輯狀態
 
   // 引入購物車 hook，確保在組件頂層調用
   const { cartItems, setCartItems, totalPrice } = useCart();
@@ -144,7 +145,7 @@ const AddressFormProduct = () => {
           street: defaultAddress.street || "",
           detailed_address: defaultAddress.detailed_address || "",
         }));
-
+        setIsEditable(false); // 設置為只讀
         // toast.success("已獲取預設地址"); // 顯示成功消息
       } else {
         // toast.info("沒有設置預設地址"); // 沒有預設地址的情況
@@ -153,6 +154,17 @@ const AddressFormProduct = () => {
       console.error("Fetch default address error: ", error);
       toast.error("無法獲取預設地址");
     }
+  };
+
+  const handleCustomAddressClick = () => {
+    setFormData((prevData) => ({
+      ...prevData,
+      city: "",
+      district: "",
+      detailed_address: "",
+      address: "", // 如果需要清空完整地址欄位
+    }));
+    setIsEditable(true); // 設置為可編輯狀態
   };
 
   // 從後端獲取付款方式
@@ -381,6 +393,7 @@ const AddressFormProduct = () => {
                 name="radio-2"
                 value="customed_address"
                 className="radio"
+                onClick={handleCustomAddressClick}
               />
               <span className="ml-2">自訂地址</span>
             </label>
@@ -401,6 +414,7 @@ const AddressFormProduct = () => {
                 name="city"
                 value={formData.city}
                 onChange={handleChange}
+                readOnly={!isEditable} // 根據可編輯狀態設置
                 className="block w-full px-4 py-2 mt-2 border rounded-md"
                 placeholder="請輸入縣市"
               />
@@ -418,6 +432,7 @@ const AddressFormProduct = () => {
                 name="district"
                 value={formData.district}
                 onChange={handleChange}
+                readOnly={!isEditable} // 根據可編輯狀態設置
                 className="block w-full px-4 py-2 mt-2 border rounded-md"
                 placeholder="請輸入鄉鎮市區"
               />
@@ -435,6 +450,7 @@ const AddressFormProduct = () => {
                 name="detailed_address"
                 value={formData.detailed_address}
                 onChange={handleChange}
+                readOnly={!isEditable} // 根據可編輯狀態設置
                 className="block w-full px-4 py-2 mt-2 border rounded-md"
                 placeholder="請輸入詳細地址"
               />
