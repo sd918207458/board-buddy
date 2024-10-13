@@ -8,7 +8,7 @@ import SearchBar from '@/components/searchbar';
 import Carousel2 from "@/components/carousel-game2";
 import Gamecard from "@/components/gamecard";
 import CreateRoomButton from "@/components/createroombutton";
-import Test from "@/components/test";
+// import Test from "@/components/test";
 export default function Gameindex() {
   const [searchResults, setSearchResults] = useState([]); // 用于存储搜索结果
   const [allGames, setAllGames] = useState([]); // 用于存储所有游戏数据
@@ -106,7 +106,6 @@ export default function Gameindex() {
     <>
       <div className="bg-[#003E52]">
         <Breadcrumbs />
-        <Sidebar />
         <Carousel1 />
         <SearchBar onSearchResults={handleSearchResults} /> {/* 将搜索结果传递给父组件 */}
 
@@ -210,7 +209,7 @@ export default function Gameindex() {
         </div>
 
         
-        <Test/>
+        <Sidebar />
         <CreateRoomButton/>
         <Footer />
       </div>

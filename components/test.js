@@ -1,25 +1,5 @@
-// import React, { useState } from 'react';
 import React, { useState, useEffect } from 'react';
 import NavbarSwitcher from "@/components/NavbarSwitcher"; // 使用 NavbarSwitcher 组件++
-
-// const friendsData = [
-//   { name: '小明', avatar: 'https://picsum.photos/50/50?random=1' },
-//   { name: '小紅', avatar: 'https://picsum.photos/50/50?random=2' },
-//   { name: '小華', avatar: 'https://picsum.photos/50/50?random=3' },
-//   { name: '小李', avatar: 'https://picsum.photos/50/50?random=4' },
-//   { name: '小張', avatar: 'https://picsum.photos/50/50?random=5' },
-// ];
-
-// const messages = {
-//   herry: [
-//     { from: '我', text: '嗨，herry！' },
-//     { from: 'herry', text: '你好！' },
-//   ],
-//   ginny: [
-//     { from: '我', text: 'ginny，你在嗎？' },
-//     { from: 'ginny', text: '在的，怎麼了？' },
-//   ],
-// };
 
 const DrawerComponent2 = () => {
   const [drawerContent2, setDrawerContent2] = useState('聊天室');
@@ -34,12 +14,6 @@ const DrawerComponent2 = () => {
   const [usersId, setUsersId] = useState(''); // 将 usersId 定义为状态
   const [username, setUsername] = useState(""); // 用于接收 Navbar 中的 username++
   const [alertMessage, setAlertMessage] = useState('');
-
-  // useEffect(() => {
-  //   const userId = 1; // 你的用户 ID
-  //   const friendId = 2; // 你的好友 ID
-  //   fetchMessages(userId, friendId);
-  // }, []);
 
   useEffect(() => {
     console.log('当前的 messages 结构:', messages);
@@ -347,15 +321,15 @@ useEffect(() => {
     <div className="drawer drawer-end">
       <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
       <div className="fixed bottom-4 right-4">
-  <button
-    onClick={() => handleOpenDrawer2('聊天室')} // 保持原有功能
-    className="flex flex-col items-center justify-center w-20 h-20 border border-white text-white bg-transparent 
-                   transition-transform duration-300 hover:scale-110 hover:bg-[#EFB880] rounded-lg"
-  >
-    <span>好友</span>
-    <span>聊天</span>
-  </button>
-</div>
+        <button
+          onClick={() => handleOpenDrawer2('聊天室')} // 保持原有功能
+          className="flex flex-col items-center justify-center w-20 h-20 border border-white text-white bg-transparent 
+                        transition-transform duration-300 hover:scale-110 hover:bg-[#EFB880] rounded-lg"
+          >
+          <span>好友</span>
+          <span>聊天</span>
+        </button>
+      </div>
 
 
       <div className="drawer-side" style={{ zIndex: 60 }}>
