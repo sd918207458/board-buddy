@@ -5,28 +5,37 @@ import EditRoomModal from '@/components/edit_room'; // 确保路径正确
 // 假设这些是您的 API 路径
 const API_URLS = {
   favorites: 'http://localhost:3005/api/roomheart',
-  joinRecords: 'http://localhost:3005/api/roomhistory',
-  postRecords: 'http://localhost:3005/api/gamecreat',
+  joinRecords: 'http://localhost:3005/api/joinRecords',
+  postRecords: 'http://localhost:3005/api/postRecords',
 };
 
-const friendsData = [
-  { name: '小明', avatar: 'https://picsum.photos/50/50?random=1' },
-  { name: '小紅', avatar: 'https://picsum.photos/50/50?random=2' },
-  { name: '小華', avatar: 'https://picsum.photos/50/50?random=3' },
-  { name: '小李', avatar: 'https://picsum.photos/50/50?random=4' },
-  { name: '小張', avatar: 'https://picsum.photos/50/50?random=5' },
-];
 
-const messages = {
-  小明: [
-    { from: '我', text: '嗨，小明！' },
-    { from: '小明', text: '你好！' },
-  ],
-  小紅: [
-    { from: '我', text: '小紅，你在嗎？' },
-    { from: '小紅', text: '在的，怎麼了？' },
-  ],
-};
+
+const postRecords = [...Array(6)].map((_, index) => ({
+  id: index,
+  title: `發文紀錄 ${index + 1}`,
+  type: '發文類型',
+  image: `https://picsum.photos/200/300?random=${index + 36}`,
+}));
+
+// const friendsData = [
+//   { name: '小明', avatar: 'https://picsum.photos/50/50?random=1' },
+//   { name: '小紅', avatar: 'https://picsum.photos/50/50?random=2' },
+//   { name: '小華', avatar: 'https://picsum.photos/50/50?random=3' },
+//   { name: '小李', avatar: 'https://picsum.photos/50/50?random=4' },
+//   { name: '小張', avatar: 'https://picsum.photos/50/50?random=5' },
+// ];
+
+// const messages = {
+//   小明: [
+//     { from: '我', text: '嗨，小明！' },
+//     { from: '小明', text: '你好！' },
+//   ],
+//   小紅: [
+//     { from: '我', text: '小紅，你在嗎？' },
+//     { from: '小紅', text: '在的，怎麼了？' },
+//   ],
+// };
 
 const DrawerComponent = () => {
   const [activeTab, setActiveTab] = useState('已成團');
@@ -136,14 +145,15 @@ const DrawerComponent = () => {
       fetchFavorites();
       fetchJoinRecords();
       fetchPostRecords();
-    }, 2000); // 5000毫秒 = 5秒
+    }, 5000); // 5000毫秒 = 5秒
 
     // 清理定时器
     return () => clearInterval(interval);
   }, []);
 
-  const handleOpenDrawer = (content) => {
-    setDrawerContent(content);
+  const handleOpenDrawer = (content2) => {
+    setDrawerContent(content2);
+    console.log("我的最愛",content2);
     document.getElementById('my-drawer-4').checked = true;
   };
 
@@ -182,12 +192,12 @@ const DrawerComponent = () => {
     setDescription('');
   };
 
-  const handleSendMessage = () => {
-    if (selectedFriend && newMessage) {
-      messages[selectedFriend].push({ from: '我', text: newMessage });
-      setNewMessage('');
-    }
-  };
+  // const handleSendMessage = () => {
+  //   if (selectedFriend && newMessage) {
+  //     messages[selectedFriend].push({ from: '我', text: newMessage });
+  //     setNewMessage('');
+  //   }
+  // };
 
   const handleBackToChatList = () => {
     setSelectedFriend(null);
@@ -249,11 +259,11 @@ const handleSaveEdit = async (editedData) => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m-3-3h8a2 2 0 002-2V4a2 2 0 00-2-2H4a2 2 0 00-2 2v6a2 2 0 002 2h8z" />
           </svg>
         </button>
-      <button className="btn tooltip tooltip-left" data-tip="聊天室" onClick={() => handleOpenDrawer('聊天室')}>
+      {/* <button className="btn tooltip tooltip-left" data-tip="聊天室" onClick={() => handleOpenDrawer('聊天室')}>
         <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="#EFB880">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8a9 9 0 1115.556 5.192L21 21l-4.808-1.556A9 9 0 013 8z" />
         </svg>
-      </button>
+      </button> */}
     </div>
   </div>
 </div>
@@ -277,14 +287,14 @@ const handleSaveEdit = async (editedData) => {
                     <div key={item.id} className="card bg-base-100 shadow-xl w-full h-48">
                       <div className="flex h-full">
                         <figure className="w-2/5 h-full">
-                          <img src={item.img ? `http://localhost:3005/room/${item.img}` : "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1470&q=80"} alt="Random" className="object-cover w-full h-full" />
+                          <img src={item.imageUrl} alt="Random" className="object-cover w-full h-full" />
                         </figure>
                         <div className="card-body w-3/5 flex flex-col justify-between">
                           <h2 className="card-title">{item.room_name}</h2>
                           <ul className="list-disc list-inside">
                             <li>地址：{item.location}</li>
                             <li>時間：{item.event_date}</li>
-                            <li>遊戲：{item.game1}.{item.game2}.{item.game3}</li>
+                            <li>遊戲：{item.game1}.遊戲：{item.game2}.遊戲：{item.game3}</li>
                           </ul>
                         </div>
                       </div>
@@ -315,14 +325,13 @@ const handleSaveEdit = async (editedData) => {
                     <div key={record.id} className="card bg-base-100 shadow-xl w-full h-48">
                       <div className="flex h-full">
                         <figure className="w-2/5 h-full">
-                          <img src={record.img ? `http://localhost:3005/room/${record.img}` : "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1470&q=80"} alt="Random" className="object-cover w-full h-full" />
+                          <img src={record.imageUrl} alt="Random" className="object-cover w-full h-full" />
                         </figure>
                         <div className="card-body w-3/5 flex flex-col justify-between">
                           <h2 className="card-title">{record.room_name}</h2>
                           <ul className="list-disc list-inside">
                             <li>地址：{record.location}</li>
                             <li>時間：{record.event_date}</li>
-                            <li>遊戲：{record.game1}.{record.game2}.{record.game3}</li>
                           </ul>
                         </div>
                       </div>
@@ -414,7 +423,7 @@ const handleSaveEdit = async (editedData) => {
               </div>
             </div>
           )}
-          {drawerContent === '聊天室' && (
+          {/* {drawerContent === '聊天室' && (
             <div className="w-full">
               {selectedFriend ? (
                 <>
@@ -468,7 +477,7 @@ const handleSaveEdit = async (editedData) => {
                 </>
               )}
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </div>

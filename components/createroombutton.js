@@ -6,7 +6,7 @@ const CreateRoomButton = () => {
   };
 
   return (
-    <div className="fixed bottom-4 right-4">
+    <div className="fixed bottom-28 right-4">
       <button
         onClick={handleClick}
         className="flex flex-col items-center justify-center w-20 h-20 border border-white text-white bg-transparent 
