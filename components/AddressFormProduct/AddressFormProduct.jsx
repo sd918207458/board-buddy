@@ -228,11 +228,15 @@ const AddressFormProduct = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    if (!formData.city || !formData.district || !formData.address) {
-      toast.error("請填寫完整的地址資訊");
-      return;
-    }
+    // 如果 7-11 的地址已經填寫，則不需要檢查其他地址
+    const isStore711AddressFilled = store711.storename && store711.storeaddress;
 
+    if (!isStore711AddressFilled) {
+      if (!formData.city || !formData.district || !formData.address) {
+        toast.error("請填寫完整的地址資訊");
+        return false;
+      }
+    }
     if (!formData.cardNumber || !formData.cardName || !formData.expiryDate) {
       toast.error("請填寫完整的信用卡資訊");
       return;
@@ -252,6 +256,8 @@ const AddressFormProduct = () => {
       ),
       address: {
         address: formData.address,
+        store_name: store711.storename,
+        store_address: store711.storeaddress,
         // city: formData.city,
         // district: formData.district,
       },
