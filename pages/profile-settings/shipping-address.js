@@ -1,3 +1,4 @@
+// shipping-address.js
 import React, { useState, useEffect } from "react";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";

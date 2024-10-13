@@ -1,4 +1,3 @@
-// AddressCard.js
 import React from "react";
 
 const AddressCard = ({
@@ -8,6 +7,7 @@ const AddressCard = ({
   handleSetDefault,
 }) => {
   if (!address) return null;
+  console.log("Address Delivery Method:", address.deliveryMethod);
 
   return (
     <div className="card bg-base-100 shadow-xl mb-4">
