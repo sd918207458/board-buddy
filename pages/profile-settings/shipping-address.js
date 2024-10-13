@@ -36,22 +36,6 @@ const initialFormData = (userData = {}) => ({
   storeAddress: "",
 });
 
-// Initial form data function
-const initialFormData = (userData = {}) => ({
-  username: userData.username || "",
-  phone: userData.phone_number || "",
-  city: "",
-  area: "",
-  street: "",
-  detailed_address: "",
-  isDefault: false,
-  address_id: null,
-  deliveryMethod: "homeDelivery",
-  storeType: "",
-  storeName: "",
-  storeAddress: "",
-});
-
 export default function ShippingAddress() {
   const [addresses, setAddresses] = useState([]);
   const [formData, setFormData] = useState(initialFormData());
@@ -114,11 +98,6 @@ export default function ShippingAddress() {
     } catch (error) {
       handleError("無法加載地址數據", error);
     }
-  };
-
-  const handleError = (message, error = null) => {
-    console.error(message, error);
-    toast.error(message);
   };
 
   const handleError = (message, error = null) => {
@@ -296,7 +275,6 @@ export default function ShippingAddress() {
               handleSubmit={handleSubmit}
               isEditing={isEditing}
               isLoading={isLoading}
-              closeModal={closeModal} // 傳入 closeModal 確保取消按鈕也能正常關閉模態窗
               closeModal={closeModal} // 傳入 closeModal 確保取消按鈕也能正常關閉模態窗
             />
           </div>
