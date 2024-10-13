@@ -15,7 +15,8 @@ const OrderRow = ({ order }) => {
 
   // 提取第一筆商品的圖片
   const firstItemImage = order.items[0]?.image;
-
+  // 在這裡使用 console.log 來檢查 order.address 的結構
+  console.log(order.address);
   return (
     <tr
       className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 ease-in-out"
@@ -42,7 +43,15 @@ const OrderRow = ({ order }) => {
           <div className="text-sm text-gray-500">無圖片</div>
         )}
       </td>
-      <td className="text-left">{order.address}</td>
+      {/* 多一個address因為這裡是物件 */}
+      <td className="text-left">{order.address.address}</td>
+      {/* <td className="text-left">
+        {order.address
+          ? `${order.address}, ${order.address.city}, ${order.address.district}`
+          : "無地址"}
+      </td> */}
+      {/* <td className="text-left">{order.address ? order.address : "無地址"}</td> */}
+      {/* <div>{JSON.stringify(order.address)}</div>; */}
       <td className="text-right">{`NT$${order.total}`}</td>
       <th className="flex gap-2 justify-center m-3">
         <Link href={`/my-orders/${order.orderId}`} legacyBehavior>

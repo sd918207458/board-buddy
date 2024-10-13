@@ -36,6 +36,22 @@ const initialFormData = (userData = {}) => ({
   storeAddress: "",
 });
 
+// Initial form data function
+const initialFormData = (userData = {}) => ({
+  username: userData.username || "",
+  phone: userData.phone_number || "",
+  city: "",
+  area: "",
+  street: "",
+  detailed_address: "",
+  isDefault: false,
+  address_id: null,
+  deliveryMethod: "homeDelivery",
+  storeType: "",
+  storeName: "",
+  storeAddress: "",
+});
+
 export default function ShippingAddress() {
   const [addresses, setAddresses] = useState([]);
   const [formData, setFormData] = useState(initialFormData());
@@ -58,6 +74,17 @@ export default function ShippingAddress() {
     }
   }, [userData]);
 
+  useEffect(() => {
+    if (userData) {
+      setFormData((prev) => ({
+        ...prev,
+        username: userData.username,
+        phone: userData.phone_number,
+      }));
+    }
+  }, [userData]);
+
+  // Fetch user info
   const fetchUserInfo = async () => {
     try {
       const response = await fetchWithAuth(`${API_BASE_URL}/users/check`);
@@ -72,6 +99,7 @@ export default function ShippingAddress() {
     }
   };
 
+  // Fetch addresses
   const fetchAddresses = async () => {
     try {
       const response = await fetchWithAuth(
@@ -93,6 +121,12 @@ export default function ShippingAddress() {
     toast.error(message);
   };
 
+  const handleError = (message, error = null) => {
+    console.error(message, error);
+    toast.error(message);
+  };
+
+  // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -137,12 +171,14 @@ export default function ShippingAddress() {
     }
   };
 
+  // Handle edit address
   const handleEdit = (address) => {
     setIsEditing(true);
     setFormData({ ...initialFormData(userData), ...address });
     openModal();
   };
 
+  // Handle delete address
   const handleDelete = async (addressId) => {
     setIsLoading(true);
     try {
@@ -150,6 +186,7 @@ export default function ShippingAddress() {
         `${API_BASE_URL}/shipment/addresses/${addressId}`,
         { method: "DELETE" }
       );
+      if (!response.ok) throw new Error("刪除地址失敗");
       if (!response.ok) throw new Error("刪除地址失敗");
 
       setAddresses((prevAddresses) =>
@@ -163,12 +200,14 @@ export default function ShippingAddress() {
     }
   };
 
+  // Handle set default address
   const handleSetDefault = async (addressId) => {
     try {
       const response = await fetchWithAuth(
         `${API_BASE_URL}/shipment/addresses/${addressId}/default`,
         { method: "PUT" }
       );
+      if (!response.ok) throw new Error("設定預設地址失敗");
       if (!response.ok) throw new Error("設定預設地址失敗");
 
       setAddresses((prevAddresses) =>
@@ -182,7 +221,7 @@ export default function ShippingAddress() {
       handleError("設定預設地址失敗", error);
     }
   };
-
+  // Reset form
   const resetForm = () => {
     setFormData(initialFormData(userData));
     setIsEditing(false);
@@ -236,7 +275,13 @@ export default function ShippingAddress() {
         </div>
 
         <dialog id="my_modal_1" className="modal">
-          <div className="modal-box relative">
+          <div className="modal-box relative relative">
+            <button
+              className="btn btn-sm btn-circle absolute right-2 top-2"
+              onClick={closeModal}
+            >
+              ✕
+            </button>
             <button
               className="btn btn-sm btn-circle absolute right-2 top-2"
               onClick={closeModal}
@@ -252,8 +297,12 @@ export default function ShippingAddress() {
               isEditing={isEditing}
               isLoading={isLoading}
               closeModal={closeModal} // 傳入 closeModal 確保取消按鈕也能正常關閉模態窗
+              closeModal={closeModal} // 傳入 closeModal 確保取消按鈕也能正常關閉模態窗
             />
           </div>
+          <form method="dialog" className="modal-backdrop">
+            <button onClick={closeModal}>關閉</button>
+          </form>
           <form method="dialog" className="modal-backdrop">
             <button onClick={closeModal}>關閉</button>
           </form>

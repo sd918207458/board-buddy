@@ -57,16 +57,21 @@ export const CartProvider = ({ children }) => {
     (total, item) => total + item.quantity,
     0
   );
-  // 計算購物車內所有商品的總價
-  const totalPrice = cartItems.reduce((total, item) => {
-    // 如果 price 是字符串，則移除逗號，否則直接轉換為數字
-    const itemPrice =
-      typeof item.price === "string"
-        ? parseFloat(item.price.replace(/,/g, ""))
-        : parseFloat(item.price);
+  // 設定固定運費
+  const shippingCost = 130; // 固定運費
 
-    return total + itemPrice * item.quantity;
-  }, 0);
+  // 計算購物車內所有商品的總價，包括運費
+  const totalPrice =
+    cartItems.reduce((total, item) => {
+      // 如果 price 是字符串，則移除逗號，否則直接轉換為數字
+      const itemPrice =
+        typeof item.price === "string"
+          ? parseFloat(item.price.replace(/,/g, ""))
+          : parseFloat(item.price);
+
+      return total + itemPrice * item.quantity;
+    }, 0) + shippingCost; // 在這裡加上運費
+
   const handleQuantityChange = (index, amount) => {
     const newCartItems = [...cartItems];
     if (newCartItems[index].quantity + amount > 0) {
@@ -101,7 +106,7 @@ export const CartProvider = ({ children }) => {
         cartItems, // 返回購物車中的商品
         addToCart, // 返回將商品加入購物車的函數
         setCartItems, // 返回設置購物車內容的函數
-        totalPrice, // 返回購物車的總價
+        totalPrice, // 返回購物車的總價（包括運費）
         isCartVisible, // 返回購物車是否可見的狀態
         setIsCartVisible, // 返回設置購物車可見狀態的函數
         updateCartItems, // 返回更新購物車項目的函數
@@ -110,6 +115,7 @@ export const CartProvider = ({ children }) => {
         isMounted,
         handleRemoveItem,
         clearCart,
+        shippingCost, // 返回運費
       }}
     >
       {children}

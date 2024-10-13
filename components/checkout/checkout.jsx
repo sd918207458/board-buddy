@@ -12,6 +12,7 @@ const Checkout = () => {
     handleQuantityChange, // 更新商品數量的函數
     handleRemoveItem, // 移除商品的函數
     isMounted, // 判斷組件是否加載完成
+    shippingCost,
   } = useCart();
   const MySwal = withReactContent(Swal);
 
@@ -107,7 +108,7 @@ const Checkout = () => {
         </table>
         <div className={styles.totalSection}>
           {/* 總價加上千位逗號 */}
-          <h2>應付總額: NT${totalPrice.toLocaleString()}</h2>
+          <h2>小計: NT${totalPrice.toLocaleString()}</h2>
         </div>
       </section>
     </>
