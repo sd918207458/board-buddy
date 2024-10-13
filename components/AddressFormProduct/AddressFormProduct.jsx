@@ -36,6 +36,7 @@ const AddressFormProduct = () => {
     is_default: false,
     store_type: "",
     district: "",
+    detailed_address: "",
   });
   const [addresses, setAddresses] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState("");
@@ -97,7 +98,7 @@ const AddressFormProduct = () => {
           city: defaultAddress.city || "",
           district: defaultAddress.area || "",
           street: defaultAddress.street || "",
-          is_default: defaultAddress.isDefault,
+          detailed_address: defaultAddress.detailed_address || "",
         }));
       }
       setLoading(false);
@@ -431,7 +432,7 @@ const AddressFormProduct = () => {
               <input
                 id="address"
                 type="text"
-                name="address"
+                name="detailed_address"
                 value={formData.detailed_address}
                 onChange={handleChange}
                 className="block w-full px-4 py-2 mt-2 border rounded-md"
