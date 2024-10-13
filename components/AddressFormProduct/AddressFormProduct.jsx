@@ -80,14 +80,14 @@ const AddressFormProduct = () => {
       }
       const data = await response.json();
       setAddresses(data.data || []);
-      const defaultAddress = data.data?.find((address) => address.is_default);
+      const defaultAddress = data.data?.find((address) => address.isDefault);
       if (defaultAddress) {
         setFormData((prevData) => ({
           ...prevData,
           address: defaultAddress.detailed_address || "",
           city: defaultAddress.city || "",
           district: defaultAddress.area || "",
-          is_default: defaultAddress.is_default,
+          is_default: defaultAddress.isDefault,
         }));
       }
       setLoading(false);
