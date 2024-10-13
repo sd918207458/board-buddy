@@ -14,37 +14,88 @@ const AddressForm = ({
   isLoading,
   closeModal,
 }) => {
-  const cities = taiwanDistricts.map((city) => city.name);
   const [areas, setAreas] = useState([]);
 
+  // 引用 7-11 門市選擇的 hooks
   const { store711, openWindow } = useShip711StoreOpener(
     "http://localhost:3005/api/shipment/711",
     { autoCloseMins: 3 }
   );
 
+  // 回傳門市資訊並將名稱和地址填入對應欄位
   useShip711StoreCallback((storeInfo) => {
-    if (storeInfo && storeInfo.storename && storeInfo.storeaddress) {
+    if (storeInfo) {
       handleChange({
-        target: {
-          name: "storeName",
-          value: storeInfo.storename,
-        },
+        target: { name: "storeName", value: storeInfo.storename },
       });
       handleChange({
-        target: {
-          name: "storeAddress",
-          value: storeInfo.storeaddress,
-        },
+        target: { name: "storeAddress", value: storeInfo.storeaddress },
       });
     }
   });
 
+  // 根據選擇的城市來更新區域
   useEffect(() => {
     const selectedCity = taiwanDistricts.find(
       (city) => city.name === formData.city
     );
     setAreas(selectedCity ? selectedCity.districts : []);
   }, [formData.city]);
+
+  const renderInput = (
+    label,
+    name,
+    value,
+    placeholder,
+    required = false,
+    readOnly = false
+  ) => (
+    <div className="form-control">
+      <label className="label">
+        <span className="label-text">{label}</span>
+      </label>
+      <input
+        type="text"
+        name={name}
+        value={value || ""}
+        onChange={handleChange}
+        placeholder={placeholder}
+        className="input input-bordered w-full text-black"
+        required={required}
+        readOnly={readOnly}
+      />
+    </div>
+  );
+
+  const renderSelect = (
+    label,
+    name,
+    value,
+    options,
+    required = false,
+    disabled = false
+  ) => (
+    <div className="form-control">
+      <label className="label">
+        <span className="label-text">{label}</span>
+      </label>
+      <select
+        name={name}
+        value={value || ""}
+        onChange={handleChange}
+        className="select select-bordered w-full text-black"
+        required={required}
+        disabled={disabled}
+      >
+        <option value="">{`請選擇${label}`}</option>
+        {options.map((option, index) => (
+          <option key={index} value={option.value || option}>
+            {option.label || option}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
 
   return (
     <form onSubmit={handleSubmit}>
@@ -53,187 +104,108 @@ const AddressForm = ({
       </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text">收貨方式</span>
-          </label>
-          <select
-            name="deliveryMethod"
-            value={formData.deliveryMethod || ""}
-            onChange={handleChange}
-            className="select select-bordered w-full text-black"
-            required
-          >
-            <option value="homeDelivery">宅配到府</option>
-            <option value="convenienceStore">超商取貨</option>
-          </select>
-        </div>
+        {renderSelect(
+          "收貨方式",
+          "deliveryMethod",
+          formData.deliveryMethod,
+          [
+            { value: "homeDelivery", label: "宅配到府" },
+            // { value: "convenienceStore", label: "超商取貨" }, // 註釋掉超商取貨選項
+          ],
+          true
+        )}
 
         {formData.deliveryMethod === "homeDelivery" && (
           <>
-            <div className="form-control">
-              <label className="label" htmlFor="username">
-                <span className="label-text">收件人姓名</span>
-              </label>
-              <input
-                id="username"
-                type="text"
-                name="username"
-                value={formData.username || ""}
-                onChange={handleChange}
-                placeholder="請輸入收件人姓名"
-                className="input input-bordered w-full text-black"
-                required
-              />
-            </div>
-            <div className="form-control">
-              <label className="label" htmlFor="phone">
-                <span className="label-text">聯絡電話</span>
-              </label>
-              <input
-                id="phone"
-                type="text"
-                name="phone"
-                value={formData.phone || ""}
-                onChange={handleChange}
-                placeholder="請輸入聯絡電話"
-                className="input input-bordered w-full text-black"
-                required
-              />
-            </div>
-            <div className="form-control">
-              <label className="label" htmlFor="city">
-                <span className="label-text">城市</span>
-              </label>
-              <select
-                name="city"
-                value={formData.city || ""}
-                onChange={handleChange}
-                className="select select-bordered w-full text-black"
-                required
-              >
-                <option value="">請選擇城市</option>
-                {cities.map((city, index) => (
-                  <option key={index} value={city}>
-                    {city}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="form-control">
-              <label className="label" htmlFor="area">
-                <span className="label-text">區域</span>
-              </label>
-              <select
-                name="area"
-                value={formData.area || ""}
-                onChange={handleChange}
-                className="select select-bordered w-full text-black"
-                required
-                disabled={!formData.city}
-              >
-                <option value="">請選擇區域</option>
-                {areas.map((area) => (
-                  <option key={area.zip} value={area.name}>
-                    {area.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="form-control">
-              <label className="label" htmlFor="street">
-                <span className="label-text">街道</span>
-              </label>
-              <input
-                id="street"
-                type="text"
-                name="street"
-                value={formData.street || ""}
-                onChange={handleChange}
-                placeholder="請輸入街道"
-                className="input input-bordered w-full text-black"
-                required
-              />
-            </div>
-            <div className="form-control">
-              <label className="label" htmlFor="detailed_address">
-                <span className="label-text">詳細地址</span>
-              </label>
-              <input
-                id="detailed_address"
-                type="text"
-                name="detailed_address"
-                value={formData.detailed_address || ""}
-                onChange={handleChange}
-                placeholder="請輸入詳細地址"
-                className="input input-bordered w-full text-black"
-                required
-              />
-            </div>
-          </>
-        )}
-
-        {formData.deliveryMethod === "convenienceStore" && (
-          <>
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">選擇超商</span>
-              </label>
-              <select
-                name="storeType"
-                value={formData.storeType || ""}
-                onChange={handleChange}
-                className="select select-bordered w-full text-black"
-                required
-              >
-                <option value="">請選擇超商</option>
-                <option value="7-11">7-11</option>
-                <option value="FamilyMart">全家</option>
-              </select>
-            </div>
-
-            {formData.storeType === "7-11" && (
-              <div className="form-control mt-4">
-                <label className="label">
-                  <span className="label-text">選擇7-11門市</span>
-                </label>
-                <button
-                  type="button"
-                  onClick={() => openWindow()}
-                  className="btn btn-primary w-full"
-                >
-                  選擇門市
-                </button>
-                <div className="form-control mt-4">
-                  <label className="label">
-                    <span className="label-text">門市名稱</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="storeName"
-                    value={store711.storename || formData.storeName || ""}
-                    placeholder="請選擇店鋪"
-                    className="input input-bordered w-full text-black"
-                    readOnly
-                  />
-                </div>
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">門市地址</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="storeAddress"
-                    value={store711.storeaddress || formData.storeAddress || ""}
-                    placeholder="請選擇店鋪"
-                    className="input input-bordered w-full text-black"
-                    readOnly
-                  />
-                </div>
-              </div>
+            {renderInput(
+              "收件人姓名",
+              "username",
+              formData.username,
+              "請輸入收件人姓名",
+              true
+            )}
+            {renderInput(
+              "聯絡電話",
+              "phone",
+              formData.phone,
+              "請輸入聯絡電話",
+              true
+            )}
+            {renderSelect(
+              "城市",
+              "city",
+              formData.city,
+              taiwanDistricts.map((city) => city.name),
+              true
+            )}
+            {renderSelect(
+              "區域",
+              "area",
+              formData.area,
+              areas.map((area) => area.name),
+              true,
+              !formData.city
+            )}
+            {renderInput("街道", "street", formData.street, "請輸入街道", true)}
+            {renderInput(
+              "詳細地址",
+              "detailed_address",
+              formData.detailed_address,
+              "請輸入詳細地址",
+              true
             )}
           </>
         )}
+
+        {/* 
+        {formData.deliveryMethod === "convenienceStore" && (
+          <>
+            {renderSelect(
+              "選擇超商",
+              "storeType",
+              formData.storeType,
+              [
+                { value: "7-11", label: "7-11" },
+                { value: "FamilyMart", label: "全家" },
+              ],
+              true
+            )}
+
+            {formData.storeType === "7-11" && (
+              <>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">選擇7-11門市</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={openWindow}
+                    className="btn btn-primary w-full"
+                  >
+                    選擇門市
+                  </button>
+                  {renderInput(
+                    "門市名稱",
+                    "storeName",
+                    store711.storeName || formData.storeName,
+                    "請選擇店鋪",
+                    true,
+                    true
+                  )}
+                  {renderInput(
+                    "門市地址",
+                    "storeAddress",
+                    store711.storeAddress || formData.storeAddress,
+                    "請選擇店鋪",
+                    true,
+                    true
+                  )}
+                </div>
+              </>
+            )}
+          </>
+        )}
+        */}
       </div>
 
       <div className="form-control">

@@ -236,7 +236,13 @@ export default function ShippingAddress() {
         </div>
 
         <dialog id="my_modal_1" className="modal">
-          <div className="modal-box">
+          <div className="modal-box relative">
+            <button
+              className="btn btn-sm btn-circle absolute right-2 top-2"
+              onClick={closeModal}
+            >
+              ✕
+            </button>
             <AddressForm
               formData={formData}
               handleChange={(e) =>
@@ -245,9 +251,12 @@ export default function ShippingAddress() {
               handleSubmit={handleSubmit}
               isEditing={isEditing}
               isLoading={isLoading}
-              closeModal={closeModal}
+              closeModal={closeModal} // 傳入 closeModal 確保取消按鈕也能正常關閉模態窗
             />
           </div>
+          <form method="dialog" className="modal-backdrop">
+            <button onClick={closeModal}>關閉</button>
+          </form>
         </dialog>
       </div>
       <Footer />
