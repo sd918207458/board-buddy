@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import EditRoomModal from '@/components/edit_room'; // 确保路径正确
 
 
 // 假设这些是您的 API 路径
@@ -38,6 +39,10 @@ const DrawerComponent = () => {
   const [description, setDescription] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [newMessage, setNewMessage] = useState('');
+  // 编辑房间状态
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingRoomData, setEditingRoomData] = useState(null);
+
 
   // 获取我的最爱数据
   const fetchFavorites = async () => {
@@ -74,23 +79,30 @@ const DrawerComponent = () => {
   };
 
   // 获取发文记录数据并筛选出 member_id 为 tai 的数据
-const fetchPostRecords = async () => {
-  try {
-    const response = await fetch(API_URLS.postRecords);
-    const data = await response.json();
-    if (Array.isArray(data)) {
-      // 筛选出 member_id 为 'tai' 的记录
-      const filteredData = data.filter(record => record.member_id === 'tai');
-      setPostRecords(filteredData);
-    } else {
-      console.error('Post records data is not an array:', data);
-      setPostRecords([]); // 确保设置为数组
+  const fetchPostRecords = async () => {
+    try {
+      const response = await fetch(API_URLS.postRecords);
+      const data = await response.json();
+  
+      // 檢查 data 物件是否包含 data 鍵
+      if (data && Array.isArray(data.data)) {
+        // 篩選出 member_id 為 '李台生' 的記錄
+        const filteredData = data.data.filter(record => record.member_id === '李台生');
+  
+        // 檢查篩選結果
+        console.log('Filtered Post Records:', filteredData); // 日誌篩選結果
+  
+        setPostRecords(filteredData);
+      } else {
+        console.error('Post records data is not an array:', data);
+        setPostRecords([]); // 確保設置為空數組
+      }
+    } catch (error) {
+      console.error('Error fetching post records:', error);
+      setPostRecords([]); // 確保設置為空數組
     }
-  } catch (error) {
-    console.error('Error fetching post records:', error);
-    setPostRecords([]); // 确保设置为数组
-  }
-};
+  };
+  
 
 
   useEffect(() => {
@@ -98,12 +110,7 @@ const fetchPostRecords = async () => {
     fetchJoinRecords();
     fetchPostRecords();
 
-    const postRecords = [...Array(6)].map((_, index) => ({
-      id: index,
-      title: `發文紀錄 ${index + 1}`,
-      type: '發文類型',
-      image: `https://picsum.photos/200/300?random=${index + 36}`,
-    }));
+   
     
     const friendsData = [
       { name: '小明', avatar: 'https://picsum.photos/50/50?random=1' },
@@ -140,13 +147,35 @@ const fetchPostRecords = async () => {
     document.getElementById('my-drawer-4').checked = true;
   };
 
-  const handleDeletePost = (id) => {
-    if (window.confirm('是否刪除此筆揪團？')) {
-      console.log(`刪除發文紀錄 ID: ${id}`);
-      // 此处可加入删除逻辑
+  const handleDeletePost = async (room_id) => {
+    console.log('Calling handleDeletePost with room_id:', room_id); // 確認調用的 ID
+    if (!room_id) {
+      console.error('無效的 room_id:', room_id);
+      alert('無效的 room_id');
+      return;
+    }
+  
+    try {
+      const response = await fetch(`http://localhost:3005/api/gamecreat/${room_id}`, {
+        method: 'DELETE',
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('刪除失敗:', errorData);
+        alert(`刪除失敗: ${errorData.message || '未知錯誤'}`);
+        return;
+      }
+  
+      // 刪除成功後更新狀態
+      setPostRecords(prevRecords => prevRecords.filter(post => post.room_id !== room_id));
+      alert('刪除成功');
+    } catch (error) {
+      console.error('刪除過程中出錯:', error);
+      alert('刪除過程中出錯: ' + error.message);
     }
   };
-
+  
   const handleSubmitFeedback = () => {
     console.log('反饋已送出:', selectedFeedback, description);
     setSelectedFeedback('');
@@ -163,7 +192,36 @@ const fetchPostRecords = async () => {
   const handleBackToChatList = () => {
     setSelectedFriend(null);
   };
+  const handleEditPost = (post) => {
+    setEditingRoomData(post);
+    setIsEditing(true);
+};
 
+const handleSaveEdit = async (editedData) => {
+    try {
+        const response = await fetch(`http://localhost:3005/api/gamecreat/${editedData.get('room_id')}`, {
+            method: 'PUT',
+            body: editedData,
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('更新失败:', errorData);
+            alert(`更新失败: ${errorData.message || '未知错误'}`);
+            return;
+        }
+
+        const updatedPost = await response.json();
+        setPostRecords(prevRecords => prevRecords.map(post => post.room_id === updatedPost.room_id ? updatedPost : post));
+        alert('更新成功');
+    } catch (error) {
+        console.error('更新过程中出错:', error);
+        alert('更新过程中出错: ' + error.toString());
+    } finally {
+        setIsEditing(false);
+        setEditingRoomData(null);
+    }
+};
 
   return (
     <div className="drawer drawer-end">
@@ -278,31 +336,55 @@ const fetchPostRecords = async () => {
             </>
           )}
           {drawerContent === '發文紀錄' && (
-            <>
-              <div className="overflow-y-auto h-[calc(100%-6rem)] mt-4">
-                <div className="flex flex-col space-y-4">
-                  {postRecords.map((post) => (
-                    <div key={post.id} className="card bg-base-100 shadow-xl w-full h-48">
-                      <div className="flex h-full">
-                        <figure className="w-2/5 h-full">
-                          <img src={post.img ? `http://localhost:3005/room/${post.img}` : "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1470&q=80"} alt="Random" className="object-cover w-full h-full" />
-                        </figure>
-                        <div className="card-body w-3/5 flex flex-col justify-between">
-                          <h2 className="card-title">{post.room_name}</h2>
-                          <ul className="list-disc list-inside">
-                            <li>地址：{post.location}</li>
-                            <li>時間：{post.event_date}</li>
-                            <li>遊戲：{post.game1}.{post.game2}.{post.game3}</li>
-                          </ul>
-                          <button className="btn btn-sm" onClick={() => handleDeletePost(post.id)}>刪除</button>
+              <>
+                <div className="overflow-y-auto h-[calc(100%-6rem)] mt-4">
+                  <div className="flex flex-col space-y-4">
+                    {postRecords.map((post) => (
+                      <div key={post.room_id} className="card bg-base-100 shadow-xl w-full h-48 relative">
+                        <div className="flex h-full">
+                          <figure className="w-2/5 h-full">
+                            <img 
+                              src={post.img ? `http://localhost:3005/room/${post.img}` : "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1470&q=80"} 
+                              alt="Random" 
+                              className="object-cover w-full h-full" 
+                            />
+                          </figure>
+                          <div className="card-body w-3/5 flex flex-col justify-between">
+                            <h2 className="card-title">{post.room_name}</h2>
+                            <ul className="list-disc list-inside">
+                              <li>地址：{post.location}</li>
+                              <li>時間：{post.event_date}</li>
+                              <li>遊戲：{post.game1}.{post.game2}.{post.game3}</li>
+                            </ul>
+                            <div className="absolute top-2 right-2 space-x-2">
+                            <span 
+  className="text-blue-500 underline cursor-pointer" 
+  onClick={() => handleEditPost(post)}>編輯
+</span>
+
+                              <span 
+                                className="text-red-500 underline cursor-pointer" 
+                                onClick={() => handleDeletePost(post.room_id)}>刪除
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </>
-          )}
+              </>
+            )}
+            {/* 这里添加 EditRoomModal */}
+            {isEditing && (
+                <EditRoomModal
+                  roomData={editingRoomData}
+                  onClose={() => setIsEditing(false)}
+                  onSave={handleSaveEdit}
+                />
+              )}
+
+
           {drawerContent === '意見回饋' && (
             <div className="flex flex-col w-full">
               <select
