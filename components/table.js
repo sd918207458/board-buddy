@@ -15,8 +15,14 @@ const OrderRow = ({ order }) => {
 
   // 提取第一筆商品的圖片
   const firstItemImage = order.items[0]?.image;
-  // 在這裡使用 console.log 來檢查 order.address 的結構
-  console.log(order.address);
+
+  // 渲染完整地址，如果 address 存在則顯示，否則顯示"無地址"
+  const fullAddress = order.address
+    ? `${order.address || ""}, ${order.address.district || ""}, ${
+        order.address.city || ""
+      }`
+    : "無地址";
+
   return (
     <tr
       className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 ease-in-out"
@@ -28,30 +34,21 @@ const OrderRow = ({ order }) => {
           {order.orderId}
         </div>
         <div className="text-sm text-gray-500 dark:text-gray-300">
-          {new Date(order.date).toLocaleString()} {/* 格式化日期 */}
+          {new Date(order.date).toLocaleString()}
         </div>
       </td>
       <td className="text-center">
-        {/* 只顯示第一筆商品圖片 */}
         {firstItemImage ? (
           <img
             src={firstItemImage}
-            alt={`商品圖片`}
+            alt="商品圖片"
             className="w-12 h-12 object-cover rounded-md"
           />
         ) : (
           <div className="text-sm text-gray-500">無圖片</div>
         )}
       </td>
-      {/* 多一個address因為這裡是物件 */}
-      <td className="text-left">{order.address.address}</td>
-      {/* <td className="text-left">
-        {order.address
-          ? `${order.address}, ${order.address.city}, ${order.address.district}`
-          : "無地址"}
-      </td> */}
-      {/* <td className="text-left">{order.address ? order.address : "無地址"}</td> */}
-      {/* <div>{JSON.stringify(order.address)}</div>; */}
+      <td className="text-left">{fullAddress}</td>
       <td className="text-right">{`NT$${order.total}`}</td>
       <th className="flex gap-2 justify-center m-3">
         <Link href={`/my-orders/${order.orderId}`} legacyBehavior>
