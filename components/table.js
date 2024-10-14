@@ -18,11 +18,9 @@ const OrderRow = ({ order }) => {
 
   // 渲染完整地址，如果 address 存在則顯示，否則顯示"無地址"
   const fullAddress = order.address
-    ? `${order.address || ""}, ${order.address.district || ""}, ${
-        order.address.city || ""
-      }`
+    ? `${order.address.address || ""}`
     : "無地址";
-
+  console.log(order.address.address);
   return (
     <tr
       className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 ease-in-out"
