@@ -71,14 +71,13 @@ export default function OrderDetails() {
   if (!orderDetails) {
     return <div className="text-center">找不到訂單資料。</div>;
   }
-
+  console.log(orderDetails.address);
   return (
     <>
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
         <div className="w-full max-w-4xl mx-auto overflow-hidden bg-white rounded-lg shadow-lg dark:bg-gray-800">
           {/* Breadcrumbs */}
           <div className="p-4">
-         
             <GoBackButton />
           </div>
 
@@ -105,13 +104,19 @@ export default function OrderDetails() {
           </section>
 
           {/* 訂單詳情 */}
+          {/* 配送資訊 */}
           <div className="p-6">
             <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
               配送資訊
             </h3>
             <p>
               <strong>地址：</strong>
-              {orderDetails.address || "無資料"}
+              {orderDetails.address
+                ? `
+                  ${orderDetails.address.address}`
+                : "無資料"}
+              {/* ${orderDetails.address.store_address}, */}
+              {/* ${orderDetails.address.store_name}, */}
             </p>
             <p>
               <strong>訂單日期：</strong>
