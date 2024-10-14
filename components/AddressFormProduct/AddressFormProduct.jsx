@@ -206,10 +206,14 @@ const AddressFormProduct = () => {
     }
   };
 
+  // 處理選擇不同運送方式的邏輯
   const handleOptionChange = (e) => {
     const selectedMethod = e.target.value;
     console.log("Selected delivery method:", selectedMethod);
+
     setIsConvenienceStore(selectedMethod === "convenience_store");
+
+    // 如果選擇了便利商店取貨，清空地址資料
     if (selectedMethod === "convenience_store") {
       setFormData((prevData) => ({
         ...prevData,
@@ -220,10 +224,23 @@ const AddressFormProduct = () => {
         detailed_address: "",
         store_type: "7-11",
       }));
-    } else {
-      const defaultAddress = addresses.find((address) => address.is_default);
-      if (defaultAddress) {
-        updateFormDataWithDefaultAddress(defaultAddress);
+    }
+    // 如果選擇了宅配，保留當前的地址資料，或者使用預設地址
+    else if (selectedMethod === "home_delivery") {
+      const defaultAddressRadio = document.querySelector(
+        'input[name="radio-2"]:checked'
+      );
+      if (defaultAddressRadio && defaultAddressRadio.value === "is_default") {
+        handleDefaultClick(); // 如果選擇了預設地址，抓取預設地址
+      } else {
+        setFormData((prevData) => ({
+          ...prevData,
+          address: formData.address,
+          city: formData.city,
+          district: formData.district,
+          street: formData.street,
+          detailed_address: formData.detailed_address,
+        }));
       }
     }
   };
