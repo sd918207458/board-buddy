@@ -50,6 +50,27 @@ const determineCardType = (cardNumber) => {
   return "Unknown";
 };
 
+// Helper function to format card number
+const formatCardNumber = (value) => {
+  const sanitizedValue = value.replace(/\D/g, ""); // Only digits allowed
+  const parts = [];
+  for (let i = 0; i < sanitizedValue.length; i += 4) {
+    parts.push(sanitizedValue.substring(i, i + 4));
+  }
+  return parts.join(" "); // Add a space every four digits
+};
+
+// Helper function to format expiry date as MM/YY
+const formatExpiryDate = (value) => {
+  const sanitizedValue = value.replace(/\D/g, ""); // Only digits allowed
+  if (sanitizedValue.length >= 3) {
+    return (
+      sanitizedValue.substring(0, 2) + "/" + sanitizedValue.substring(2, 4)
+    );
+  }
+  return sanitizedValue;
+};
+
 // Initial state for payment methods
 const initialMethodState = {
   id: null,
@@ -113,7 +134,7 @@ export default function PaymentMethods() {
 
   const validateField = (name, value) => {
     let error = "";
-    if (name === "cardNumber" && value.length < 16) {
+    if (name === "cardNumber" && value.replace(/\s/g, "").length < 16) {
       error = "信用卡號必須為16位數字";
     } else if (
       name === "expiryDate" &&
@@ -126,18 +147,34 @@ export default function PaymentMethods() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setCurrentMethod((prev) => ({
-      ...prev,
-      [name]: value,
-      ...(name === "cardNumber" && { cardType: determineCardType(value) }),
-    }));
-    validateField(name, value);
+
+    if (name === "cardNumber") {
+      const formattedCardNumber = formatCardNumber(value);
+      setCurrentMethod((prev) => ({
+        ...prev,
+        cardNumber: formattedCardNumber,
+        cardType: determineCardType(formattedCardNumber.replace(/\s/g, "")), // 去掉空格再判斷卡片類型
+      }));
+    } else if (name === "expiryDate") {
+      const formattedExpiryDate = formatExpiryDate(value);
+      setCurrentMethod((prev) => ({
+        ...prev,
+        expiryDate: formattedExpiryDate,
+      }));
+    } else {
+      setCurrentMethod((prev) => ({ ...prev, [name]: value }));
+    }
+
+    validateField(name, value); // 驗證欄位
   };
 
   const validateForm = () => {
     const newErrors = {};
     if (currentMethod.type === "creditCard") {
-      if (!currentMethod.cardNumber || currentMethod.cardNumber.length !== 16) {
+      if (
+        !currentMethod.cardNumber ||
+        currentMethod.cardNumber.replace(/\s/g, "").length !== 16
+      ) {
         newErrors.cardNumber = "信用卡卡號格式錯誤，請輸入16位數字";
       }
       if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(currentMethod.expiryDate)) {
@@ -155,7 +192,7 @@ export default function PaymentMethods() {
 
     let paymentData;
     if (currentMethod.type === "creditCard") {
-      if (!/^\d{16}$/.test(currentMethod.cardNumber)) {
+      if (!/^\d{16}$/.test(currentMethod.cardNumber.replace(/\s/g, ""))) {
         toast.error("信用卡號碼格式錯誤，請輸入16位數字");
         setIsLoading(false);
         return;
@@ -163,7 +200,7 @@ export default function PaymentMethods() {
 
       paymentData = {
         type: currentMethod.type,
-        card_number: currentMethod.cardNumber,
+        card_number: currentMethod.cardNumber.replace(/\s/g, ""), // 去除空格
         card_type: currentMethod.cardType,
         expiration_date: currentMethod.expiryDate,
         is_default: currentMethod.isDefault || false,
@@ -366,7 +403,7 @@ export default function PaymentMethods() {
                         onChange={handleChange}
                         placeholder="0000 0000 0000 0000"
                         className="input input-bordered"
-                        maxLength="16"
+                        maxLength="19" // 包含空格的長度
                         required
                       />
                       {errors.cardNumber && (
@@ -385,7 +422,7 @@ export default function PaymentMethods() {
                         onChange={handleChange}
                         placeholder="MM/YY"
                         className="input input-bordered"
-                        pattern="\d{2}/\d{2}"
+                        maxLength="5"
                         required
                       />
                       {errors.expiryDate && (
@@ -403,6 +440,7 @@ export default function PaymentMethods() {
                         onChange={handleChange}
                         className="select select-bordered"
                         required
+                        disabled // 卡片類型自動選擇，不允許手動更改
                       >
                         <option value="">選擇卡片類型</option>
                         <option value="Visa">Visa</option>

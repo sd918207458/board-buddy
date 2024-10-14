@@ -132,7 +132,7 @@ export default function Navbar({ avatarUrl, username, onAvatarUpdate }) {
                   src={
                     userData.avatar
                       ? `http://localhost:3005/avatar/${userData.avatar}`
-                      : "/default-avatar.png"
+                      : "/user.png"
                   }
                   alt="User Avatar"
                   className="avatar"
