@@ -216,6 +216,8 @@ const AddressFormProduct = () => {
         address: "",
         city: "",
         district: "",
+        street: "",
+        detailed_address: "",
         store_type: "7-11",
       }));
     } else {
