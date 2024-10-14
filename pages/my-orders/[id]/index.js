@@ -2,14 +2,13 @@ import React, { useEffect, useState } from "react";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { useRouter } from "next/router";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 export default function OrderDetails() {
   const [orderDetails, setOrderDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const router = useRouter();
   const { id } = router.query;
@@ -32,12 +31,12 @@ export default function OrderDetails() {
 
         if (selectedOrder) {
           setOrderDetails(selectedOrder);
-          toast.success("訂單資料獲取成功！");
+          console.log("訂單資料獲取成功！");
         } else {
-          toast.error("找不到對應的訂單資料");
+          console.error("找不到對應的訂單資料");
         }
       } catch (error) {
-        toast.error("伺服器錯誤，無法獲取訂單資料");
+        console.error("伺服器錯誤，無法獲取訂單資料", error);
         setError(error.message);
       } finally {
         setLoading(false);
@@ -49,7 +48,11 @@ export default function OrderDetails() {
 
   const handleImageClick = (imageUrl) => {
     setSelectedImage(imageUrl);
-    document.getElementById("image-modal").showModal();
+    setIsModalOpen(true); // 打開模態框
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false); // 關閉模態框
   };
 
   if (loading) {
@@ -99,6 +102,40 @@ export default function OrderDetails() {
             </ul>
           </section>
 
+          {/* 訂單詳情 */}
+          <div className="p-6">
+            <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
+              配送資訊
+            </h3>
+            <p>
+              <strong>地址：</strong>
+              {orderDetails.address || "無資料"}
+            </p>
+            <p>
+              <strong>訂單日期：</strong>
+              {new Date(orderDetails.date).toLocaleDateString()}
+            </p>
+          </div>
+
+          {/* 支付資訊 */}
+          <div className="p-6">
+            <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
+              支付資訊
+            </h3>
+            <p>
+              <strong>持卡人姓名：</strong>
+              {orderDetails.paymentInfo?.cardName || "無資料"}
+            </p>
+            <p>
+              <strong>卡號：</strong>**** **** ****{" "}
+              {orderDetails.paymentInfo?.cardNumber.slice(-4)}
+            </p>
+            <p>
+              <strong>到期日：</strong>
+              {orderDetails.paymentInfo?.expiryDate || "無資料"}
+            </p>
+          </div>
+
           {/* 訂單商品列表 */}
           <div className="overflow-x-auto px-4 py-6">
             <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4 text-center">
@@ -135,27 +172,34 @@ export default function OrderDetails() {
                 ))}
               </tbody>
             </table>
+
+            {/* 訂單總金額 */}
+            <div className="mt-6 text-right">
+              <p className="text-xl font-bold">
+                總金額：NT${orderDetails.total}
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 圖片模態框 */}
-      <dialog id="image-modal" className="modal">
-        <div className="modal-box">
-          <img src={selectedImage} alt="商品大圖" className="w-full" />
-          <div className="modal-action">
-            <button
-              className="btn"
-              onClick={() => document.getElementById("image-modal").close()}
-            >
-              關閉
-            </button>
+      {/* 圖片模態框 (使用 Tailwind CSS) */}
+      {isModalOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={closeModal}
+        >
+          <div className="bg-white p-4 rounded-lg shadow-lg">
+            <img src={selectedImage} alt="商品大圖" className="w-full" />
+            <div className="mt-4 text-right">
+              <button className="btn btn-primary" onClick={closeModal}>
+                關閉
+              </button>
+            </div>
           </div>
         </div>
-      </dialog>
+      )}
 
-      {/* ToastContainer for toast notifications */}
-      <ToastContainer />
       <Footer />
     </>
   );

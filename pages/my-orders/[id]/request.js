@@ -3,6 +3,7 @@ import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import GoBackButton from "@/components/GoBackButton";
 
 // 可重用的輸入欄位組件
 const InputField = ({
@@ -58,16 +59,48 @@ export default function Request() {
 
     if (storedOrder) {
       setSelectedOrder(storedOrder);
-      setFormData({
-        ...formData,
+      setFormData((prevData) => ({
+        ...prevData,
         orderNumber: storedOrder.orderId,
         orderDate: new Date(storedOrder.date).toISOString().split("T")[0],
         productName: storedOrder.items[0]?.product_name || "",
         productModel: storedOrder.items[0]?.product_type || "",
         productQuantity: storedOrder.items[0]?.quantity || 1,
-      });
+      }));
     }
+
+    // 從會員資料抓取姓名、信箱和手機號碼
+    fetchMemberData();
   }, []);
+
+  // 從後端 API 獲取會員資料
+  const fetchMemberData = async () => {
+    try {
+      const response = await fetch("http://localhost:3005/api/users/check", {
+        method: "GET",
+        credentials: "include", // 攜帶 cookie
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "獲取會員資料失敗");
+      }
+
+      const userData = await response.json();
+      const user = userData.data.user;
+
+      // 將會員資料填入表單
+      setFormData((prevData) => ({
+        ...prevData,
+        name: user.username || "",
+        email: user.email || "",
+        phone: user.phone_number || "",
+      }));
+    } catch (error) {
+      console.error("Failed to load member data:", error.message);
+      toast.error("無法加載會員資料，請重試。");
+    }
+  };
 
   const handleProductChange = (e) => {
     const selectedProduct = selectedOrder.items.find(
@@ -155,6 +188,7 @@ export default function Request() {
         <div className="card w-full max-w-lg mx-auto overflow-hidden bg-white dark:bg-gray-800 shadow-lg lg:max-w-4xl rounded-lg">
           <div className="w-full p-4">
             <Breadcrumbs />
+            <GoBackButton />
           </div>
 
           <section className="p-6">
