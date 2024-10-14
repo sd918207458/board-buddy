@@ -16,11 +16,11 @@ const OrderRow = ({ order }) => {
   // 提取第一筆商品的圖片
   const firstItemImage = order.items[0]?.image;
 
-  // 渲染完整地址，如果 address 存在則顯示，否則顯示"無地址"
+  // 渲染完整地址，避免多餘的逗號
   const fullAddress = order.address
-    ? `${order.address || ""}, ${order.address.district || ""}, ${
-        order.address.city || ""
-      }`
+    ? [order.address, order.address.district, order.address.city]
+        .filter(Boolean) // 移除空值的欄位
+        .join(", ") // 只有存在的值會加入逗號
     : "無地址";
 
   return (
