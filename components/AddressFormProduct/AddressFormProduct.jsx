@@ -36,6 +36,7 @@ const AddressFormProduct = () => {
     is_default: false,
     store_type: "",
     district: "",
+    street: "",
     detailed_address: "",
   });
   const [addresses, setAddresses] = useState([]);
@@ -168,6 +169,7 @@ const AddressFormProduct = () => {
       city: "",
       district: "",
       detailed_address: "",
+      street: "",
       address: "", // 如果需要清空完整地址欄位
     }));
     setIsEditable(true); // 設置為可編輯狀態
@@ -546,7 +548,7 @@ const AddressFormProduct = () => {
                 id="address"
                 type="text"
                 name="detailed_address"
-                value={formData.detailed_address}
+                value={`${formData.street}` + `${formData.detailed_address}`}
                 onChange={handleChange}
                 readOnly={!isEditable} // 根據可編輯狀態設置
                 className="block w-full px-4 py-2 mt-2 border rounded-md"
