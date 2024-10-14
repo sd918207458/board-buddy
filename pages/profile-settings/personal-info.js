@@ -134,7 +134,7 @@ export default function PersonalInfo() {
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] relative">
         <div className="card w-full max-w-lg mx-auto bg-white shadow-lg lg:max-w-4xl rounded-lg">
           <section className="p-6">
-            <Breadcrumbs />
+         
             <h2 className="text-2xl font-semibold text-[#003E52] text-center">
               個人資料設定
             </h2>

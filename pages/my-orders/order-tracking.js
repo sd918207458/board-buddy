@@ -143,7 +143,7 @@ export default function OrderTracking() {
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
         <div className="w-full max-w-4xl mx-auto bg-white rounded-lg shadow-lg dark:bg-gray-800">
           <div className="w-full p-4">
-            <Breadcrumbs />
+         
           </div>
           <section className="p-6">
             <h2 className="text-2xl font-bold text-gray-800 dark:text-white text-center">

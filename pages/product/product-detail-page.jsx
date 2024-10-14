@@ -5,7 +5,7 @@ import ProductDetailTest from "@/components/ProductDetail/ProductDetailTest";
 const ProductDetailPage = () => {
   return (
     <div>
-      <Breadcrumbs />
+      {/* <Breadcrumbs /> */}
       <ProductDetailTest />
       <Footer />
     </div>

@@ -78,7 +78,7 @@ export default function OrderDetails() {
         <div className="w-full max-w-4xl mx-auto overflow-hidden bg-white rounded-lg shadow-lg dark:bg-gray-800">
           {/* Breadcrumbs */}
           <div className="p-4">
-            <Breadcrumbs />
+         
             <GoBackButton />
           </div>
 

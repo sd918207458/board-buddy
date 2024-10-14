@@ -292,7 +292,7 @@ export default function PaymentMethods() {
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
         <div className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
           <div className="px-6 py-4">
-            <Breadcrumbs />
+         
             <section className="max-w-4xl mx-auto mt-6">
               <h2 className="text-lg font-semibold text-gray-700 capitalize dark:text-white mb-4">
                 我的錢包

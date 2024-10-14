@@ -36,7 +36,7 @@ export default function FAQ() {
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
 
         <div className="container mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-          <Breadcrumbs />
+       
           <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white mb-6">
             常見問題
           </h2>

@@ -15,7 +15,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Breadcrumbs />
+      {/* <Breadcrumbs /> */}
       <div className="flex justify-center">
         {/* Sidecart 固定在左邊 */}
         <div className="fixed left-40 top-20 w-72 h-[calc(100vh-100px)] overflow-y-auto z-50">
