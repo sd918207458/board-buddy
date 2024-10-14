@@ -1,10 +1,13 @@
 import React, { useState } from "react";
+import { useRouter } from "next/router"; // 引入 useRouter
 
 export default function CouponSelector({ availableCoupons = [], applyCoupon }) {
   const [selectedCoupon, setSelectedCoupon] = useState(null);
+  const router = useRouter();
 
   const handleApplyCoupon = () => {
     if (selectedCoupon) {
+      router.push("/product/product-list"); // 跳轉到商城頁面
       applyCoupon(selectedCoupon);
     } else {
       alert("請選擇一張優惠券");

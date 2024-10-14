@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Footer from "@/components/footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { useRouter } from "next/router";
+import GoBackButton from "@/components/GoBackButton";
 
 export default function OrderDetails() {
   const [orderDetails, setOrderDetails] = useState(null);
@@ -78,6 +79,7 @@ export default function OrderDetails() {
           {/* Breadcrumbs */}
           <div className="p-4">
             <Breadcrumbs />
+            <GoBackButton />
           </div>
 
           {/* 訂單進度追蹤 */}

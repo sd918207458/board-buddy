@@ -104,6 +104,69 @@ export default function Favorites() {
     </div>
   );
 
+  const renderProductCard = (product) => (
+    <div
+      key={product.product_id}
+      className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105 hover:shadow-lg"
+    >
+      <figure>
+        {product.image ? (
+          <img
+            src={product.image}
+            alt={product.product_name}
+            className="rounded-t-lg h-48 w-full object-cover"
+          />
+        ) : (
+          <div className="h-48 w-full bg-gray-200 rounded-t-lg flex items-center justify-center">
+            <span className="text-gray-500">No Image Available</span>
+          </div>
+        )}
+      </figure>
+      <div className="card-body">
+        <h2 className="card-title">{product.product_name}</h2>
+        <p>{product.description}</p>
+        <p>價格: NT${product.price}</p>
+        <div className="card-actions justify-end">
+          <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
+            立即購買
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderStoreCard = (store) => (
+    <div
+      key={store.room_id}
+      className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105 hover:shadow-lg"
+    >
+      <figure>
+        {store.img ? (
+          <img
+            src={store.img}
+            alt={store.room_name}
+            className="rounded-t-lg h-48 w-full object-cover"
+          />
+        ) : (
+          <div className="h-48 w-full bg-gray-200 rounded-t-lg flex items-center justify-center">
+            <span className="text-gray-500">No Image Available</span>
+          </div>
+        )}
+      </figure>
+      <div className="card-body">
+        <h2 className="card-title">{store.room_name}</h2>
+        <p>{store.room_intro}</p>
+        <p>地點: {store.location}</p>
+        <p>活動日期: {new Date(store.event_date).toLocaleDateString()}</p>
+        <div className="card-actions justify-end">
+          <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
+            瀏覽詳情
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderTable = () => {
     if (loading) {
       return (
@@ -124,73 +187,13 @@ export default function Favorites() {
     if (activeTab === "all") {
       return (
         <section className="max-w-4xl mx-auto grid grid-cols-2 gap-6 mt-4 sm:grid-cols-2">
-          {favoriteProducts.map((product, index) => (
-            <div
-              key={product.product_id || index}
-              className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105 hover:shadow-lg"
-            >
-              <figure>
-                {product.image ? (
-                  <img
-                    src={product.image}
-                    alt={product.product_name}
-                    className="rounded-t-lg h-48 w-full object-cover"
-                  />
-                ) : (
-                  <div className="h-48 w-full bg-gray-200 rounded-t-lg flex items-center justify-center">
-                    <span className="text-gray-500">No Image Available</span>
-                  </div>
-                )}
-              </figure>
-              <div className="card-body">
-                <h2 className="card-title">{product.product_name}</h2>
-                <p>{product.description}</p>
-                <div className="card-actions justify-end">
-                  <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
-                    立即購買
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+          {favoriteProducts.map(renderProductCard)}
         </section>
       );
     } else if (activeTab === "pending") {
       return (
         <section className="max-w-4xl mx-auto grid grid-cols-2 gap-6 mt-4 sm:grid-cols-2">
-          {favoriteStores.map((store, index) => (
-            <div
-              key={store.room_id || index}
-              className="card bg-base-100 w-96 shadow-xl transition-transform hover:scale-105 hover:shadow-lg"
-            >
-              <figure>
-                {store.img ? (
-                  <img
-                    src={store.img}
-                    alt={store.room_name}
-                    className="rounded-t-lg h-48 w-full object-cover"
-                  />
-                ) : (
-                  <div className="h-48 w-full bg-gray-200 rounded-t-lg flex items-center justify-center">
-                    <span className="text-gray-500">No Image Available</span>
-                  </div>
-                )}
-              </figure>
-              <div className="card-body">
-                <h2 className="card-title">{store.room_name}</h2>
-                <p>{store.room_intro}</p>
-                <p>{store.location}</p>
-                <p>
-                  活動日期: {new Date(store.event_date).toLocaleDateString()}
-                </p>
-                <div className="card-actions justify-end">
-                  <button className="btn btn-primary bg-[#036672] hover:bg-[#024c52]">
-                    瀏覽詳情
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+          {favoriteStores.map(renderStoreCard)}
         </section>
       );
     }
