@@ -71,23 +71,23 @@ export default function OrderDetails() {
   if (!orderDetails) {
     return <div className="text-center">找不到訂單資料。</div>;
   }
-  console.log(orderDetails.address);
+
   return (
     <>
-      <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
-        <div className="w-full max-w-4xl mx-auto overflow-hidden bg-white rounded-lg shadow-lg dark:bg-gray-800">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] to-gray-900">
+        <div className="w-full max-w-4xl mx-auto overflow-hidden bg-white rounded-lg shadow-lg dark:bg-gray-800 p-6">
           {/* Breadcrumbs */}
           <div className="p-4">
             <GoBackButton />
           </div>
 
           {/* 訂單進度追蹤 */}
-          <section className="p-6 bg-white dark:bg-gray-800 ">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4 text-center">
+          <section className="p-6 bg-white dark:bg-gray-800">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white mb-4 text-center">
               訂單明細
             </h2>
 
-            <ul className="steps steps-vertical lg:steps-horizontal justify-center w-full">
+            <ul className="steps steps-vertical lg:steps-horizontal justify-center w-full steps-lg">
               <li className="step step-primary" data-content="✓">
                 訂單建立
               </li>
@@ -103,74 +103,58 @@ export default function OrderDetails() {
             </ul>
           </section>
 
-          {/* 訂單詳情 */}
-          <div className="p-6">
-            <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
-              配送資訊
-            </h3>
-            <p>
-              <strong>地址：</strong>
-              {orderDetails.address || "無資料"}
-            </p>
-            <p>
-              <strong>訂單日期：</strong>
-              {new Date(orderDetails.date).toLocaleDateString()}
-            </p>
-          </div>
+          {/* 配送資訊與支付資訊並排顯示 */}
+          <section className="p-6 bg-white dark:bg-gray-800 grid grid-cols-1 gap-6 sm:grid-cols-2">
+            {/* 配送資訊 */}
+            <div className="p-6">
+              <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+                配送資訊
+              </h3>
+              <p>
+                <strong>地址：</strong>
+                {orderDetails.address
+                  ? `${orderDetails.address.address}`
+                  : "無資料"}
+              </p>
+              <p>
+                <strong>訂單日期：</strong>
+                {new Date(orderDetails.date).toLocaleDateString()}
+              </p>
+            </div>
 
-          {/* 訂單詳情 */}
-          {/* 配送資訊 */}
-          <div className="p-6">
-            <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
-              配送資訊
-            </h3>
-            <p>
-              <strong>地址：</strong>
-              {orderDetails.address
-                ? `
-                  ${orderDetails.address.address}`
-                : "無資料"}
-              {/* ${orderDetails.address.store_address}, */}
-              {/* ${orderDetails.address.store_name}, */}
-            </p>
-            <p>
-              <strong>訂單日期：</strong>
-              {new Date(orderDetails.date).toLocaleDateString()}
-            </p>
-          </div>
-
-          {/* 支付資訊 */}
-          <div className="p-6">
-            <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
-              支付資訊
-            </h3>
-            <p>
-              <strong>持卡人姓名：</strong>
-              {orderDetails.paymentInfo?.cardName || "無資料"}
-            </p>
-            <p>
-              <strong>卡號：</strong>**** **** ****{" "}
-              {orderDetails.paymentInfo?.cardNumber.slice(-4)}
-            </p>
-            <p>
-              <strong>到期日：</strong>
-              {orderDetails.paymentInfo?.expiryDate || "無資料"}
-            </p>
-          </div>
+            {/* 支付資訊 */}
+            <div className="p-6">
+              <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+                支付資訊
+              </h3>
+              <p>
+                <strong>持卡人姓名：</strong>
+                {orderDetails.paymentInfo?.cardName || "無資料"}
+              </p>
+              <p>
+                <strong>卡號：</strong>**** **** ****{" "}
+                {orderDetails.paymentInfo?.cardNumber.slice(-4)}
+              </p>
+              <p>
+                <strong>到期日：</strong>
+                {orderDetails.paymentInfo?.expiryDate || "無資料"}
+              </p>
+            </div>
+          </section>
 
           {/* 訂單商品列表 */}
           <div className="overflow-x-auto px-4 py-6">
-            <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4 text-center">
+            <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-4 text-center">
               商品列表
             </h3>
-            <table className="table w-full table-zebra">
+            <table className="table w-full table-zebra text-left">
               <thead>
                 <tr>
                   <th>商品名稱</th>
                   <th>商品編號</th>
-                  <th>商品價格</th>
-                  <th>商品數量</th>
-                  <th>小計</th>
+                  <th className="text-right">商品價格</th>
+                  <th className="text-right">商品數量</th>
+                  <th className="text-right">小計</th>
                   <th>圖片</th>
                 </tr>
               </thead>
@@ -179,9 +163,11 @@ export default function OrderDetails() {
                   <tr key={item.product_id}>
                     <td>{item.product_name}</td>
                     <td>{item.product_id}</td>
-                    <td>NT${item.price}</td>
-                    <td>{item.quantity}</td>
-                    <td>NT${item.price * item.quantity}</td>
+                    <td className="text-right">NT${item.price}</td>
+                    <td className="text-right">{item.quantity}</td>
+                    <td className="text-right">
+                      NT${item.price * item.quantity}
+                    </td>
                     <td>
                       <img
                         src={item.image}
@@ -197,7 +183,7 @@ export default function OrderDetails() {
 
             {/* 訂單總金額 */}
             <div className="mt-6 text-right">
-              <p className="text-xl font-bold">
+              <p className="text-2xl font-bold">
                 總金額：NT${orderDetails.total}
               </p>
             </div>
@@ -212,7 +198,11 @@ export default function OrderDetails() {
           onClick={closeModal}
         >
           <div className="bg-white p-4 rounded-lg shadow-lg">
-            <img src={selectedImage} alt="商品大圖" className="w-full" />
+            <img
+              src={selectedImage}
+              alt="商品大圖"
+              className="w-full h-96 object-contain"
+            />
             <div className="mt-4 text-right">
               <button className="btn btn-primary" onClick={closeModal}>
                 關閉

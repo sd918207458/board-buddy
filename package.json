@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "aframe": "^1.6.0",
     "axios": "^1.7.7",
     "express": "^4.20.0",
     "firebase": "^10.14.1",
