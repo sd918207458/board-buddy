@@ -99,7 +99,7 @@ export default function Register() {
             <div className="flex justify-center">
               <img
                 className="w-auto h-8"
-                src="/Board Buddy logo.png"
+                src="/Board-Buddy-logo.png"
                 alt="Logo"
               />
             </div>

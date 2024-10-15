@@ -47,7 +47,7 @@ const AddressFormProduct = () => {
   const [isEditable, setIsEditable] = useState(false); // 新增可編輯狀態
 
   // 引入購物車 hook，確保在組件頂層調用
-  const { cartItems, setCartItems, totalPrice } = useCart();
+  const { cartItems, setCartItems, totalPrice, shippingCost } = useCart();
   const router = useRouter();
 
   // 7-11 Hooks
@@ -285,10 +285,11 @@ const AddressFormProduct = () => {
     const orderData = {
       orderId: new Date().getTime(),
       items: cartItems,
-      total: cartItems.reduce(
-        (total, item) => total + item.price * item.quantity,
-        0
-      ),
+      total: totalPrice,
+      // cartItems.reduce(
+      //   (total, item) => total + item.price * item.quantity,
+      //   0
+      // ) ,
       address: {
         address: formData.address,
         store_name: store711.storename,
