@@ -133,7 +133,9 @@ export default function OrderDetails() {
               </p>
               <p>
                 <strong>卡號：</strong>**** **** ****{" "}
-                {orderDetails.paymentInfo?.cardNumber.slice(-4)}
+                {(orderDetails.paymentInfo?.cardNumber || "無法顯示卡號").slice(
+                  -4
+                )}
               </p>
               <p>
                 <strong>到期日：</strong>
