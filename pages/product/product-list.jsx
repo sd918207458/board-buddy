@@ -100,7 +100,7 @@ const ProductList = () => {
   return (
     <>
       <div className="flex overflow-visible relative overflow-x-hidden">
-        <aside className="w-70">
+        <aside className="w-80">
           {/* <Breadcrumbs /> */}
           <GameAccordion />
         </aside>

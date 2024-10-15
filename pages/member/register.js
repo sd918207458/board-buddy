@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import Footer from "@/components/footer";
@@ -92,16 +91,17 @@ export default function Register() {
     }
   };
 
-
   return (
     <>
       <div className="flex items-center justify-center min-h-screen bg-[#003E52]">
-
         <div className="card max-w-sm lg:max-w-4xl bg-base-100 shadow-xl">
           <div className="card-body w-full px-6 py-8">
-
             <div className="flex justify-center">
-              <img className="w-auto h-8" src="/logo.jfif" alt="Logo" />
+              <img
+                className="w-auto h-8"
+                src="/Board Buddy logo.png"
+                alt="Logo"
+              />
             </div>
 
             <h2 className="text-center text-2xl font-bold text-gray-700 dark:text-gray-200 mt-4">
@@ -191,7 +191,6 @@ export default function Register() {
                 </button>
               </div>
             </form>
-
 
             {/* 已有帳戶提示 */}
             <div className="flex items-center justify-center mt-4">

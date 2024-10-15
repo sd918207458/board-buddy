@@ -76,7 +76,6 @@ export default function ForgotPassword() {
   };
 
   const handleSubmitVerificationCode = () => {
-
     if (!validateVerificationCode()) {
       toast.error("請輸入有效的6位數驗證碼");
       return;
@@ -132,15 +131,17 @@ export default function ForgotPassword() {
     }
   };
 
-
-
   return (
     <>
       <div className="flex items-center justify-center min-h-screen bg-[#003E52]">
         <div className="card max-w-sm lg:max-w-4xl bg-white shadow-xl">
           <div className="card-body w-full px-6 py-8">
             <div className="flex justify-center">
-              <img className="w-auto h-8" src="/logo.jfif" alt="Logo" />
+              <img
+                className="w-auto h-8"
+                src="/Board Buddy logo.png"
+                alt="Logo"
+              />
             </div>
 
             <h2 className="text-center text-2xl font-bold text-[#003E52] mt-4">
