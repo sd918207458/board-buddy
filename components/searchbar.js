@@ -124,27 +124,33 @@ const SearchBar = ({ onSearchResults }) => {
 
   return (
     <div className="p-6">
-      <div className="mb-4 text-center">
-        <select
-          value={selectedCity}
-          onChange={(e) => setSelectedCity(e.target.value)}
-          className="select select-bordered w-48 mr-2 bg-transparent text-[#EFB880] text-lg"
-          style={{ fontSize: '22px' }}
-        >
-          {cities.map((city) => (
-            <option key={city} value={city} className="text-black">{city}</option>
-          ))}
-        </select>
-        <input
-          type="text"
-          placeholder="搜尋關鍵字"
-          value={searchKeyword}
-          onChange={(e) => setSearchKeyword(e.target.value)}
-          className="input input-bordered w-64 mr-2 bg-transparent text-white text-lg transition duration-200 focus:outline-none focus:border-2 focus:border-transparent hover:border-[#EFB880] hover:border-2"
-          style={{ fontSize: '22px' }}
-        />
-        <button onClick={() => { /* 可以在這裡觸發搜尋邏輯 */ }} className="btn btn-primary ml-2">搜尋</button>
-      </div>
+     <div className="mb-4 text-center">
+  <select
+    value={selectedCity}
+    onChange={(e) => setSelectedCity(e.target.value)}
+    className="select select-bordered w-48 mr-2 bg-transparent text-[#EFB880] text-lg"
+    style={{ fontSize: '22px' }}
+  >
+    {cities.map((city) => (
+      <option key={city} value={city} className="text-black">{city}</option>
+    ))}
+  </select>
+  <input
+    type="text"
+    placeholder="搜尋關鍵字"
+    value={searchKeyword}
+    onChange={(e) => setSearchKeyword(e.target.value)}
+    className="input input-bordered w-64 mr-2 bg-transparent text-white text-lg transition duration-200 focus:outline-none focus:border-2 focus:border-transparent hover:border-[#EFB880] hover:border-2"
+    style={{ fontSize: '22px' }}
+  />
+  <button 
+    onClick={() => { /* 可以在這裡觸發搜尋邏輯 */ }} 
+    className="btn border border-[#EFB880] bg-transparent text-[#EFB880] text-lg transition duration-300 hover:bg-[#EFB880] hover:text-white ml-2"
+  >
+    搜尋
+  </button>
+</div>
+
 
       {/* 遊戲種類 */}
       <div className="mb-4" style={{ marginLeft: '15%', marginRight: '15%' }}>

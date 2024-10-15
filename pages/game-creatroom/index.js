@@ -288,7 +288,8 @@ export default function Createroom() {
           <div className="m-auto">
             <form onSubmit={handleSubmit}>
               <div className="pt-3.5">
-                <label htmlFor="room_name" className="block text-sm text-gray-500 dark:text-gray-300">揪團標題</label>
+                <label htmlFor="room_name" className="block text-sm text-gray-500 dark:text-gray-300">揪團標題
+                <span className="text-red-400 text-xs ml-1">*此欄位必須填寫</span></label>
                 <input
                   type="text"
                   name="room_name"
@@ -323,7 +324,8 @@ export default function Createroom() {
                 />
               </div>
               <div className="pt-3.5">
-                <label className="block text-sm text-gray-500 dark:text-gray-300">遊戲選項</label>
+                <label className="block text-sm text-gray-500 dark:text-gray-300">遊戲選項
+                <span className="text-red-400 text-xs ml-1">*此欄位至少選擇一項</span></label>
                 {gameOptions.map((option, index) => (
                   <div key={index} className="flex mt-2">
                     <select
@@ -355,13 +357,14 @@ export default function Createroom() {
                 <button
                   type="button"
                   onClick={addGameOption}
-                  className="mt-2 text-blue-500 hover:underline"
+                  className="mt-2 text-[#EFB880] hover:underline"
                 >
                   新增遊戲選項
                 </button>
               </div>
               <div className="pt-3.5">
-                <label className="block text-sm text-gray-500 dark:text-gray-300">揪團類型</label>
+                <label className="block text-sm text-gray-500 dark:text-gray-300">揪團類型
+                <span className="text-red-400 text-xs ml-1">*此欄位必須填寫</span></label>
                 <div className="flex items-center mt-2">
                   <label className="mr-4 text-gray-300">
                     <input
@@ -386,7 +389,8 @@ export default function Createroom() {
                 </div>
               </div>
               <div className="pt-3.5">
-                <label htmlFor="event_date" className="block text-sm text-gray-500 dark:text-gray-300">活動日期</label>
+                <label htmlFor="event_date" className="block text-sm text-gray-500 dark:text-gray-300">活動日期
+                <span className="text-red-400 text-xs ml-1">*此欄位必須填寫</span></label>
                 <div className="flex items-center">
                   <input
                     type="date"
@@ -401,7 +405,8 @@ export default function Createroom() {
               </div>
 
               <div className="pt-3.5">
-                <label htmlFor="minperson" className="block text-sm text-gray-500 dark:text-gray-300">最少幾人</label>
+                <label htmlFor="minperson" className="block text-sm text-gray-500 dark:text-gray-300">最少幾人
+                <span className="text-red-400 text-xs ml-1">*此欄位必須填寫</span></label>
                 <input
                   type="number"
                   name="minperson"
@@ -414,7 +419,8 @@ export default function Createroom() {
               </div>
 
               <div className="pt-3.5">
-                <label htmlFor="maxperson" className="block text-sm text-gray-500 dark:text-gray-300">最多幾人</label>
+                <label htmlFor="maxperson" className="block text-sm text-gray-500 dark:text-gray-300">最多幾人
+                <span className="text-red-400 text-xs ml-1">*此欄位必須填寫</span></label>
                 <input
                   type="number"
                   name="maxperson"
@@ -427,7 +433,8 @@ export default function Createroom() {
               </div>
 
               <div className="pt-3.5">
-                <label htmlFor="location" className="block text-sm text-gray-500 dark:text-gray-300">活動地點</label>
+                <label htmlFor="location" className="block text-sm text-gray-500 dark:text-gray-300">活動地點
+                <span className="text-red-400 text-xs ml-1">*此欄位必須填寫</span></label>
                 <input
                   type="text"
                   name="location"
@@ -453,13 +460,14 @@ export default function Createroom() {
             
               
               <div className="flex justify-center mt-4">
-                <button
-                  type="submit"
-                  className={`px-6 py-2 text-white bg-blue-500 rounded-lg ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  disabled={isLoading}
-                >
-                  {isLoading ? '創建中...' : '創建'}
-                </button>
+              <button
+    type="submit"
+    className={`px-6 py-2 border border-[#EFB880] rounded-lg text-[#EFB880] transition-all duration-200 transform hover:scale-110 hover:bg-[#EFB880] hover:text-white ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+    disabled={isLoading}
+>
+    {isLoading ? '創建中...' : '創建'}
+</button>
+
               </div>
             </form>
           </div>
