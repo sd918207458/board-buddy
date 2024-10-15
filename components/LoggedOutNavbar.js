@@ -66,7 +66,7 @@ export default function LoggedOutNavbar() {
         <Link href="/" legacyBehavior>
           <a className="btn btn-ghost normal-case text-xl text-white">
             <img
-              src="/Board Buddy logo.png"
+              src="/Board-Buddy-logo.png"
               className="w-10 h-10 mr-2"
               alt="Logo"
             />

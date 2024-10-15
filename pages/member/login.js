@@ -131,7 +131,7 @@ export default function Login() {
             <div className="flex justify-center mx-auto">
               <img
                 className="w-auto h-7 sm:h-8"
-                src="/Board Buddy logo.png"
+                src="/Board-Buddy-logo.png"
                 alt="Logo"
               />
             </div>
