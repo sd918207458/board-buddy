@@ -130,11 +130,9 @@ export default function Addroom() {
             </dl>
           </div>
           <div className="grid grid-cols-2 grid-rows-2 gap-4 sm:gap-6 lg:gap-8">
-            <img src="https://tailwindui.com/img/ecommerce-images/product-feature-03-detail-01.jpg" alt="Game Image 1" className="rounded-lg bg-gray-100" />
-            <img src="https://tailwindui.com/img/ecommerce-images/product-feature-03-detail-02.jpg" alt="Game Image 2" className="rounded-lg bg-gray-100" />
-            <img src="https://tailwindui.com/img/ecommerce-images/product-feature-03-detail-03.jpg" alt="Game Image 3" className="rounded-lg bg-gray-100" />
-            <img src="https://tailwindui.com/img/ecommerce-images/product-feature-03-detail-04.jpg" alt="Game Image 4" className="rounded-lg bg-gray-100" />
-          </div>
+  <img src={parsedGame.img ? `http://localhost:3005/room/${parsedGame.img}` : "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1470&q=80"} alt="Game Image 1" className="rounded-lg bg-gray-100 col-span-2 row-span-2" />
+</div>
+
         </div>
       </div>
       <div className="flex justify-center bg-white py-4"> {/* 增加一些底部边距和白色背景 */}
