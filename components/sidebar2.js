@@ -52,12 +52,20 @@ const DrawerComponent = () => {
       console.log("888888888Username:", retrievedUsername); // 输出抓取到的 username
       fetchMemberId(retrievedUsername);
     };
-
+  // 点击更新消息
+  const handleUpdateMessages = async () => {
+    if (selectedFriend) {
+      const friend = friendsData.find(friend => friend.username === selectedFriend);
+      if (friend) {
+        await fetchMessages(usersId, friend.member_id);
+      }
+    }
+  };
     const handleSelectFriend = (friend) => {
       setSelectedFriend(friend.username);
       fetchMessages(usersId, friend.member_id); // 使用好友的 member_id
     };    
-    
+  
     const fetchMessages = async (userId, friendId) => {
       console.log("哈囉", { userId, friendId });
       try {
@@ -102,6 +110,21 @@ const DrawerComponent = () => {
         console.error('加载历史消息失败', error);
       }
     };       
+// 监听页面可见性变化
+useEffect(() => {
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === 'visible') {
+      // 当页面变为可见时，刷新消息
+      handleUpdateMessages();
+    }
+  };
+
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+
+  return () => {
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+  };
+}, [selectedFriend, usersId]);
 
   // 初始化 WebSocket
   useEffect(() => {
