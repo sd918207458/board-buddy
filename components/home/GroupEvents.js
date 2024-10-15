@@ -56,7 +56,7 @@ const GroupEvents = () => {
               className="card w-96 bg-white shadow-lg"
               initial={{ opacity: 0, y: 50 }} // 初始位置（不透明度0，Y軸下方50px）
               whileInView={{ opacity: 1, y: 0 }} // 當卡片進入視口時動畫啟動
-              viewport={{ once: true }} // 僅在第一次進入視口時觸發動畫
+              viewport={{ once: false }} // 僅在第一次進入視口時觸發動畫
               transition={{
                 delay: index * 0.1, // 每張卡片動畫延遲0.2秒
                 duration: 0.5, // 動畫持續時間

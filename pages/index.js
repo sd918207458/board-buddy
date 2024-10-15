@@ -1,6 +1,5 @@
 import React from "react";
 import Footer from "@/components/footer";
-import Breadcrumbs from "@/components/Breadcrumbs";
 import HeroSection from "@/components/home/HeroSection";
 import AboutUs from "@/components/home/AboutUs";
 import PopularProducts from "@/components/home/PopularProducts";

@@ -20,7 +20,9 @@ const RecommendedGames = () => {
 
   return (
     <section className="mt-10 py-10 bg-white">
-      <h2 className="text-3xl font-bold text-center mb-8">為您推薦的桌遊</h2>
+      <h2 className="text-3xl font-bold text-center mb-8 text-[#003E52]">
+        為您推薦的桌遊
+      </h2>
       <div className="flex flex-wrap justify-center gap-8">
         {/* 動態渲染推薦桌遊卡片（限制顯示3筆資料） */}
         {products.slice(0, 3).map((product, index) => (
@@ -29,9 +31,9 @@ const RecommendedGames = () => {
             className="card w-96 bg-gray-100 shadow-lg"
             initial={{ opacity: 0, y: 50 }} // 初始位置（不透明度0，Y軸下方50px）
             whileInView={{ opacity: 1, y: 0 }} // 當卡片進入視口時動畫啟動
-            viewport={{ once: true }} // 只在第一次進入視口時觸發
+            viewport={{ once: false }} // 每次進入視口時都觸發
             transition={{
-              delay: index * 0.1, // 每張卡片動畫延遲0.2秒
+              delay: index * 0.1, // 每張卡片動畫延遲0.1秒
               duration: 0.5, // 動畫持續時間
               type: "spring", // 彈簧效果
               stiffness: 100, // 彈性強度
