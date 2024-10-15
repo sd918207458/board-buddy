@@ -30,7 +30,7 @@ const Sidecart = () => {
         <h2 className={styles.sectionTitle}>結帳金額</h2>
         <div className={styles.summaryItem}>
           <span>商品小計</span>
-          <span>NT${totalPrice.toLocaleString()}</span>
+          <span>NT$ ${(totalPrice - shippingCost).toLocaleString()}</span>
         </div>
         <div className={styles.summaryItem}>
           <span>運費</span>
@@ -38,7 +38,7 @@ const Sidecart = () => {
         </div>
         <div className={`${styles.summaryItem} ${styles.total}`}>
           <span>應付總額</span>
-          <span>NT${(totalPrice + shippingCost).toLocaleString()}</span>
+          <span>NT${totalPrice.toLocaleString()}</span>
         </div>
       </aside>
     </div>

@@ -108,7 +108,7 @@ const Checkout = () => {
         </table>
         <div className={styles.totalSection}>
           {/* 總價加上千位逗號 */}
-          <h2>小計: NT${totalPrice.toLocaleString()}</h2>
+          <h2>小計: NT$ ${(totalPrice - shippingCost).toLocaleString()}</h2>
         </div>
       </section>
     </>
