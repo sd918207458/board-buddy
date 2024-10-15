@@ -105,7 +105,6 @@ export default function Gameindex() {
   return (
     <>
       <div className="bg-[#003E52]">
-        <Breadcrumbs />
         <Carousel1 />
         <SearchBar onSearchResults={handleSearchResults} /> {/* 将搜索结果传递给父组件 */}
 

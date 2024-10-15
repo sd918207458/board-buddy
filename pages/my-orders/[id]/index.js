@@ -71,14 +71,13 @@ export default function OrderDetails() {
   if (!orderDetails) {
     return <div className="text-center">找不到訂單資料。</div>;
   }
-
+  console.log(orderDetails.address);
   return (
     <>
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#003E52] dark:bg-gray-900">
         <div className="w-full max-w-4xl mx-auto overflow-hidden bg-white rounded-lg shadow-lg dark:bg-gray-800">
           {/* Breadcrumbs */}
           <div className="p-4">
-            <Breadcrumbs />
             <GoBackButton />
           </div>
 
@@ -103,41 +102,62 @@ export default function OrderDetails() {
               </li>
             </ul>
           </section>
-          <section className="max-w-4xl mx-auto grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
-            {/* 訂單詳情 */}
-            <div className="p-6">
-              <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
-                配送資訊
-              </h3>
-              <p>
-                <strong>地址：</strong>
-                {orderDetails.address || "無資料"}
-              </p>
-              <p>
-                <strong>訂單日期：</strong>
-                {new Date(orderDetails.date).toLocaleDateString()}
-              </p>
-            </div>
 
-            {/* 支付資訊 */}
-            <div className="p-6">
-              <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
-                支付資訊
-              </h3>
-              <p>
-                <strong>持卡人姓名：</strong>
-                {orderDetails.paymentInfo?.cardName || "無資料"}
-              </p>
-              <p>
-                <strong>卡號：</strong>**** **** ****{" "}
-                {orderDetails.paymentInfo?.cardNumber.slice(-4)}
-              </p>
-              <p>
-                <strong>到期日：</strong>
-                {orderDetails.paymentInfo?.expiryDate || "無資料"}
-              </p>
-            </div>
-          </section>
+          {/* 訂單詳情 */}
+          <div className="p-6">
+            <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
+              配送資訊
+            </h3>
+            <p>
+              <strong>地址：</strong>
+              {orderDetails.address || "無資料"}
+            </p>
+            <p>
+              <strong>訂單日期：</strong>
+              {new Date(orderDetails.date).toLocaleDateString()}
+            </p>
+          </div>
+
+          {/* 訂單詳情 */}
+          {/* 配送資訊 */}
+          <div className="p-6">
+            <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
+              配送資訊
+            </h3>
+            <p>
+              <strong>地址：</strong>
+              {orderDetails.address
+                ? `
+                  ${orderDetails.address.address}`
+                : "無資料"}
+              {/* ${orderDetails.address.store_address}, */}
+              {/* ${orderDetails.address.store_name}, */}
+            </p>
+            <p>
+              <strong>訂單日期：</strong>
+              {new Date(orderDetails.date).toLocaleDateString()}
+            </p>
+          </div>
+
+          {/* 支付資訊 */}
+          <div className="p-6">
+            <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
+              支付資訊
+            </h3>
+            <p>
+              <strong>持卡人姓名：</strong>
+              {orderDetails.paymentInfo?.cardName || "無資料"}
+            </p>
+            <p>
+              <strong>卡號：</strong>**** **** ****{" "}
+              {orderDetails.paymentInfo?.cardNumber.slice(-4)}
+            </p>
+            <p>
+              <strong>到期日：</strong>
+              {orderDetails.paymentInfo?.expiryDate || "無資料"}
+            </p>
+          </div>
+
           {/* 訂單商品列表 */}
           <div className="overflow-x-auto px-4 py-6">
             <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4 text-center">

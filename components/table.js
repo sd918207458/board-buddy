@@ -18,11 +18,9 @@ const OrderRow = ({ order }) => {
 
   // 渲染完整地址，避免多餘的逗號
   const fullAddress = order.address
-    ? [order.address, order.address.district, order.address.city]
-        .filter(Boolean) // 移除空值的欄位
-        .join(", ") // 只有存在的值會加入逗號
+    ? `${order.address.address || ""}`
     : "無地址";
-
+  console.log(order.address.address);
   return (
     <tr
       className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 ease-in-out"

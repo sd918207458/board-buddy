@@ -18,7 +18,7 @@ export default function Home() {
       <PopularStores /> {/* 熱門店家輪播圖 */}
       <GroupEvents /> {/* 桌遊揪團活動 */}
       <RecommendedGames /> {/* 推薦桌遊區塊 */}
-      <Test/>
+      {/* <Test/> */}
       <Footer />
     </>
   );

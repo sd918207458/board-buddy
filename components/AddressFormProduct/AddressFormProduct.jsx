@@ -36,6 +36,7 @@ const AddressFormProduct = () => {
     is_default: false,
     store_type: "",
     district: "",
+    street: "",
     detailed_address: "",
   });
   const [addresses, setAddresses] = useState([]);
@@ -168,6 +169,7 @@ const AddressFormProduct = () => {
       city: "",
       district: "",
       detailed_address: "",
+      street: "",
       address: "", // 如果需要清空完整地址欄位
     }));
     setIsEditable(true); // 設置為可編輯狀態
@@ -204,22 +206,41 @@ const AddressFormProduct = () => {
     }
   };
 
+  // 處理選擇不同運送方式的邏輯
   const handleOptionChange = (e) => {
     const selectedMethod = e.target.value;
     console.log("Selected delivery method:", selectedMethod);
+
     setIsConvenienceStore(selectedMethod === "convenience_store");
+
+    // 如果選擇了便利商店取貨，清空地址資料
     if (selectedMethod === "convenience_store") {
       setFormData((prevData) => ({
         ...prevData,
         address: "",
         city: "",
         district: "",
+        street: "",
+        detailed_address: "",
         store_type: "7-11",
       }));
-    } else {
-      const defaultAddress = addresses.find((address) => address.is_default);
-      if (defaultAddress) {
-        updateFormDataWithDefaultAddress(defaultAddress);
+    }
+    // 如果選擇了宅配，保留當前的地址資料，或者使用預設地址
+    else if (selectedMethod === "home_delivery") {
+      const defaultAddressRadio = document.querySelector(
+        'input[name="radio-2"]:checked'
+      );
+      if (defaultAddressRadio && defaultAddressRadio.value === "is_default") {
+        handleDefaultClick(); // 如果選擇了預設地址，抓取預設地址
+      } else {
+        setFormData((prevData) => ({
+          ...prevData,
+          address: formData.address,
+          city: formData.city,
+          district: formData.district,
+          street: formData.street,
+          detailed_address: formData.detailed_address,
+        }));
       }
     }
   };
@@ -546,7 +567,7 @@ const AddressFormProduct = () => {
                 id="address"
                 type="text"
                 name="detailed_address"
-                value={formData.detailed_address}
+                value={`${formData.street}` + `${formData.detailed_address}`}
                 onChange={handleChange}
                 readOnly={!isEditable} // 根據可編輯狀態設置
                 className="block w-full px-4 py-2 mt-2 border rounded-md"
