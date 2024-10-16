@@ -74,34 +74,32 @@ export default function LoggedOutNavbar() {
         </Link>
         <nav className="flex space-x-6">
           <Link href="/" legacyBehavior>
-            <a className="btn btn-ghost text-white flex flex-col items-center">
-              <GiHouse className="w-6 h-6" />
-              <span>首頁</span>
-            </a>
+          <a className="btn btn-ghost flex flex-col items-center text-white hover:text-[#EFB880] transition-colors">
+  <GiHouse className="w-6 h-6 hover:text-[#EFB880]" />
+  <span className="hover:text-[#EFB880]">首頁</span>
+</a>
+
           </Link>
           <Link href="/game-index" legacyBehavior>
-            <a className="btn btn-ghost text-white flex flex-col items-center">
-              <GiThreeFriends className="w-6 h-6" />
-              <span>揪團</span>
-            </a>
+          <a className="btn btn-ghost flex flex-col items-center text-white hover:text-[#EFB880] transition-colors">
+  <GiThreeFriends className="w-6 h-6 hover:text-[#EFB880]" />
+  <span className="hover:text-[#EFB880]">揪團</span>
+</a>
+
           </Link>
           <Link href="/product/product-list" legacyBehavior>
-            <a className="btn btn-ghost text-white flex flex-col items-center">
-              <GiShoppingBag className="w-6 h-6" />
-              <span>商城</span>
-            </a>
+          <a className="btn btn-ghost flex flex-col items-center text-white hover:text-[#EFB880] transition-colors">
+  <GiShoppingBag className="w-6 h-6 hover:text-[#EFB880]" />
+  <span className="hover:text-[#EFB880]">商城</span>
+</a>
+
           </Link>
-          {/* <Link href="/forum" legacyBehavior>
-            <a className="btn btn-ghost text-white flex flex-col items-center">
-              <GiTalk className="w-6 h-6" />
-              <span>討論區</span>
-            </a>
-          </Link> */}
           <Link href="/profile-settings/FAQ" legacyBehavior>
-            <a className="btn btn-ghost text-white flex flex-col items-center">
-              <GiTalk className="w-6 h-6" />
-              <span>常見問題</span>
-            </a>
+          <a className="btn btn-ghost flex flex-col items-center text-white hover:text-[#EFB880] transition-colors">
+  <GiTalk className="w-6 h-6 hover:text-[#EFB880]" />
+  <span className="hover:text-[#EFB880]">常見問題</span>
+</a>
+
           </Link>
         </nav>
       </div>

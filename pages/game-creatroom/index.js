@@ -288,7 +288,7 @@ export default function Createroom() {
           <div className="m-auto">
             <form onSubmit={handleSubmit}>
               <div className="pt-3.5">
-                <label htmlFor="room_name" className="block text-sm text-gray-500 dark:text-gray-300">揪團標題
+                <label htmlFor="room_name" className="block text-sm text-gray-100 dark:text-gray-300">揪團標題
                 <span className="text-red-400 text-xs ml-1">*此欄位必須填寫</span></label>
                 <input
                   type="text"
@@ -302,7 +302,7 @@ export default function Createroom() {
               </div>
 
               <div className="pt-3.5">
-                <label htmlFor="room_intro" className="block text-sm text-gray-500 dark:text-gray-300">揪團介紹</label>
+                <label htmlFor="room_intro" className="block text-sm text-gray-100 dark:text-gray-300">揪團介紹</label>
                 <input
                   type="text"
                   name="room_intro"
@@ -315,7 +315,7 @@ export default function Createroom() {
               </div>
 
               <div className="pt-3.5">
-                <label htmlFor="img" className="block text-sm text-gray-500 dark:text-gray-300">揪團圖片</label>
+                <label htmlFor="img" className="block text-sm text-gray-100 dark:text-gray-300">揪團圖片</label>
                 <input
                   type="file"
                   name="img"
@@ -324,7 +324,7 @@ export default function Createroom() {
                 />
               </div>
               <div className="pt-3.5">
-                <label className="block text-sm text-gray-500 dark:text-gray-300">遊戲選項
+                <label className="block text-sm text-gray-100 dark:text-gray-300">遊戲選項
                 <span className="text-red-400 text-xs ml-1">*此欄位至少選擇一項</span></label>
                 {gameOptions.map((option, index) => (
                   <div key={index} className="flex mt-2">
@@ -363,7 +363,7 @@ export default function Createroom() {
                 </button>
               </div>
               <div className="pt-3.5">
-                <label className="block text-sm text-gray-500 dark:text-gray-300">揪團類型
+                <label className="block text-sm text-gray-100 dark:text-gray-300">揪團類型
                 <span className="text-red-400 text-xs ml-1">*此欄位必須填寫</span></label>
                 <div className="flex items-center mt-2">
                   <label className="mr-4 text-gray-300">
@@ -389,7 +389,7 @@ export default function Createroom() {
                 </div>
               </div>
               <div className="pt-3.5">
-                <label htmlFor="event_date" className="block text-sm text-gray-500 dark:text-gray-300">活動日期
+                <label htmlFor="event_date" className="block text-sm text-gray-100 dark:text-gray-300">活動日期
                 <span className="text-red-400 text-xs ml-1">*此欄位必須填寫</span></label>
                 <div className="flex items-center">
                   <input
@@ -405,7 +405,7 @@ export default function Createroom() {
               </div>
 
               <div className="pt-3.5">
-                <label htmlFor="minperson" className="block text-sm text-gray-500 dark:text-gray-300">最少幾人
+                <label htmlFor="minperson" className="block text-sm text-gray-100 dark:text-gray-300">最少幾人
                 <span className="text-red-400 text-xs ml-1">*此欄位必須填寫</span></label>
                 <input
                   type="number"
@@ -419,7 +419,7 @@ export default function Createroom() {
               </div>
 
               <div className="pt-3.5">
-                <label htmlFor="maxperson" className="block text-sm text-gray-500 dark:text-gray-300">最多幾人
+                <label htmlFor="maxperson" className="block text-sm text-gray-100 dark:text-gray-300">最多幾人
                 <span className="text-red-400 text-xs ml-1">*此欄位必須填寫</span></label>
                 <input
                   type="number"
@@ -433,7 +433,7 @@ export default function Createroom() {
               </div>
 
               <div className="pt-3.5">
-                <label htmlFor="location" className="block text-sm text-gray-500 dark:text-gray-300">活動地點
+                <label htmlFor="location" className="block text-sm text-gray-100 dark:text-gray-300">活動地點
                 <span className="text-red-400 text-xs ml-1">*此欄位必須填寫</span></label>
                 <input
                   type="text"
@@ -447,7 +447,7 @@ export default function Createroom() {
               </div>
 
               <div className="pt-3.5">
-                <label htmlFor="roomrule" className="block text-sm text-gray-500 dark:text-gray-300">揪團規則</label>
+                <label htmlFor="roomrule" className="block text-sm text-gray-100 dark:text-gray-300">揪團規則</label>
                 <textarea
                   name="roomrule"
                   placeholder="請輸入揪團規則"

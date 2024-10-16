@@ -143,7 +143,7 @@ export default function Favorites() {
       <figure>
         {store.img ? (
           <img
-            src={store.img}
+            src={store.img ? `http://localhost:3005/room/${store.img}` : "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1470&q=80"}
             alt={store.room_name}
             className="rounded-t-lg h-48 w-full object-cover"
           />
