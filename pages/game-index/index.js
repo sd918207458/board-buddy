@@ -197,9 +197,13 @@ export default function Gameindex() {
                     </h1>
                     <br />
                     <div className="flex justify-center items-center">
-                    <button className="px-4 py-2 w-32 text-[#003E52] border border-[#003E52] bg-transparent rounded hover:bg-[#003E52] hover:text-white transition-colors">
+                    <button 
+  className="px-4 py-2 w-32 text-[#003E52] border border-[#003E52] bg-transparent rounded hover:bg-[#003E52] hover:text-white transition-colors"
+  onClick={() => window.open('https://www.facebook.com/GrowLifegameshop/?locale=zh_TW', '_blank')}
+>
   前往粉專
 </button>
+
 
                     </div>
                     </div>
