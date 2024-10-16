@@ -97,7 +97,8 @@ const Carousel = ({ gamesData }) => {
                                 type={typeDisplay}  
                                 game={games} 
                                 location={location} 
-                                date={event_date} 
+                                date={event_date.split('T')[0]}
+
                             />
                         );
                     })}

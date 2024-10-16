@@ -593,8 +593,8 @@ const handleSaveEdit = async (editedData) => {
                           <h2 className="card-title">{item.room_name}</h2>
                           <ul className="list-disc list-inside">
                             <li>地址：{item.location}</li>
-                            <li>時間：{item.event_date}</li>
-                            <li>遊戲：{item.game1}.遊戲：{item.game2}.遊戲：{item.game3}</li>
+                            <li>時間：{item.event_date.split('T')[0]}</li>
+                            <li>遊戲：{item.game1}.{item.game2}.{item.game3}</li>
                           </ul>
                         </div>
                       </div>
@@ -632,7 +632,8 @@ const handleSaveEdit = async (editedData) => {
                           <h2 className="card-title">{record.room_name}</h2>
                           <ul className="list-disc list-inside">
                             <li>地址：{record.location}</li>
-                            <li>時間：{record.event_date}</li>
+                            <li>時間：{record.event_date.split('T')[0]}</li>
+                            <li>遊戲：{record.game1}.{record.game2}.{record.game3}</li>
                           </ul>
                         </div>
                       </div>
@@ -664,7 +665,7 @@ const handleSaveEdit = async (editedData) => {
                             <h2 className="card-title">{post.room_name}</h2>
                             <ul className="list-disc list-inside">
                               <li>地址：{post.location}</li>
-                              <li>時間：{post.event_date}</li>
+                              <li>時間：{post.event_date.split('T')[0]}</li>
                               <li>遊戲：{post.game1}.{post.game2}.{post.game3}</li>
                             </ul>
                             <div className="absolute top-2 right-2 space-x-2">

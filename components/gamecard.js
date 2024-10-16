@@ -79,7 +79,8 @@ const GameCard = ({ game }) => {
                     <div className="ml-4 text-sm text-gray-100 dark:text-gray-300">
                         <p>遊戲: {game.game1}, {game.game2}, {game.game3}</p>
                         <p>地點: {game.location}</p>
-                        <p>日期: {game.event_date}</p>
+                        <p>日期: {game.event_date.split('T')[0]}</p>
+
                     </div>
                 </div>
 

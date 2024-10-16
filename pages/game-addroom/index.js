@@ -135,11 +135,26 @@ export default function Addroom() {
 
         </div>
       </div>
-      <div className="flex justify-center bg-white py-4"> {/* 增加一些底部边距和白色背景 */}
-        <button onClick={handleJoinRoom} className="mx-4 bg-blue-600 text-white px-4 py-2 rounded">加入房間</button>
-        <button className="mx-4 bg-green-600 text-white px-4 py-2 rounded">聯絡房主</button>
-        <button onClick={() => router.push('http://localhost:3000/game-index')} className="mx-4 bg-gray-600 text-white px-4 py-2 rounded">返回遊戲列表</button>
-      </div>
+      <div className="flex justify-center bg-white py-4">
+  <button
+    onClick={handleJoinRoom}
+    className="mx-4 border border-[#003E52] text-[#003E52] px-4 py-2 rounded transition-transform transform hover:scale-110 hover:bg-[#003E52] hover:text-white"
+  >
+    加入房間
+  </button>
+  <button
+    className="mx-4 border border-[#003E52] text-[#003E52] px-4 py-2 rounded transition-transform transform hover:scale-110 hover:bg-[#003E52] hover:text-white"
+  >
+    聯絡房主
+  </button>
+  <button
+    onClick={() => router.push('http://localhost:3000/game-index')}
+    className="mx-4 border border-[#003E52] text-[#003E52] px-4 py-2 rounded transition-transform transform hover:scale-110 hover:bg-[#003E52] hover:text-white"
+  >
+    返回遊戲列表
+  </button>
+</div>
+
 
       <Footer />
     </>
