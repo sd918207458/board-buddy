@@ -22,7 +22,7 @@ const GroupEvents = () => {
             title: "策略桌遊比賽 - 激烈對決",
             date: "2024年10月5日 14:00",
             location: "高雄桌遊俱樂部",
-            image: "/home_assets/桌遊活動2.jpg",
+            image: "/home_assets/桌遊活動4.jpg",
           },
           {
             id: 3,
