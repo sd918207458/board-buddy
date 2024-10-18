@@ -145,7 +145,7 @@ const EditRoomModal = ({ roomData, onClose, onSave }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
   <div className="bg-white p-5 rounded-md w-full max-w-md shadow-lg overflow-auto max-h-[90vh]">
-    <h2 className="text-lg font-bold">編輯房间</h2>
+    <h2 className="text-lg font-bold">編輯房間</h2>
 
     <div className="mb-2">
       <label className="block text-sm text-gray-700">房間名稱</label>
